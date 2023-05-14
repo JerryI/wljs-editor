@@ -1,0 +1,43 @@
+{
+  "name": "wljs-editor",
+  "version": "0.0.1",
+  "description": "WLJS Code editor",
+  "scripts": {
+    "build": "node --max-old-space-size=8192 ./node_modules/.bin/rollup --config rollup.config.mjs"
+  },
+  "wljs-meta": {
+    "jsmodule": [
+      "dist/kernel.js",
+      "dist/boxes.js"
+    ],
+    "wlkernel": "src/boxes.wl",
+    "wl": "src/processor.wl",
+    "priority": -10
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JerryI/wolfram-js-frontend00"
+  },
+  "dependencies": {
+      "@codemirror/legacy-modes": "6.3.2",
+      "@codemirror/state": "6.2.0",
+      "@codemirror/stream-parser": "0.19.9",
+      "@codemirror/view": "6.9.6",
+
+      "@codemirror/lang-html" : "6.4.2",
+      "@codemirror/lang-javascript": "6.1.4",
+      "@codemirror/lang-markdown": "6.1.1",
+      
+
+      "codemirror": "6.0.1",
+      "parcel-bundler": "1.12.5",
+      "rainbowbrackets": "^2.0.2",
+    "mma-uncompress": "^1.0.1",
+    "node-balanced": "^0.0.14",
+    "priceless-mathematica": "^1.1.2",
+    "rollup": "^3.21.6"
+  },
+  "resolutions": {
+    "@babel/preset-env": "7.13.8"
+  }
+}
