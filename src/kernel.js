@@ -50,6 +50,8 @@ import {StreamLanguage} from "@codemirror/language"
 import {spreadsheet} from "@codemirror/legacy-modes/mode/spreadsheet"
 
 import { wolframLanguage } from "priceless-mathematica/src/mathematica/mathematica"
+import { defaultFunctions } from "priceless-mathematica/src/mathematica/functions"
+
 import { Arrowholder, Greekholder } from "priceless-mathematica/src/sugar/misc"
 import { fractionsWidget } from "priceless-mathematica/src/sugar/fractions";
 import { subscriptWidget } from "priceless-mathematica/src/sugar/subscript";
@@ -64,6 +66,14 @@ const languageConf = new Compartment
 
 let globalExtensions = []
 
+window.EditorAutocomplete = defaultFunctions;
+window.EditorAutocomplete.extend = (list) => {
+  window.EditorAutocomplete.push(...list);
+  wolframLanguage.reBuild(window.EditorAutocomplete);
+}
+
+console.log('loaded!');
+
 const validator = new Balanced({
   open: ['{', '[', '('],
   close: ['}', ']', ')'],
@@ -71,22 +81,20 @@ const validator = new Balanced({
 });
 
 const unknownLanguage = StreamLanguage.define(spreadsheet);
-const regLang = new RegExp(/^[^\.\s]*\.[^\.\s]+/);
+const regLang = new RegExp(/^[\w]*\.[\w]+/);
 
 function checkDocType(str) {
   const r = regLang.exec(str);
-  console.log('checking string...');
-  console.log(r);
 
   const arr = Object.values(window.SupportedLanguages);
 
   for (let i=0; i<arr.length; ++i) {
-    console.log(arr[i]);
-    console.log(arr[i].check(r));
+    //console.log(arr[i]);
+    //console.log(arr[i].check(r));
     if (arr[i].check(r)) return arr[i];
   }
 
-  console.log('unknown language');
+
 
   /*switch(r[1]) {
     case 'js': 
@@ -108,8 +116,7 @@ const autoLanguage = EditorState.transactionExtender.of(tr => {
 
   if (docType.legacy) {
     //hard to distinguish...
-    console.log('legacy mode');
-    console.log(tr.startState.facet(language));
+
 
     if (tr.startState.facet(language).name == docType.name) return null;
     console.log('switching... to '+docType.name);
@@ -119,7 +126,7 @@ const autoLanguage = EditorState.transactionExtender.of(tr => {
 
   } else {
     //if it is the same
-    console.log('non-legacy mode');
+
     if (docType.name === tr.startState.facet(language).name) return null;
 
     console.log('switching... to '+docType.name);
@@ -335,7 +342,7 @@ compactWLEditor = (args) => {
     args.extensions || [],   
     minimalSetup,
     editorCustomThemeCompact,      
-    wolframLanguage,
+    wolframLanguage.of(window.EditorAutocomplete),
     ExecutableHolder,
     fractionsWidget(compactWLEditor),
     subscriptWidget(compactWLEditor),
@@ -363,7 +370,7 @@ compactWLEditor = (args) => {
 
 
 const mathematicaPlugins = [
-  wolframLanguage, 
+  wolframLanguage.of(window.EditorAutocomplete), 
   ExecutableHolder, 
   fractionsWidget(compactWLEditor),
   subscriptWidget(compactWLEditor),
@@ -443,13 +450,9 @@ class CodeMirrorCell {
     constructor(parent, data) {
       this.origin = parent;
       const origin = this.origin;
-
-      console.log('new data');
-      console.log(data);
       
       const initialLang = checkDocType(data).plugins;
-      console.log('language: ');
-      console.log(initialLang);
+
       const editor = new EditorView({
         doc: data,
         extensions: [
@@ -572,7 +575,7 @@ class CodeMirrorCell {
         parent: element
       });
       
-      return this;
+
   }
   
   window.SupportedLanguages.push({

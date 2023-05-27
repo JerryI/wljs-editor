@@ -27046,6 +27046,30 @@ function regExpFromArray (array, flags, grouped) {
 
 	return new RegExp(string, flags || undefined);
 }
+
+/**
+ * returns an array of ranges that are not in the without ranges
+ * 
+ * @param  {Array} ranges
+ * @param  {Array} without
+ * @return {Array}
+ */
+function rangesWithout (ranges, without) {
+	return ranges.filter(function (range) {
+		var ignored = false;
+
+		for (var i = 0; i < without.length; i++) {
+			if (isIndexInRage(range.index, without[i])) {
+				ignored = true;
+				break;
+			}
+		}
+
+		return !ignored;
+	});
+}
+var getRangesForMatch_1 = getRangesForMatch;
+var rangesWithout_1 = rangesWithout;
 // exports.escapeRegExp = escapeRegExp;
 // exports.regExpFromArray = regExpFromArray;
 
@@ -34429,7 +34453,7 @@ With[{s = #},
 ExportString[%, "JSON"
 */
 
-const functions = [
+let defaultFunctions = [
   {
     "label":"AASTriangle",
     "type":"keyword",
@@ -36709,11 +36733,6 @@ const functions = [
     "label":"BeginDialogPacket",
     "type":"keyword",
     "info":"BeginDialogPacket[integer] is a WSTP packet that indicates the start of the Dialog subsession refere"
-  },
-  {
-    "label":"BeginFrontEndInteractionPacket",
-    "type":"keyword",
-    "info":"System`BeginFrontEndInteractionPacket"
   },
   {
     "label":"BeginPackage",
@@ -43866,11 +43885,6 @@ const functions = [
     "info":"EndDialogPacket[integer] is a WSTP packet indicating the end of the Dialog subsession referenced by "
   },
   {
-    "label":"EndFrontEndInteractionPacket",
-    "type":"keyword",
-    "info":"System`EndFrontEndInteractionPacket"
-  },
-  {
     "label":"EndOfBuffer",
     "type":"keyword",
     "info":"EndOfBuffer is a symbol that represents the end of currently available data in the buffer for a proc"
@@ -46401,61 +46415,6 @@ const functions = [
     "info":"Front is a symbol that represents the front of a graphic for purposes of placement and alignment."
   },
   {
-    "label":"FrontEndDynamicExpression",
-    "type":"keyword",
-    "info":"FrontEndDynamicExpression is a global front end option that specifies an expression to be dynamicall"
-  },
-  {
-    "label":"FrontEndEventActions",
-    "type":"keyword",
-    "info":"FrontEndEventActions is an option for the notebook front end that gives a list of actions to perform"
-  },
-  {
-    "label":"FrontEndExecute",
-    "type":"keyword",
-    "info":"FrontEndExecute[expr] sends expr to be executed by the Wolfram System front end. "
-  },
-  {
-    "label":"FrontEndObject",
-    "type":"keyword",
-    "info":"System`FrontEndObject"
-  },
-  {
-    "label":"FrontEndResource",
-    "type":"keyword",
-    "info":"System`FrontEndResource"
-  },
-  {
-    "label":"FrontEndResourceString",
-    "type":"keyword",
-    "info":"System`FrontEndResourceString"
-  },
-  {
-    "label":"FrontEndStackSize",
-    "type":"keyword",
-    "info":"System`FrontEndStackSize"
-  },
-  {
-    "label":"FrontEndToken",
-    "type":"keyword",
-    "info":"FrontEndToken[\"cmd\"] is an object that represents a front end command token, typically corresponding"
-  },
-  {
-    "label":"FrontEndTokenExecute",
-    "type":"keyword",
-    "info":"FrontEndTokenExecute[\"cmd\"] executes the specified front end command token, typically corresponding "
-  },
-  {
-    "label":"FrontEndValueCache",
-    "type":"keyword",
-    "info":"System`FrontEndValueCache"
-  },
-  {
-    "label":"FrontEndVersion",
-    "type":"keyword",
-    "info":"System`FrontEndVersion"
-  },
-  {
     "label":"FrontFaceColor",
     "type":"keyword",
     "info":"System`FrontFaceColor"
@@ -47474,11 +47433,6 @@ const functions = [
     "label":"GetFileName",
     "type":"keyword",
     "info":"System`GetFileName"
-  },
-  {
-    "label":"GetFrontEndOptionsDataPacket",
-    "type":"keyword",
-    "info":"System`GetFrontEndOptionsDataPacket"
   },
   {
     "label":"GetLinebreakInformationPacket",
@@ -54771,16 +54725,6 @@ const functions = [
     "info":"NebulaData[entity, property] gives the value of the specified property for the nebula entity.NebulaD"
   },
   {
-    "label":"NeedCurrentFrontEndPackagePacket",
-    "type":"keyword",
-    "info":"System`NeedCurrentFrontEndPackagePacket"
-  },
-  {
-    "label":"NeedCurrentFrontEndSymbolsPacket",
-    "type":"keyword",
-    "info":"System`NeedCurrentFrontEndSymbolsPacket"
-  },
-  {
     "label":"NeedlemanWunschSimilarity",
     "type":"keyword",
     "info":"NeedlemanWunschSimilarity[u, v] gives a number representing the NeedlemanâWunsch similarity between "
@@ -58639,11 +58583,6 @@ const functions = [
     "label":"PrivateFontOptions",
     "type":"keyword",
     "info":"PrivateFontOptions is an option for selections that specifies settings for various font suboptions."
-  },
-  {
-    "label":"PrivateFrontEndOptions",
-    "type":"keyword",
-    "info":"System`PrivateFrontEndOptions"
   },
   {
     "label":"PrivateKey",
@@ -66951,11 +66890,6 @@ const functions = [
     "info":"Using is an option to Roots that specifies any subsidiary equations that are to be used."
   },
   {
-    "label":"UsingFrontEnd",
-    "type":"keyword",
-    "info":"UsingFrontEnd[expr] evaluates expr, making use of a front end if necessary."
-  },
-  {
     "label":"UtilityFunction",
     "type":"keyword",
     "info":"UtilityFunction is an option for Predict, Classify, and related functions that specifies the utility"
@@ -68589,84 +68523,7 @@ const functions = [
     "label":"ZTransform",
     "type":"keyword",
     "info":"ZTransform[expr, n, z] gives the Z transform of expr. ZTransform[expr, {n , n , â¦}, {z , z , â¦}] giv"
-  },
-  {
-    "label":"Plotly",
-    "type":"keyword",
-    "info":"Plotly[expr, {x, 0, 1}] gives an interactive plot of a expr"
-  },   
-  {
-    "label":"ListPlotly",
-    "type":"keyword",
-    "info":"ListPlotly[{{x1,y1},{x2,y2}...}] gives an interactive plot of data"
-  }, 
-  {
-    "label":"ListLinePlotly",
-    "type":"keyword",
-    "info":"ListLinePlotly[{{x1,y1},{x2,y2}...}] gives an interactive plot of data"
   },  
-  {
-    "label":"HTMLForm",
-    "type":"keyword",
-    "info":"HTMLForm[\"<h1>Hi!</h1>\"] prints custom HTML script"
-  },  
-  {
-    "label":"SVGForm",
-    "type":"keyword",
-    "info":"SVGForm[expr] exports and displays any object as SVG graphics"
-  },  
-  {
-    "label":"CreateFrontEndObject",
-    "type":"keyword",
-    "info":"CreateFrontEndObject[expr, uid] put expr into sharable dynamic expression with uid as id, that can be read by frontend"
-  },
-  {
-    "label":"FrontEndRef",
-    "type":"keyword",
-    "info":"FrontEndRef[object or uid] acts as a reference to frontend object. Prevents evaluation on a Kernel"
-  }, 
-  {
-    "label":"FrontEndOnly",
-    "type":"keyword",
-    "info":"FrontEndOnly[expr] prevents evaluation on a Kernel"
-  },  
-  {
-    "label":"SendToFrontEnd",
-    "type":"keyword",
-    "info":"SendToFrontEnd[expr] evaluate arbitary expression on frontend"
-  }, 
-  {
-    "label":"EventObject",
-    "type":"keyword",
-    "info":"EventObject[<|expr|>] a holder of the event object"
-  },   
-  {
-    "label":"EventBind",
-    "type":"keyword",
-    "info":"EventBind[EventObject[event], handler] binds a handler to event"
-  },    
-  {
-    "label":"RequestAnimationFrame",
-    "type":"keyword",
-    "info":"RequestAnimationFrame an wrapper for ListLinePlotly or ListPlotly"
-  },
-  {
-    "label":"SetFrontEndObject",
-    "type":"keyword",
-    "info":"SetFrontEndObject[obj or uid, expr] sets the frontend object by itself or uid to an arbitary expr"
-  },
-  {
-    "label":"EventRemove",
-    "type":"keyword",
-    "info":"EventRemove[EventObject[event]] removes handler from event"
-  },  
-  {
-    "label":"InputField",
-    "type":"keyword",
-    "info":"InputField[\"default string\"] creates an input form"
-  },    
-
-  
 	{
 		"label":"ECcaEC",
 		"type":"text",
@@ -69074,12 +68931,12 @@ function newESC() {
   };
 }
 
-function Completions(context) {
+function Completions(context, defaultFunctions) {
   let word = context.matchBefore(/\w*/);
   if (word.from === word.to && !context.explicit) return null;
   return {
     from: word.from,
-    options: functions
+    options: defaultFunctions
   };
 }
 
@@ -69106,7 +68963,7 @@ var reIdInContext = new RegExp(
   "(?:`?)(?:" + Identifier + ")(?:`(?:" + Identifier + "))*(?:`?)"
 );
 
-const builtins = functions.map((e) => e.label);
+let builtins = defaultFunctions.map((e) => e.label);
 
 const builtinsSpecial = [
   "True",
@@ -69300,16 +69157,36 @@ const mathematica = {
   }
 };
 
-const wolframLanguage = [
+let wolframLanguage;
+
+wolframLanguage = [
   StreamLanguage.define(mathematica),
   autocompletion({
     override: [
-      async (ctx) => Completions(ctx)
+      async (ctx) => Completions(ctx, defaultFunctions)
       //snippetCompletion('mySnippet(${one}, ${two})', {label: 'mySnippet'})
     ]
   }),
   keymap.of([{ key: "Escape", run: newESC() }])
 ];
+
+wolframLanguage.of = (vocabulary) => {
+
+  return [
+    StreamLanguage.define(mathematica),
+    autocompletion({
+      override: [
+        async (ctx) => Completions(ctx, vocabulary)
+        //snippetCompletion('mySnippet(${one}, ${two})', {label: 'mySnippet'})
+      ]
+    }),
+    keymap.of([{ key: "Escape", run: newESC() }])
+  ];  
+};
+
+wolframLanguage.reBuild = (vocabulary) => {
+  builtins = vocabulary.map((e) => e.label);
+};
 
 const GreekMatcher = new MatchDecorator({
   regexp: /\$([a-zA-z]+)\$/g,
@@ -69445,74 +69322,162 @@ function isCursorInside(update, from, to, inclusive = true) {
   return false;
 }
 
+String.prototype.splitNoQuotes = function (expr) {
+ 
+const arr = [];
+const source = this;
+
+var ignore = getRangesForMatch_1(source, /\"[^\"]*\"/g);
+var quotes = getRangesForMatch_1(source, new RegExp(expr, 'g'));
+quotes = rangesWithout_1(quotes, ignore); 
+
+let index = 0;
+for (let i=0; i<quotes.length; ++i) {
+  arr.push(source.substring(index, quotes[i].index));
+  index = quotes[i].index + 1;
+}
+
+if (index < source.length) {
+  arr.push(source.substring(index));
+}
+
+return arr;
+};
+
+const explodeArgs = (re, cursor, pos, f) => {
+    new Balanced_1({
+        head: re,
+        open: "[",
+        close: "]",
+        balance: false
+    })
+        .matchContentsInBetweenBrackets(cursor.value, [])
+        .forEach(function (m) {
+        var sub = cursor.value.substring(m.index + m.head.length, m.index + m.length - 1);
+        
+      
+        const blockString = getRangesForMatch_1(sub, /\"[^\"]*\"/g);
+      
+        var compoundMatches = new Balanced_1({
+            open: ["[", "{"],
+            close: ["]", "}"],
+            balance: [false, false],
+            ignore: Array.prototype.concat.call([], blockString)
+        }).matchContentsInBetweenBrackets(sub, []);
+      
+        let SyntaxTree = [];
+        var lastIndex = 0;
+        //console.log(compoundMatches);
+      
+       
+      
+        const getNext = (list) => {
+          if (list.length == 0) {
+            if (lastIndex < sub.length) {
+              const before = sub.substring(lastIndex).trim();
+              if (before[0] === ',') {
+                SyntaxTree.push({before: before, type: 1});
+              } else {
+                const splitted = before.splitNoQuotes(',');
+                if (splitted.length == 1) {
+                  let prev = SyntaxTree[SyntaxTree.length-1];
+                 
+                  prev.enclosed += before;
+                  SyntaxTree[SyntaxTree.length-1] = prev;
+                } else {
+                  let prev = SyntaxTree[SyntaxTree.length-1];
+                  prev.enclosed += splitted.shift();
+                  SyntaxTree[SyntaxTree.length-1] = prev;  
+                  
+                  SyntaxTree.push({before: ','+splitted.join(','), type: 1});
+                }
+              }
+            }
+            return;
+          }
+          
+          const e = list.shift();
+          const before = sub.substring(lastIndex, e.index).trim();
+          const enclosed = sub.substring(e.index, e.index + e.length).trim();
+        
+          
+          
+          if (lastIndex > 0) {
+            if (before[0] === ',') {
+              SyntaxTree.push({before, enclosed, type: 0});
+            } else {
+              let prev = SyntaxTree[SyntaxTree.length-1];
+              prev.enclosed += before + enclosed;
+              SyntaxTree[SyntaxTree.length-1] = prev;
+            }
+          } else {
+            SyntaxTree.push({before, enclosed, type: 0});
+          }
+          
+          lastIndex = e.index + e.length;
+          getNext(list);
+        };
+
+        if (compoundMatches.length !== 0)
+          getNext(compoundMatches);
+        else
+          SyntaxTree.push({before: sub, type: 1});
+      
+     
+        
+
+        var args = [];
+      
+        SyntaxTree.reverse().forEach(function (s) {
+            var localargs = [];
+            if (s.before.length == 0) {
+                localargs.push(s.enclosed.trim());
+                args.push(localargs);
+                return;
+            }
+            var matches = s.before.splitNoQuotes(",");
+            if (SyntaxTree.length > 1)
+                matches.shift();
+          
+   
+          
+            if (matches.length == 0) {
+                matches = [s.before];
+              
+            }
+          
+            if (s.type == 0) {
+                const a = ((matches.pop() + s.enclosed));
+                  matches.forEach(function (a) {
+                     localargs.push(a.trim());
+                });
+              localargs.push(a.trim());
+              
+            } else {
+                matches.forEach(function (a) {
+                    localargs.push(a.trim());
+                });
+            }
+            args.push(localargs);
+        });
+
+        f(pos + m.index, {
+            length: m.length,
+            pos: pos + m.index,
+            args: args.reverse().flat(),
+            str: sub
+        });
+
+    });
+};
+
 function iterMatches(doc, re, from, to, f) {
     re.lastIndex = 0;
     var _loop_1 = function (cursor, pos, m) {
         if (!cursor.lineBreak) {
-            new Balanced_1({
-                head: re,
-                open: "[",
-                close: "]",
-                balance: false
-            })
-                .matchContentsInBetweenBrackets(cursor.value, [])
-                .forEach(function (m) {
-                var sub = cursor.value.substring(m.index + m.head.length, m.index + m.length - 1);
-                //console.log(sub);
-                var compoundMatches = new Balanced_1({
-                    open: ["[", "{"],
-                    close: ["]", "}"],
-                    balance: [false, false]
-                }).matchContentsInBetweenBrackets(sub, []);
-                var SyntaxTree = [];
-                var lastIndex = 0;
-                compoundMatches.forEach(function (e) {
-                    SyntaxTree.push({
-                        begin: sub.substring(lastIndex, e.index),
-                        expr: sub.substring(e.index, e.index + e.length),
-                        type: 0
-                    });
-                    lastIndex = e.index + e.length;
-                });
-                if (lastIndex < sub.length - 1) {
-                    SyntaxTree.push({
-                        begin: sub.substring(lastIndex),
-                        type: 1
-                    });
-                }
-                var args = [];
-                SyntaxTree.reverse().forEach(function (s) {
-                    var localargs = [];
-                    if (s.begin.length == 0) {
-                        localargs.push(s.expr);
-                        return;
-                    }
-                    var matches = s.begin.split(",");
-                    if (SyntaxTree.length > 1)
-                        matches.shift();
-                    if (matches.length == 0)
-                        matches = [s.begin];
-                    if (s.type == 0) {
-                        localargs.push((matches.pop() + s.expr).trim());
-                        if (matches.length > 0)
-                            matches.forEach(function (a) {
-                                localargs.push(a.trim());
-                            });
-                    }
-                    else {
-                        matches.forEach(function (a) {
-                            localargs.push(a.trim());
-                        });
-                    }
-                    args.push.apply(args, localargs.reverse());
-                });
-                f(pos + m.index, {
-                    length: m.length,
-                    pos: pos + m.index,
-                    args: args.reverse(),
-                    str: sub
-                });
-            });
+
+            explodeArgs(re, cursor, pos, f);        
+            
         }
     };
     for (var cursor = doc.iterRange(from, to), pos = from, m = void 0; !cursor.next().done; pos += cursor.value.length) {
@@ -69626,7 +69591,7 @@ var BallancedMatchDecorator = /** @class */ (function () {
                     return ranges_1.push(deco.range(from, to));
                 };
                 if (fromLine == toLine) {
-                    console.error("It migtht not works, since it did not implement it correctly");
+                    console.log("It migtht not works, since it did not implement it correctly");
                     /*this.regexp.lastIndex = start - fromLine.from
                     while ((m = this.regexp.exec(fromLine.text)) && m.index < end - fromLine.from)
                       this.addMatch(m, view, m.index + fromLine.from, add)*/
@@ -69724,6 +69689,8 @@ let Widget$4 = class Widget extends WidgetType {
   toDOM(view) {
     let span = document.createElement("span");
     span.classList.add('fraction');
+
+    //console.log(this.visibleValue.args);
 
     if (this.visibleValue.args.length !== 2) {
       this.visibleValue.args = ["_", "_"];
@@ -70975,6 +70942,14 @@ const languageConf = new Compartment;
 
 let globalExtensions = [];
 
+window.EditorAutocomplete = defaultFunctions;
+window.EditorAutocomplete.extend = (list) => {
+  window.EditorAutocomplete.push(...list);
+  wolframLanguage.reBuild(window.EditorAutocomplete);
+};
+
+console.log('loaded!');
+
 const validator = new Balanced_1({
   open: ['{', '[', '('],
   close: ['}', ']', ')'],
@@ -70982,22 +70957,20 @@ const validator = new Balanced_1({
 });
 
 const unknownLanguage = StreamLanguage.define(spreadsheet);
-const regLang = new RegExp(/^[^\.\s]*\.[^\.\s]+/);
+const regLang = new RegExp(/^[\w]*\.[\w]+/);
 
 function checkDocType(str) {
   const r = regLang.exec(str);
-  console.log('checking string...');
-  console.log(r);
 
   const arr = Object.values(window.SupportedLanguages);
 
   for (let i=0; i<arr.length; ++i) {
-    console.log(arr[i]);
-    console.log(arr[i].check(r));
+    //console.log(arr[i]);
+    //console.log(arr[i].check(r));
     if (arr[i].check(r)) return arr[i];
   }
 
-  console.log('unknown language');
+
 
   /*switch(r[1]) {
     case 'js': 
@@ -71019,8 +70992,7 @@ const autoLanguage = EditorState.transactionExtender.of(tr => {
 
   if (docType.legacy) {
     //hard to distinguish...
-    console.log('legacy mode');
-    console.log(tr.startState.facet(language));
+
 
     if (tr.startState.facet(language).name == docType.name) return null;
     console.log('switching... to '+docType.name);
@@ -71030,7 +71002,7 @@ const autoLanguage = EditorState.transactionExtender.of(tr => {
 
   } else {
     //if it is the same
-    console.log('non-legacy mode');
+
     if (docType.name === tr.startState.facet(language).name) return null;
 
     console.log('switching... to '+docType.name);
@@ -71246,7 +71218,7 @@ compactWLEditor = (args) => {
     args.extensions || [],   
     minimalSetup,
     editorCustomThemeCompact,      
-    wolframLanguage,
+    wolframLanguage.of(window.EditorAutocomplete),
     ExecutableHolder,
     fractionsWidget(compactWLEditor),
     subscriptWidget(compactWLEditor),
@@ -71274,7 +71246,7 @@ compactWLEditor = (args) => {
 
 
 const mathematicaPlugins = [
-  wolframLanguage, 
+  wolframLanguage.of(window.EditorAutocomplete), 
   ExecutableHolder, 
   fractionsWidget(compactWLEditor),
   subscriptWidget(compactWLEditor),
@@ -71349,13 +71321,9 @@ class CodeMirrorCell {
     constructor(parent, data) {
       this.origin = parent;
       const origin = this.origin;
-
-      console.log('new data');
-      console.log(data);
       
       const initialLang = checkDocType(data).plugins;
-      console.log('language: ');
-      console.log(initialLang);
+
       const editor = new EditorView({
         doc: data,
         extensions: [
@@ -71473,7 +71441,7 @@ class CodeMirrorCell {
         parent: element
       });
       
-      return undefined;
+
   };
   
   window.SupportedLanguages.push({

@@ -8,15 +8,16 @@
   "wljs-meta": {
     "jsmodule": [
       "dist/kernel.js",
-      "dist/boxes.js"
+      "src/boxes.js"
     ],
     "wlkernel": "src/boxes.wl",
     "wl": "src/processor.wl",
+    "autocomplete": "src/autocomplete.js",
     "priority": -10
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/JerryI/wolfram-js-frontend00"
+    "url": "https://github.com/JerryI/wljs-editor"
   },
   "dependencies": {
       "@codemirror/legacy-modes": "6.3.2",
@@ -34,7 +35,7 @@
       "rainbowbrackets": "^2.0.2",
     "mma-uncompress": "^1.0.1",
     "node-balanced": "^0.0.14",
-    "priceless-mathematica": "^1.1.2",
+    "priceless-mathematica": "^1.1.8",
     "rollup": "^3.21.6"
   },
   "resolutions": {

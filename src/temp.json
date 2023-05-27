@@ -1,0 +1,55 @@
+  {
+    "label":"FrontEndDynamicExpression",
+    "type":"keyword",
+    "info":"FrontEndDynamicExpression is a global front end option that specifies an expression to be dynamicall"
+  },
+  {
+    "label":"FrontEndEventActions",
+    "type":"keyword",
+    "info":"FrontEndEventActions is an option for the notebook front end that gives a list of actions to perform"
+  },
+  {
+    "label":"FrontEndExecute",
+    "type":"keyword",
+    "info":"FrontEndExecute[expr] sends expr to be executed by the Wolfram System front end. "
+  },
+  {
+    "label":"FrontEndObject",
+    "type":"keyword",
+    "info":"System`FrontEndObject"
+  },
+  {
+    "label":"FrontEndResource",
+    "type":"keyword",
+    "info":"System`FrontEndResource"
+  },
+  {
+    "label":"FrontEndResourceString",
+    "type":"keyword",
+    "info":"System`FrontEndResourceString"
+  },
+  {
+    "label":"FrontEndStackSize",
+    "type":"keyword",
+    "info":"System`FrontEndStackSize"
+  },
+  {
+    "label":"FrontEndToken",
+    "type":"keyword",
+    "info":"FrontEndToken[\"cmd\"] is an object that represents a front end command token, typically corresponding"
+  },
+  {
+    "label":"FrontEndTokenExecute",
+    "type":"keyword",
+    "info":"FrontEndTokenExecute[\"cmd\"] executes the specified front end command token, typically corresponding "
+  },
+  {
+    "label":"FrontEndValueCache",
+    "type":"keyword",
+    "info":"System`FrontEndValueCache"
+  },
+  {
+    "label":"FrontEndVersion",
+    "type":"keyword",
+    "info":"System`FrontEndVersion"
+  },
