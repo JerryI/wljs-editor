@@ -35,7 +35,7 @@
       "rainbowbrackets": "^2.0.2",
     "mma-uncompress": "^1.0.1",
     "node-balanced": "^0.0.14",
-    "priceless-mathematica": "^1.1.8",
+    "priceless-mathematica": "^1.1.9",
     "rollup": "^3.21.6"
   },
   "resolutions": {
