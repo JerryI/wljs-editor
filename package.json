@@ -20,22 +20,22 @@
     "url": "https://github.com/JerryI/wljs-editor"
   },
   "dependencies": {
-      "@codemirror/legacy-modes": "6.3.2",
-      "@codemirror/state": "6.2.0",
-      "@codemirror/stream-parser": "0.19.9",
-      "@codemirror/view": "6.9.6",
-
-      "@codemirror/lang-html" : "6.4.2",
-      "@codemirror/lang-javascript": "6.1.4",
-      "@codemirror/lang-markdown": "6.1.1",
-      
-
-      "codemirror": "6.0.1",
-      "parcel-bundler": "1.12.5",
-      "rainbowbrackets": "^2.0.2",
+    "@codemirror/lang-html": "6.4.2",
+    "@codemirror/lang-javascript": "6.1.4",
+    "@codemirror/lang-markdown": "6.1.1",
+    "@codemirror/legacy-modes": "6.3.2",
+    "@codemirror/state": "6.2.0",
+    "@codemirror/stream-parser": "0.19.9",
+    "@codemirror/view": "6.9.6",
+    "@rollup/plugin-commonjs": "^25.0.0",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.1.0",
+    "codemirror": "6.0.1",
     "mma-uncompress": "^1.0.1",
     "node-balanced": "^0.0.14",
+    "parcel-bundler": "1.12.5",
     "priceless-mathematica": "^1.1.9",
+    "rainbowbrackets": "^2.0.2",
     "rollup": "^3.21.6"
   },
   "resolutions": {

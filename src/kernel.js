@@ -64,6 +64,12 @@ import { BallancedMatchDecorator } from "priceless-mathematica/src/sugar/matcher
 
 const languageConf = new Compartment
 
+const extras = []
+
+
+if (window.OfflineMode)
+  extras.push(window.EditorState.readOnly.of(true))
+
 let globalExtensions = []
 
 window.EditorAutocomplete = defaultFunctions;
@@ -354,6 +360,7 @@ compactWLEditor = (args) => {
     BoxesHolder,
     Greekholder,
     Arrowholder,
+    extras,
     
     EditorView.updateListener.of((v) => {
       if (v.docChanged) {
@@ -381,13 +388,13 @@ const mathematicaPlugins = [
   rainbowBrackets(),
   Greekholder,
   Arrowholder,
-  BoxesHolder
+  BoxesHolder,
+  extras
 ]
 
 
 
 import { defaultKeymap } from "@codemirror/commands";
-import { text } from "d3";
 
 let editorCustomTheme = EditorView.theme({
   "&.cm-focused": {
