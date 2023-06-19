@@ -18,6 +18,11 @@ window.EditorAutocomplete.extend([
         "label": "CustomBox",
         "type": "keyword",
         "info": "Make a decoration box for a symbol"
+    },
+    {
+        "label": "MiddlewareHandler",
+        "type": "keyword",
+        "info": "MiddlewareHandler[exp, \"type\"->handler, opts...] captures event from container"
     }       
 ])
 
