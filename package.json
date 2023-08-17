@@ -13,7 +13,8 @@
     "wlkernel": "src/boxes.wl",
     "wl": "src/processor.wl",
     "autocomplete": "src/autocomplete.js",
-    "priority": -10
+    "priority": -10,
+    "important": true
   },
   "repository": {
     "type": "git",
