@@ -66,8 +66,9 @@ const languageConf = new Compartment
 
 const extras = []
 
+if (!window.EditorGlobalExtensions) window.EditorGlobalExtensions = [];
 
-let globalExtensions = []
+
 
 window.EditorAutocomplete = defaultFunctions;
 window.EditorAutocomplete.extend = (list) => {
@@ -619,7 +620,7 @@ class CodeMirrorCell {
             } }
             , ...defaultKeymap, ...historyKeymap
           ]),
-          globalExtensions,
+          window.EditorGlobalExtensions,
           
           EditorView.updateListener.of((v) => {
             if (v.docChanged) {
@@ -681,7 +682,7 @@ class CodeMirrorCell {
           cellTypesHighlight,
           languageConf.of(initialLang),
           autoLanguage, 
-          globalExtensions,
+          window.EditorGlobalExtensions,
           editorCustomTheme,
           EditorState.readOnly.of(true)
         ],
