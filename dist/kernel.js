@@ -71288,7 +71288,7 @@ if (window.electronAPI) {
       console.log('result');
       console.log(res);
       selectedCell.editor.dispatch({
-        changes: {...selection, insert: res}
+        changes: {...selection, insert: res.slice(1,-1)}
       });
     });
   });
