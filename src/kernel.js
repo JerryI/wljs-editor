@@ -448,9 +448,11 @@ if (window.electronAPI) {
 
 
 
-    selectedCell.evalString(id + '[' + substr + ']').then((res) => {
+    selectedCell.origin.evalString(id + '[' + substr + ']').then((res) => {
+      console.log('result');
+      console.log(res);
       selectedCell.editor.dispatch({
-        changes: {from: ranges[0].from, to: ranges[0].to, insert: res}
+        changes: {...selection, insert: res}
       });
     })
   });
