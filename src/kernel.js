@@ -434,6 +434,27 @@ class ExecutableInlineWidget extends WidgetType {
 }
 
 let compactWLEditor = null;
+let selectedCell = undefined;
+
+if (window.electronAPI) {
+  window.electronAPI.contextMenu((event, id) => {
+    if (!selectedCell) return;
+    if (!selectedCell.editor.viewState) return;
+    const ranges = selectedCell.editor.viewState.state.selection.ranges;
+    if (!ranges.length) return;
+
+    const selection = ranges[0];
+    const substr = selectedCell.editor.state.doc.toString().replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"').slice(selection.from, selection.to);
+
+
+
+    selectedCell.evalString(id + '[' + substr + ']').then((res) => {
+      selectedCell.editor.dispatch({
+        changes: {from: ranges[0].from, to: ranges[0].to, insert: res}
+      });
+    })
+  });
+}
 
 compactWLEditor = (args) => {
   let editor = new EditorView({
@@ -567,6 +588,8 @@ class CodeMirrorCell {
       
       const initialLang = checkDocType(data).plugins;
 
+      const self = this;
+
       const editor = new EditorView({
         doc: data,
         extensions: [
@@ -616,7 +639,7 @@ class CodeMirrorCell {
             } },
             { key: "Shift-Enter", preventDefault: true, run: function (editor, key) { 
               console.log(editor.state.doc.toString()); 
-              origin.eval(editor.state.doc.toString()) 
+              origin.eval(editor.state.doc.toString()); 
             } }
             , ...defaultKeymap, ...historyKeymap
           ]),
@@ -626,6 +649,10 @@ class CodeMirrorCell {
             if (v.docChanged) {
               origin.save(v.state.doc.toString().replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"'));
             }
+            if (v.selectionSet) {
+              selectedCell = self;
+            }
+            
           }),
             editorCustomTheme
         ],
@@ -638,7 +665,9 @@ class CodeMirrorCell {
       };
   
       if(globalCMFocus) editor.focus();
-      globalCMFocus = false;    
+      globalCMFocus = false;  
+      
+      
       
       return this;
     }
