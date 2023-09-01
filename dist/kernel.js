@@ -71399,6 +71399,69 @@ let editorCustomThemeCompact = EditorView.theme({
 
 let globalCMFocus = false;
 
+window.EditorExtensions = [
+  () => highlightSpecialChars(),
+  () => history(),
+  () => drawSelection(),
+  () => dropCursor(),
+  () => indentOnInput(),
+  () => bracketMatching(),
+  () => closeBrackets(),
+  () => EditorView.lineWrapping,
+  () => autocompletion(),
+  () => syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+  () => highlightSelectionMatches(),
+  () => cellTypesHighlight,
+  () => placeholder$5('Type Wolfram Expression / .md / .html / .js'),
+  
+  (self, initialLang) => languageConf.of(initialLang),
+  () => autoLanguage, 
+  
+  (self, initialLang) => keymap.of([indentWithTab,
+    { key: "Backspace", run: function (editor, key) { 
+      if(editor.state.doc.length === 0) { self.origin.remove(); }  
+    } },
+    { key: "ArrowLeft", run: function (editor, key) {  
+      editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+    } },   
+    { key: "ArrowRight", run: function (editor, key) {  
+      editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+    } },                      
+    { key: "ArrowUp", run: function (editor, key) {  
+      console.log('arrowup');
+      console.log(editor.state.selection.ranges[0]);
+      if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+      self.origin.focusPrev(self.origin);
+
+      editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+    } },
+    { key: "ArrowDown", run: function (editor, key) { 
+      console.log('arrowdown');
+      console.log(editor.state.selection.ranges[0]);
+      if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+      self.origin.focusNext(self.origin);
+
+      editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+    } },
+    { key: "Shift-Enter", preventDefault: true, run: function (editor, key) { 
+      console.log(editor.state.doc.toString()); 
+      self.origin.eval(editor.state.doc.toString()); 
+    } }
+    , ...defaultKeymap, ...historyKeymap
+  ]),
+  
+  (self, initialLang) => EditorView.updateListener.of((v) => {
+    if (v.docChanged) {
+      self.origin.save(v.state.doc.toString().replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"'));
+    }
+    if (v.selectionSet) {
+      selectedCell = self;
+    }
+    
+  }),
+  () => editorCustomTheme
+];
+
 class CodeMirrorCell {
     origin = {}
     editor = {}
@@ -71426,70 +71489,7 @@ class CodeMirrorCell {
 
       const editor = new EditorView({
         doc: data,
-        extensions: [
-          highlightSpecialChars(),
-          history(),
-          drawSelection(),
-          dropCursor(),
-          indentOnInput(),
-          bracketMatching(),
-          closeBrackets(),
-          EditorView.lineWrapping,
-          autocompletion(),
-          syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
-          highlightSelectionMatches(),
-          cellTypesHighlight,
-          window.Extensions,
-          placeholder$5('Type Wolfram Expression / .md / .html / .js'),
-          
-          languageConf.of(initialLang),
-          autoLanguage, 
-          
-          keymap.of([indentWithTab,
-            { key: "Backspace", run: function (editor, key) { 
-              if(editor.state.doc.length === 0) { origin.remove(); }  
-            } },
-            { key: "ArrowLeft", run: function (editor, key) {  
-              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
-            } },   
-            { key: "ArrowRight", run: function (editor, key) {  
-              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
-            } },                      
-            { key: "ArrowUp", run: function (editor, key) {  
-              console.log('arrowup');
-              console.log(editor.state.selection.ranges[0]);
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                origin.focusPrev(origin);
-
-              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
-            } },
-            { key: "ArrowDown", run: function (editor, key) { 
-              console.log('arrowdown');
-              console.log(editor.state.selection.ranges[0]);
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                origin.focusNext(origin);
-
-              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
-            } },
-            { key: "Shift-Enter", preventDefault: true, run: function (editor, key) { 
-              console.log(editor.state.doc.toString()); 
-              origin.eval(editor.state.doc.toString()); 
-            } }
-            , ...defaultKeymap, ...historyKeymap
-          ]),
-          window.EditorGlobalExtensions,
-          
-          EditorView.updateListener.of((v) => {
-            if (v.docChanged) {
-              origin.save(v.state.doc.toString().replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"'));
-            }
-            if (v.selectionSet) {
-              selectedCell = self;
-            }
-            
-          }),
-            editorCustomTheme
-        ],
+        extensions: window.EditorExtensions.map((e) => e(self, initialLang)),
         parent: this.origin.element
       });
       
@@ -71526,27 +71526,6 @@ class CodeMirrorCell {
   };
 
   core.PreviewCell = (element, data) => {
-      const initialLang = checkDocType(data).plugins;
-
-      new EditorView({
-        doc: data,
-        extensions: [
-          highlightSpecialChars(),
-          bracketMatching(),
-          closeBrackets(),
-          EditorView.lineWrapping,
-          syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
-          highlightSelectionMatches(),
-          cellTypesHighlight,
-          languageConf.of(initialLang),
-          autoLanguage, 
-          window.EditorGlobalExtensions,
-          editorCustomTheme,
-          EditorState.readOnly.of(true)
-        ],
-        parent: element
-      });
-      
 
   };
   
