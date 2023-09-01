@@ -71399,6 +71399,8 @@ let editorCustomThemeCompact = EditorView.theme({
 
 let globalCMFocus = false;
 
+if (!window.EditorEpilog) window.EditorEpilog = [];
+
 window.EditorExtensions = [
   () => highlightSpecialChars(),
   () => history(),
@@ -71500,6 +71502,8 @@ class CodeMirrorCell {
   
       if(globalCMFocus) editor.focus();
       globalCMFocus = false;  
+
+      window.EditorEpilog.forEach((e) => e(self, initialLang));
       
       
       
