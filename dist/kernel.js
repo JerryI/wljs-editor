@@ -71524,6 +71524,10 @@ class CodeMirrorCell {
     compactWLEditor({doc: textData, parent: env.element, update: updateFunction});
   };
 
+  core.StripOnInput = async () => {
+    
+  };
+
   core.EditorView.update = async (args, env) => {
     const textData = await interpretate(args[0], env);
     env.local.dispatch(textData);
