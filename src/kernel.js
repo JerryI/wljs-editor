@@ -446,9 +446,9 @@ if (window.electronAPI) {
     const selection = ranges[0];
     console.log('yoko');
     console.log(selection);
-    console.log(selectedCell.editor.state.doc.toString());
+    console.log(selectedCell.editor.state.doc.toString().slice(selection.from, selection.to + 1));
     console.log('processing');
-    const substr = selectedCell.editor.state.doc.toString().replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"').slice(selection.from, selection.to + 1);
+    const substr = selectedCell.editor.state.doc.toString().slice(selection.from, selection.to + 1).replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"');
 
 
 
