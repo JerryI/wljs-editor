@@ -35,8 +35,10 @@ import {
   highlightActiveLineGutter
 } from "@codemirror/view"
 
+import {tags} from "@lezer/highlight"
+
 import { EditorState, Compartment } from "@codemirror/state"
-import { syntaxHighlighting, indentOnInput, bracketMatching, defaultHighlightStyle } from "@codemirror/language"
+import { syntaxHighlighting, indentOnInput, bracketMatching, HighlightStyle} from "@codemirror/language"
 import { history, historyKeymap } from "@codemirror/commands"
 import { highlightSelectionMatches } from "@codemirror/search"
 import { autocompletion, closeBrackets } from "@codemirror/autocomplete"
@@ -67,6 +69,49 @@ const languageConf = new Compartment
 const extras = []
 
 if (!window.EditorGlobalExtensions) window.EditorGlobalExtensions = [];
+
+/// A default highlight style (works well with light themes).
+const defaultHighlightStyle = HighlightStyle.define([
+  {tag: tags.meta,
+   color: "var(--editor-key-meta)"},
+  {tag: tags.link,
+   textDecoration: "underline"},
+  {tag: tags.heading,
+   textDecoration: "underline",
+   fontWeight: "bold"},
+  {tag: tags.emphasis,
+   fontStyle: "italic"},
+  {tag: tags.strong,
+   fontWeight: "bold"},
+  {tag: tags.strikethrough,
+   textDecoration: "line-through"},
+  {tag: tags.keyword,
+   color: "var(--editor-key-keyword)"},
+  {tag: [tags.atom, tags.bool, tags.url, tags.contentSeparator, tags.labelName],
+   color: "var(--editor-key-atom)"},
+  {tag: [tags.literal, tags.inserted],
+   color: "var(--editor-key-literal)"},
+  {tag: [tags.string, tags.deleted],
+   color: "var(--editor-key-string)"},
+  {tag: [tags.regexp, tags.escape, tags.special(tags.string)],
+   color: "var(--editor-key-escape)"},
+  {tag: tags.definition(tags.variableName),
+   color: "var(--editor-key-variable)"},
+  {tag: tags.local(tags.variableName),
+   color: "var(--editor-local-variable)"},
+  {tag: [tags.typeName, tags.namespace],
+   color: "var(--editor-key-type)"},
+  {tag: tags.className,
+   color: "var(--editor-key-class)"},
+  {tag: [tags.special(tags.variableName), tags.macroName],
+   color: "var(--editor-special-variable)"},
+  {tag: tags.definition(tags.propertyName),
+   color: "var(--editor-key-property)"},
+  {tag: tags.comment,
+   color: "var(--editor-key-comment)"},
+  {tag: tags.invalid,
+   color: "var(--editor-key-invalid)"}
+])
 
 
 
@@ -446,9 +491,9 @@ if (window.electronAPI) {
     const selection = ranges[0];
     console.log('yoko');
     console.log(selection);
-    console.log(selectedCell.editor.state.doc.toString().slice(selection.from, selection.to + 1));
+    console.log(selectedCell.editor.state.doc.toString().slice(selection.from, selection.to));
     console.log('processing');
-    const substr = selectedCell.editor.state.doc.toString().slice(selection.from, selection.to + 1).replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"');
+    const substr = selectedCell.editor.state.doc.toString().slice(selection.from, selection.to).replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"');
 
 
 
@@ -532,7 +577,7 @@ import { defaultKeymap } from "@codemirror/commands";
 
 let editorCustomTheme = EditorView.theme({
   "&.cm-focused": {
-    outline: "1px dashed #696969", 
+    outline: "1px dashed var(--editor-outline)", 
     background: 'inherit'
   },
   ".cm-line": {
@@ -547,7 +592,7 @@ let editorCustomTheme = EditorView.theme({
 
 let editorCustomThemeCompact = EditorView.theme({
   "&.cm-focused": {
-    outline: "1px dashed #696969",
+    outline: "1px dashed var(--editor-outline)",
     background: 'inherit'
   },
   ".cm-line": {
@@ -583,7 +628,7 @@ window.EditorExtensions = [
   () => closeBrackets(),
   () => EditorView.lineWrapping,
   () => autocompletion(),
-  () => syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+  () => syntaxHighlighting(defaultHighlightStyle, { fallback: false }),
   () => highlightSelectionMatches(),
   () => cellTypesHighlight,
   () => placeholder('Type Wolfram Expression / .md / .html / .js'),

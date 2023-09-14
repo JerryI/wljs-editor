@@ -16750,7 +16750,7 @@ const treeHighlighter = /*@__PURE__*/Prec.high(/*@__PURE__*/ViewPlugin.fromClass
 /**
 A default highlight style (works well with light themes).
 */
-const defaultHighlightStyle = /*@__PURE__*/HighlightStyle.define([
+const defaultHighlightStyle$1 = /*@__PURE__*/HighlightStyle.define([
     { tag: tags$1.meta,
         color: "#404740" },
     { tag: tags$1.link,
@@ -20872,7 +20872,7 @@ const minimalSetup = /*@__PURE__*/(() => [
     highlightSpecialChars(),
     history(),
     drawSelection(),
-    syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+    syntaxHighlighting(defaultHighlightStyle$1, { fallback: true }),
     keymap.of([
         ...defaultKeymap,
         ...historyKeymap,
@@ -70904,6 +70904,49 @@ const extras = [];
 
 if (!window.EditorGlobalExtensions) window.EditorGlobalExtensions = [];
 
+/// A default highlight style (works well with light themes).
+const defaultHighlightStyle = HighlightStyle.define([
+  {tag: tags$1.meta,
+   color: "var(--editor-key-meta)"},
+  {tag: tags$1.link,
+   textDecoration: "underline"},
+  {tag: tags$1.heading,
+   textDecoration: "underline",
+   fontWeight: "bold"},
+  {tag: tags$1.emphasis,
+   fontStyle: "italic"},
+  {tag: tags$1.strong,
+   fontWeight: "bold"},
+  {tag: tags$1.strikethrough,
+   textDecoration: "line-through"},
+  {tag: tags$1.keyword,
+   color: "var(--editor-key-keyword)"},
+  {tag: [tags$1.atom, tags$1.bool, tags$1.url, tags$1.contentSeparator, tags$1.labelName],
+   color: "var(--editor-key-atom)"},
+  {tag: [tags$1.literal, tags$1.inserted],
+   color: "var(--editor-key-literal)"},
+  {tag: [tags$1.string, tags$1.deleted],
+   color: "var(--editor-key-string)"},
+  {tag: [tags$1.regexp, tags$1.escape, tags$1.special(tags$1.string)],
+   color: "var(--editor-key-escape)"},
+  {tag: tags$1.definition(tags$1.variableName),
+   color: "var(--editor-key-variable)"},
+  {tag: tags$1.local(tags$1.variableName),
+   color: "var(--editor-local-variable)"},
+  {tag: [tags$1.typeName, tags$1.namespace],
+   color: "var(--editor-key-type)"},
+  {tag: tags$1.className,
+   color: "var(--editor-key-class)"},
+  {tag: [tags$1.special(tags$1.variableName), tags$1.macroName],
+   color: "var(--editor-special-variable)"},
+  {tag: tags$1.definition(tags$1.propertyName),
+   color: "var(--editor-key-property)"},
+  {tag: tags$1.comment,
+   color: "var(--editor-key-comment)"},
+  {tag: tags$1.invalid,
+   color: "var(--editor-key-invalid)"}
+]);
+
 
 
 window.EditorAutocomplete = defaultFunctions;
@@ -71282,9 +71325,9 @@ if (window.electronAPI) {
     const selection = ranges[0];
     console.log('yoko');
     console.log(selection);
-    console.log(selectedCell.editor.state.doc.toString().slice(selection.from, selection.to + 1));
+    console.log(selectedCell.editor.state.doc.toString().slice(selection.from, selection.to));
     console.log('processing');
-    const substr = selectedCell.editor.state.doc.toString().slice(selection.from, selection.to + 1).replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"');
+    const substr = selectedCell.editor.state.doc.toString().slice(selection.from, selection.to).replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"');
 
 
 
@@ -71364,7 +71407,7 @@ const mathematicaPlugins = [
 
 let editorCustomTheme = EditorView.theme({
   "&.cm-focused": {
-    outline: "1px dashed #696969", 
+    outline: "1px dashed var(--editor-outline)", 
     background: 'inherit'
   },
   ".cm-line": {
@@ -71379,7 +71422,7 @@ let editorCustomTheme = EditorView.theme({
 
 let editorCustomThemeCompact = EditorView.theme({
   "&.cm-focused": {
-    outline: "1px dashed #696969",
+    outline: "1px dashed var(--editor-outline)",
     background: 'inherit'
   },
   ".cm-line": {
@@ -71415,7 +71458,7 @@ window.EditorExtensions = [
   () => closeBrackets(),
   () => EditorView.lineWrapping,
   () => autocompletion(),
-  () => syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+  () => syntaxHighlighting(defaultHighlightStyle, { fallback: false }),
   () => highlightSelectionMatches(),
   () => cellTypesHighlight,
   () => placeholder$5('Type Wolfram Expression / .md / .html / .js'),
