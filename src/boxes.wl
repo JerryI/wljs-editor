@@ -8,7 +8,7 @@ CustomBox[x_, opts__] := FrontEndBox[x, ToString[Compress[Hold[opts]], InputForm
 
 (*InterpretationBox[boxes,expr]	interpret boxes as representing the expression expr - replace expressions with a box instead of styling*)
 
-Highlight[expr_] := FrontEndBoxTemporal[expr, ToString[Compress[Hold[StyleBox[Background->RGBColor[1,1,0]]]], InputForm]]
+iHighlight[expr_] := FrontEndBoxTemporal[expr, ToString[Compress[Hold[StyleBox[Background->RGBColor[1,1,0]]]], InputForm]]
 
 FrontEndBoxTemporalWrapper[expr_, __] := expr
 
