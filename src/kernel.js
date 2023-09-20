@@ -303,6 +303,113 @@ class BoxesWidget extends WidgetType {
     console.error('not implemented');
   }
 }
+//-----
+const BoxesMatcherT = (ref, view) => { return new BallancedMatchDecorator({
+  regexp: /FrontEndBoxTemporal\[/,
+  decoration: match => Decoration.replace({
+    widget: new BoxesWidgetT(match, ref, view),
+  })
+}) };
+
+const BoxesHolderT = ViewPlugin.fromClass(class {
+  constructor(view) {
+    this.disposable = [];
+    this.BoxesHolderT = BoxesMatcherT(this.disposable, view).createDeco(view);
+    
+  }
+  update(update) {
+    this.BoxesHolderT = BoxesMatcherT(this.disposable, update).updateDeco(update, this.BoxesHolderT);
+  }
+  destroy() {
+    console.log('removed holder');
+    console.log('disposable');
+    console.log(this.disposable);
+    this.disposable.forEach((el)=>{
+        el.dispose();
+    });
+  }
+}, {
+  decorations: instance => instance.BoxesHolderT,
+  provide: plugin => EditorView.atomicRanges.of(view => {
+    var _a;
+    return ((_a = view.plugin(plugin)) === null || _a === void 0 ? void 0 : _a.BoxesHolderT) || Decoration.none;
+  })
+});   
+
+class BoxesWidgetT extends WidgetType {
+  constructor(visibleValue, ref, view) {
+    super();
+    this.view = view;
+    this.visibleValue = visibleValue;
+    this.ref = ref;
+    this.subEditor = compactWLEditor;
+  }
+  eq(other) {
+    return this.visibleValue.str === other.visibleValue.str;
+  }
+  updateDOM(dom, view) {
+    console.log('update widget DOM');
+    return true
+  }
+  toDOM(view) {
+    let span = document.createElement("span");
+    span.classList.add("subscript-tail");
+ 
+    const args = this.visibleValue.args;
+    const visibleValue = this.visibleValue;
+    
+    const recreateString = (args) => {
+      this.visibleValue.str =  'FrontEndBoxTemporal['+args[0]+','+args[1]+']';
+      console.log('recreated');
+      console.log(this.visibleValue.str);
+      const changes = {from: visibleValue.pos, to: visibleValue.pos + visibleValue.length, insert: this.visibleValue.str};
+      this.visibleValue.length = this.visibleValue.str.length;
+
+      return changes;
+    }
+
+    this.subEditor({
+      doc: args[0],
+      parent: span,
+      update: (upd) => {
+        const valid = validator.matchContentsInBetweenBrackets(upd, []);
+        if (!valid) return;
+
+        this.visibleValue.args[0] = upd;
+        const change = recreateString(this.visibleValue.args);
+        console.log('insert change');
+        console.log(change);
+        view.dispatch({changes: change});
+      },
+      eval: () => {
+        view.viewState.state.config.eval();
+      }
+    });
+
+    console.log("args:");
+    console.log(args);
+    const decoded = Mma.DecompressDecode(args[1]);
+    const json = Mma.toArray(decoded.parts[0]);
+
+    const cuid = Date.now() + Math.floor(Math.random() * 100);
+    var global = {call: cuid};
+    let env = {global: global, element: span}; //Created in CM6
+    interpretate(json, env);
+
+
+    return span;
+  }
+
+  ignoreEvent() {
+    return true;
+  }
+
+  destroy() {
+    console.error('not implemented');
+  }
+}
+
+//----
 
 const ExecutableMatcher = (ref) => { return new MatchDecorator({
   regexp: /FrontEndExecutable\["([^"]+)"\]/g,
@@ -616,6 +723,7 @@ compactWLEditor = (args) => {
     bracketMatching(),
     rainbowBrackets(),
     BoxesHolder,
+    BoxesHolderT,
     BoxViewHolder,
     Greekholder,
     Arrowholder,
@@ -649,6 +757,7 @@ const mathematicaPlugins = [
   Greekholder,
   Arrowholder,
   BoxesHolder,
+  BoxesHolderT,
   BoxViewHolder,
   extras
 ]

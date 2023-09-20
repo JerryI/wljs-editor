@@ -3,6 +3,8 @@
     boxes.name = "WebObjects/Boxes";
   
     interpretate.contextExpand(boxes);
+
+    boxes.Background = () => "Background"
   
     boxes.FrameBox = async (args, env) => {
         env.element.classList.add('frame-box');
