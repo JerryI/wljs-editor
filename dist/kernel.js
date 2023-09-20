@@ -71211,6 +71211,86 @@ class ExecutableWidget extends WidgetType {
   }
 }
 
+//----
+
+
+const BoxViewMatcher = (ref, view) => { return new BallancedMatchDecorator({
+  regexp: /FrontEndView\[/,
+  decoration: match => Decoration.replace({
+    widget: new BoxViewWidget(match, ref, view),
+  })
+}) };
+
+const BoxViewHolder = ViewPlugin.fromClass(class {
+  constructor(view) {
+    this.disposable = [];
+    this.BoxViewHolder = BoxViewMatcher(this.disposable, view).createDeco(view);
+    
+  }
+  update(update) {
+    this.BoxViewHolder = BoxViewMatcher(this.disposable, update).updateDeco(update, this.BoxViewHolder);
+  }
+  destroy() {
+    console.log('removed holder');
+    console.log('disposable');
+    console.log(this.disposable);
+    this.disposable.forEach((el)=>{
+        el.dispose();
+    });
+  }
+}, {
+  decorations: instance => instance.BoxViewHolder,
+  provide: plugin => EditorView.atomicRanges.of(view => {
+    var _a;
+    return ((_a = view.plugin(plugin)) === null || _a === void 0 ? void 0 : _a.BoxViewHolder) || Decoration.none;
+  })
+});   
+
+class BoxViewWidget extends WidgetType {
+  constructor(visibleValue, ref, view) {
+    super();
+    this.view = view;
+    this.visibleValue = visibleValue;
+    this.ref = ref;
+  }
+  eq(other) {
+    return this.visibleValue.str === other.visibleValue.str;
+  }
+
+  toDOM(view) {
+    let span = document.createElement("span");
+    span.classList.add("frontend-view");
+ 
+    const args = this.visibleValue.args;
+  
+    console.log("args:");
+    console.log(args);
+    const decoded = Mma.DecompressDecode(args[1]);
+    const json = Mma.toArray(decoded.parts[0]);
+
+    console.log(json);
+
+    const cuid = Date.now() + Math.floor(Math.random() * 100);
+    var global = {call: cuid};
+    let env = {global: global, element: span}; //Created in CM6
+    interpretate(json, env);
+
+
+    return span;
+  }
+
+  ignoreEvent() {
+    return true;
+  }
+
+  destroy() {
+    console.error('not implemented');
+  }
+}
+
+
+//----
+
 const ExecutableInlineMatcher = (ref) => { return new MatchDecorator({
   regexp: /FrontEndInlineExecutable\["([^"]+)"\]/g,
   decoration: match => Decoration.replace({
@@ -71370,6 +71450,7 @@ compactWLEditor = (args) => {
     bracketMatching(),
     rainbowBrackets(),
     BoxesHolder,
+    BoxViewHolder,
     Greekholder,
     Arrowholder,
     extras,
@@ -71402,6 +71483,7 @@ const mathematicaPlugins = [
   Greekholder,
   Arrowholder,
   BoxesHolder,
+  BoxViewHolder,
   extras
 ];
 
