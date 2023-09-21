@@ -5,6 +5,7 @@
   "scripts": {
     "build": "node --max-old-space-size=8192 ./node_modules/.bin/rollup --config rollup.config.mjs"
   },
+  "defaultPackage": true,
   "wljs-meta": {
     "jsmodule": [
       "dist/kernel.js",
