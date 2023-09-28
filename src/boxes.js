@@ -71,10 +71,21 @@
 
           return "rgb("+r+","+g+","+b+")";
         } else {
-            
-          console.error('g2d: RGBColor must have three arguments!');
+          let a = await interpretate(args[0], env);
+
+          a = a.map((e) => e*255);
+  
+          return "rgb("+a[0]+","+a[1]+","+a[2]+")";
         }
 
         return undefined;
+    }
+
+    boxes.PaneSelectorBox = async (args, env) => {
+        const list = await interpretate(args[0], {...env, hold:true});
+        //needs an editor View
+        env.element.innerText = "EditorView is in development";
+        env.element.style.border = "1px solid gray";
+        env.element.style.borderRadius = "4px";
     }
 }
