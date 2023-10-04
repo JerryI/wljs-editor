@@ -70842,7 +70842,7 @@ const cellTypesHighlight = ViewPlugin.fromClass(
     getDecorationsFor(from, to, decorations) {
       let { doc } = this.view.state;
 
-      let r = /^\.[\w| |=|\d|.]+\s*$/g;
+      let r = /^\.[\w| |-|=|\d|.]+\s*$/g;
       for (
         let pos = from, cursor = doc.iterRange(from, to), m;
         !cursor.next().done;
@@ -71515,6 +71515,37 @@ class ExecutableInlineWidget extends WidgetType {
 
 let compactWLEditor = null;
 let selectedCell = undefined;
+
+window.EditorSelected = {
+  get: () => {
+    if (!selectedCell) return '';
+    if (!selectedCell.editor.viewState) return '';
+    const ranges = selectedCell.editor.viewState.state.selection.ranges;
+    if (!ranges.length) return '';
+
+    const selection = ranges[0];
+    console.log('yoko');
+    console.log(selection);
+    console.log(selectedCell.editor.state.doc.toString().slice(selection.from, selection.to));
+    console.log('processing');
+    return selectedCell.editor.state.doc.toString().slice(selection.from, selection.to);
+  },
+
+  set: (data) => {
+    if (!selectedCell) return;
+    if (!selectedCell.editor.viewState) return;
+    const ranges = selectedCell.editor.viewState.state.selection.ranges;
+    if (!ranges.length) return;
+
+    const selection = ranges[0];
+
+    console.log('result');
+      console.log(data);
+      selectedCell.editor.dispatch({
+        changes: {...selection, insert: data}
+      });
+  }
+};
 
 if (window.electronAPI) {
   window.electronAPI.contextMenu((event, id) => {
