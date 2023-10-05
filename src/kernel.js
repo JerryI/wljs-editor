@@ -9,6 +9,8 @@ import {markdownLanguage, markdown} from "@codemirror/lang-markdown"
 
 import {htmlLanguage, html} from "@codemirror/lang-html"
 
+import {cssLanguage, css} from "@codemirror/lang-css"
+
 import {indentWithTab} from "@codemirror/commands" 
  
 import { MatchDecorator, WidgetType, keymap } from "@codemirror/view"
@@ -840,6 +842,20 @@ let globalCMFocus = false;
 
 if (!window.EditorEpilog) window.EditorEpilog = [];
 
+window.EditorExtensionsMinimal = [
+  () => highlightSpecialChars(),
+  () => history(),
+  () => drawSelection(),
+  () => dropCursor(),
+  () => indentOnInput(),
+  () => bracketMatching(),
+  () => closeBrackets(),
+  () => EditorView.lineWrapping,
+  () => autocompletion(),
+  () => syntaxHighlighting(defaultHighlightStyle, { fallback: false }),
+  () => highlightSelectionMatches()
+] 
+
 window.EditorExtensions = [
   () => highlightSpecialChars(),
   () => history(),
@@ -998,6 +1014,9 @@ class CodeMirrorCell {
   window.markdown = markdown
   window.htmlLanguage = htmlLanguage
   window.html = html
+
+  window.cssLanguage = cssLanguage
+  window.css = css
 
   window.EditorView = EditorView
   window.highlightSpecialChars = highlightSpecialChars

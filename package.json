@@ -1,6 +1,6 @@
 {
   "name": "wljs-editor",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "WLJS Code editor",
   "scripts": {
     "build": "node --max-old-space-size=8192 ./node_modules/.bin/rollup --config rollup.config.mjs",
@@ -24,6 +24,7 @@
     "url": "https://github.com/JerryI/wljs-editor"
   },
   "dependencies": {
+    "@codemirror/lang-css": "^6.2.1",
     "@codemirror/lang-html": "6.4.2",
     "@codemirror/lang-javascript": "6.1.4",
     "@codemirror/lang-markdown": "6.1.1",

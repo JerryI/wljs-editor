@@ -25679,7 +25679,7 @@ const cssLanguage = /*@__PURE__*/LRLanguage.define({
                 Declaration: /*@__PURE__*/continuedIndent()
             }),
             /*@__PURE__*/foldNodeProp.add({
-                Block: foldInside
+                "Block KeyframeList": foldInside
             })
         ]
     }),
@@ -71684,6 +71684,20 @@ let globalCMFocus = false;
 
 if (!window.EditorEpilog) window.EditorEpilog = [];
 
+window.EditorExtensionsMinimal = [
+  () => highlightSpecialChars(),
+  () => history(),
+  () => drawSelection(),
+  () => dropCursor(),
+  () => indentOnInput(),
+  () => bracketMatching(),
+  () => closeBrackets(),
+  () => EditorView.lineWrapping,
+  () => autocompletion(),
+  () => syntaxHighlighting(defaultHighlightStyle, { fallback: false }),
+  () => highlightSelectionMatches()
+]; 
+
 window.EditorExtensions = [
   () => highlightSpecialChars(),
   () => history(),
@@ -71837,6 +71851,9 @@ class CodeMirrorCell {
   window.markdown = markdown;
   window.htmlLanguage = htmlLanguage;
   window.html = html;
+
+  window.cssLanguage = cssLanguage;
+  window.css = css;
 
   window.EditorView = EditorView;
   window.highlightSpecialChars = highlightSpecialChars;
