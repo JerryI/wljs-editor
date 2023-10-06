@@ -811,7 +811,24 @@ let editorCustomTheme = EditorView.theme({
   },
   ".cm-activeLine": {
     'background-color': 'transparent'
-  }
+  },
+
+  ".rainbow-bracket-red": { color: 'var(--editor-bracket-1)' },
+  ".rainbow-bracket-orange": { color: 'var(--editor-bracket-2)' },
+  ".rainbow-bracket-yellow": { color: 'var(--editor-bracket-3)' },
+  ".rainbow-bracket-green": { color: 'var(--editor-bracket-4)' },
+  ".rainbow-bracket-blue": { color: 'var(--editor-bracket-5)' },
+  ".rainbow-bracket-indigo": { color: 'var(--editor-bracket-6)' },
+  ".rainbow-bracket-violet": { color: 'var(--editor-bracket-7)' },
+
+  ".rainbow-bracket-red > span": { color: 'var(--editor-bracket-1-a)' },
+  ".rainbow-bracket-orange > span": { color: 'var(--editor-bracket-2-a)' },
+  ".rainbow-bracket-yellow > span": { color: 'var(--editor-bracket-3-a)' },
+  ".rainbow-bracket-green > span": { color: 'var(--editor-bracket-4-a)' },
+  ".rainbow-bracket-blue > span": { color: 'var(--editor-bracket-5-a)' },
+  ".rainbow-bracket-indigo > span": { color: 'var(--editor-bracket-6-a)' },
+  ".rainbow-bracket-violet > span": { color: 'var(--editor-bracket-7-a)' }
+
 });
 
 let editorCustomThemeCompact = EditorView.theme({
@@ -835,7 +852,24 @@ let editorCustomThemeCompact = EditorView.theme({
   },
   ".cm-content": {
     "padding": '0px 0'
-  }
+  },
+
+  ".rainbow-bracket-red": { color: 'var(--editor-bracket-1)' },
+  ".rainbow-bracket-orange": { color: 'var(--editor-bracket-2)' },
+  ".rainbow-bracket-yellow": { color: 'var(--editor-bracket-3)' },
+  ".rainbow-bracket-green": { color: 'var(--editor-bracket-4)' },
+  ".rainbow-bracket-blue": { color: 'var(--editor-bracket-5)' },
+  ".rainbow-bracket-indigo": { color: 'var(--editor-bracket-6)' },
+  ".rainbow-bracket-violet": { color: 'var(--editor-bracket-7)' },
+
+  ".rainbow-bracket-red > span": { color: 'var(--editor-bracket-1-a)' },
+  ".rainbow-bracket-orange > span": { color: 'var(--editor-bracket-2-a)' },
+  ".rainbow-bracket-yellow > span": { color: 'var(--editor-bracket-3-a)' },
+  ".rainbow-bracket-green > span": { color: 'var(--editor-bracket-4-a)' },
+  ".rainbow-bracket-blue > span": { color: 'var(--editor-bracket-5-a)' },
+  ".rainbow-bracket-indigo > span": { color: 'var(--editor-bracket-6-a)' },
+  ".rainbow-bracket-violet > span": { color: 'var(--editor-bracket-7-a)' }
+
 });
 
 let globalCMFocus = false;

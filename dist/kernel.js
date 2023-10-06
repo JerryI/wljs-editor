@@ -70842,7 +70842,7 @@ const cellTypesHighlight = ViewPlugin.fromClass(
     getDecorationsFor(from, to, decorations) {
       let { doc } = this.view.state;
 
-      let r = /^\.[\w| |-|=|\d|.]+\s*$/g;
+      let r = /^\.\w+\s*$/g;
       for (
         let pos = from, cursor = doc.iterRange(from, to), m;
         !cursor.next().done;
@@ -70886,24 +70886,10 @@ class CellTypeWidget extends WidgetType {
   toDOM() {
     let span = document.createElement("div");
     span.classList.add('cell-type-widget');
-    const string = this.rawValue.split(' ');
-    const ext = string[0].split('.');
+    const ext = this.rawValue.split('.');
     console.log(ext);
     span.classList.add('cell-type-'+ext[1].trim());
-    span.innerText = string[0].trim();
-    if (string.length > 1) {
-      const params = string.slice(1);
-      const wallet = document.createElement('span');
-      wallet.appendChild(span);
-      params.forEach((p)=>{
-        const pel = document.createElement('span');
-        pel.innerText = p;
-        pel.classList.add('cell-type-'+ext[1].trim()+'-'+p.split('=')[0]);
-        wallet.appendChild(pel);
-      });
-
-      return wallet;
-    }
+    span.innerText = this.rawValue.trim();
     return span;
   }
 
@@ -71653,7 +71639,24 @@ let editorCustomTheme = EditorView.theme({
   },
   ".cm-activeLine": {
     'background-color': 'transparent'
-  }
+  },
+
+  ".rainbow-bracket-red": { color: 'var(--editor-bracket-1)' },
+  ".rainbow-bracket-orange": { color: 'var(--editor-bracket-2)' },
+  ".rainbow-bracket-yellow": { color: 'var(--editor-bracket-3)' },
+  ".rainbow-bracket-green": { color: 'var(--editor-bracket-4)' },
+  ".rainbow-bracket-blue": { color: 'var(--editor-bracket-5)' },
+  ".rainbow-bracket-indigo": { color: 'var(--editor-bracket-6)' },
+  ".rainbow-bracket-violet": { color: 'var(--editor-bracket-7)' },
+
+  ".rainbow-bracket-red > span": { color: 'var(--editor-bracket-1-a)' },
+  ".rainbow-bracket-orange > span": { color: 'var(--editor-bracket-2-a)' },
+  ".rainbow-bracket-yellow > span": { color: 'var(--editor-bracket-3-a)' },
+  ".rainbow-bracket-green > span": { color: 'var(--editor-bracket-4-a)' },
+  ".rainbow-bracket-blue > span": { color: 'var(--editor-bracket-5-a)' },
+  ".rainbow-bracket-indigo > span": { color: 'var(--editor-bracket-6-a)' },
+  ".rainbow-bracket-violet > span": { color: 'var(--editor-bracket-7-a)' }
+
 });
 
 let editorCustomThemeCompact = EditorView.theme({
@@ -71677,7 +71680,24 @@ let editorCustomThemeCompact = EditorView.theme({
   },
   ".cm-content": {
     "padding": '0px 0'
-  }
+  },
+
+  ".rainbow-bracket-red": { color: 'var(--editor-bracket-1)' },
+  ".rainbow-bracket-orange": { color: 'var(--editor-bracket-2)' },
+  ".rainbow-bracket-yellow": { color: 'var(--editor-bracket-3)' },
+  ".rainbow-bracket-green": { color: 'var(--editor-bracket-4)' },
+  ".rainbow-bracket-blue": { color: 'var(--editor-bracket-5)' },
+  ".rainbow-bracket-indigo": { color: 'var(--editor-bracket-6)' },
+  ".rainbow-bracket-violet": { color: 'var(--editor-bracket-7)' },
+
+  ".rainbow-bracket-red > span": { color: 'var(--editor-bracket-1-a)' },
+  ".rainbow-bracket-orange > span": { color: 'var(--editor-bracket-2-a)' },
+  ".rainbow-bracket-yellow > span": { color: 'var(--editor-bracket-3-a)' },
+  ".rainbow-bracket-green > span": { color: 'var(--editor-bracket-4-a)' },
+  ".rainbow-bracket-blue > span": { color: 'var(--editor-bracket-5-a)' },
+  ".rainbow-bracket-indigo > span": { color: 'var(--editor-bracket-6-a)' },
+  ".rainbow-bracket-violet > span": { color: 'var(--editor-bracket-7-a)' }
+
 });
 
 let globalCMFocus = false;
