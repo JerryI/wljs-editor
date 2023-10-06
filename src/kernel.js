@@ -1032,7 +1032,11 @@ class CodeMirrorCell {
   }
   
   window.SupportedLanguages.push({
-    check: (r) => {return(r === null)},
+    check: (r) => {
+      if (r === null) return true; 
+      if (r[0] === '.master') return true;
+      return false;
+    },
     legacy: true, 
     plugins: mathematicaPlugins,
     name: 'mathematica'
