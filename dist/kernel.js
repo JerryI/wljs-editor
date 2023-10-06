@@ -71855,15 +71855,13 @@ class CodeMirrorCell {
   };
   
   window.SupportedLanguages.push({
-    check: (r) => {
-      if (r === null) return true; 
-      if (r[0] === '.master') return true;
-      return false;
-    },
+    check: (r) => {return (r === null)},
     legacy: true, 
     plugins: mathematicaPlugins,
     name: 'mathematica'
   });
+
+  window.EditorMathematicaPlugins = mathematicaPlugins;
 
   window.SupportedCells['codemirror'] = {
     view: CodeMirrorCell
