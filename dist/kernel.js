@@ -71828,17 +71828,37 @@ class CodeMirrorCell {
     }
   }
 
+  core.ReadOnly = () => "ReadOnly";
+
   //for dynamics
   core.EditorView = async (args, env) => {
     //cm6 inline editor (editable or read-only)
     const textData = await interpretate(args[0], env);
-    const options = core._getRules(args, env);
+    const options = await core._getRules(args, env);
 
     let updateFunction = () => {};
 
-    if (options.Event) ;
+    const ext = [];
+    if (options.ReadOnly) {
+      ext.push(EditorState.readOnly.of(true));
+    }
 
-    compactWLEditor({doc: textData, parent: env.element, update: updateFunction});
+    if (options.Event) {
+      //then it means this is like a slider
+      updateFunction = (data) => {
+        console.log('editor view emitt data: '+data);
+        server.emitt(options.Event, '"'+data.replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"')+'"');
+      };
+      
+    }
+
+    if (env.local) {
+      //if it is running in a container
+      env.local.editor = compactWLEditor({doc: textData, parent: env.element, eval: ()=>{}, update: updateFunction, extensions: ext});
+    } else {
+      compactWLEditor({doc: textData, parent: env.element, eval: ()=>{}, update: updateFunction, extensions: ext});
+    }
+    
   };
 
   core.StripOnInput = async () => {
@@ -71846,8 +71866,21 @@ class CodeMirrorCell {
   };
 
   core.EditorView.update = async (args, env) => {
+    if (!env.local.editor) return;
     const textData = await interpretate(args[0], env);
-    env.local.dispatch(textData);
+    console.log('editor view: dispatch');
+    env.local.editor.dispatch({
+      changes: {from: 0, to: env.local.editor.state.doc.length, insert: textData}
+    });
+  };
+
+  core.EditorView.destroy = async (args, env) => {
+    await interpretate(args[0], env);
+    if (env.local) {
+      if (env.local.editor) {
+        env.local.editor.destroy();
+      }
+    }
   };
 
   core.PreviewCell = (element, data) => {
