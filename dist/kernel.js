@@ -70842,7 +70842,7 @@ const cellTypesHighlight = ViewPlugin.fromClass(
     getDecorationsFor(from, to, decorations) {
       let { doc } = this.view.state;
 
-      let r = /^\.\w+\s*$/g;
+      let r = /^\.[\w| |-|=|\d|.]+\s*$/g;
       for (
         let pos = from, cursor = doc.iterRange(from, to), m;
         !cursor.next().done;
@@ -70886,10 +70886,24 @@ class CellTypeWidget extends WidgetType {
   toDOM() {
     let span = document.createElement("div");
     span.classList.add('cell-type-widget');
-    const ext = this.rawValue.split('.');
+    const string = this.rawValue.split(' ');
+    const ext = string[0].split('.');
     console.log(ext);
     span.classList.add('cell-type-'+ext[1].trim());
-    span.innerText = this.rawValue.trim();
+    span.innerText = string[0].trim();
+    if (string.length > 1) {
+      const params = string.slice(1);
+      const wallet = document.createElement('span');
+      wallet.appendChild(span);
+      params.forEach((p)=>{
+        const pel = document.createElement('span');
+        pel.innerText = p;
+        pel.classList.add('cell-type-'+ext[1].trim()+'-'+p.split('=')[0]);
+        wallet.appendChild(pel);
+      });
+
+      return wallet;
+    }
     return span;
   }
 
