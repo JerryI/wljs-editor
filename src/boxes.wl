@@ -30,6 +30,10 @@ TemplateBox[expr_List, "DateObject", __] := With[{date = expr[[1]][[1]][[1]]},
 
 Unprotect[InterpretationBox]
 
+InterpretationBox[placeholder_, expr_, opts___] := With[{data = expr, v = EditorView[ToString[placeholder, InputForm], ReadOnly->True]},
+   FrontEndView[expr, ToString[Compress[Hold[v]], InputForm]]
+]
+
 InterpretationBox[RowBox[view_List], expr_, opts___] := With[{data = expr, v = InterpretationBoxView[view]},
    FrontEndView[expr, ToString[Compress[Hold[v]], InputForm]]
 ]

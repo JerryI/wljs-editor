@@ -1030,6 +1030,8 @@ class CodeMirrorCell {
     } else {
       compactWLEditor({doc: textData, parent: env.element, eval: ()=>{}, update: updateFunction, extensions: ext});
     }
+
+    env.element.style.verticalAlign = "inherit";
     
   }
 
