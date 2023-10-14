@@ -34,7 +34,7 @@ import { Mma } from "mma-uncompress/src/mma";
 import {
   highlightSpecialChars, drawSelection, highlightActiveLine, dropCursor,
   rectangularSelection, crosshairCursor, placeholder,
-  highlightActiveLineGutter
+  highlightActiveLineGutter, lineNumbers
 } from "@codemirror/view"
 
 import {tags} from "@lezer/highlight"
@@ -890,11 +890,21 @@ window.EditorExtensionsMinimal = [
   () => highlightSelectionMatches()
 ] 
 
+window.EditorParameters = {
+
+};
+
 window.EditorExtensions = [
   () => highlightSpecialChars(),
   () => history(),
   () => drawSelection(),
   () => dropCursor(),
+  () => {
+      if (window.EditorParameters["gutter"])
+        return lineNumbers();
+
+      return [];
+    },
   () => indentOnInput(),
   () => bracketMatching(),
   () => closeBrackets(),

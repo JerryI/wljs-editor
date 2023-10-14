@@ -38,6 +38,8 @@ InterpretationBox[RowBox[view_List], expr_, opts___] := With[{data = expr, v = I
    FrontEndView[expr, ToString[Compress[Hold[v]], InputForm]]
 ]
 
+FrontEndView /: ToString[FrontEndView[x_, y_], arg___] := ToString[FrontEndView, arg]<>"["<>ExportString[x, "Text"]<>","<>ToString[y, arg]<>"]";
+
 InterpretationBoxView[{TagBox["ByteArray", "SummaryHead"], "[", content_, "]"}] := content
 
 TemplateBox[v_List, "SummaryPanel"] := v

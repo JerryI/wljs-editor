@@ -1,4 +1,4 @@
-BeginPackage["JerryI`WolframJSFrontend`WolframLanguageSupport`", {"CodeParser`"}];
+BeginPackage["JerryI`WolframJSFrontend`WolframLanguageSupport`", {"CodeParser`", "JerryI`WSP`"}];
 
 Begin["Private`"];
 
@@ -37,6 +37,15 @@ WolframProcessor[expr_String, signature_String, callback_] := Module[{str = Stri
 
 JerryI`WolframJSFrontend`Notebook`NotebookAddEvaluator[((True&)    ->  <|"SyntaxChecker"->WolframCheckSyntax,    "Epilog"->SplitExpression,  "Prolog"->(#&), "Evaluator"->WolframProcessor   |>), "LowestPriority"];
 
+
+root = $InputFileName // DirectoryName // ParentDirectory;
+
+(* extend the settings menu *)
+JerryI`WolframJSFrontend`Extensions`ExtendSettings[Function[Null,
+  LoadPage["settings/editor.wsp", {}, "Base"->root]
+], "Editor"];
+
 End[];
 
 EndPackage[];
+

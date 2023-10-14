@@ -1,6 +1,6 @@
 {
   "name": "wljs-editor",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "WLJS Code editor",
   "scripts": {
     "build": "node --max-old-space-size=8192 ./node_modules/.bin/rollup --config rollup.config.mjs",
@@ -16,6 +16,7 @@
     "wl": "src/processor.wl",
     "styles": "src/styles.css",
     "autocomplete": "src/autocomplete.js",
+    "header": "src/header.wsp",
     "priority": -10,
     "important": true
   },
