@@ -81,11 +81,39 @@
         return undefined;
     }
 
-    boxes.PaneSelectorBox = async (args, env) => {
+    /*boxes.PaneSelectorBox = async (args, env) => {
         const list = await interpretate(args[0], {...env, hold:true});
         //needs an editor View
         env.element.innerText = "EditorView is in development";
         env.element.style.border = "1px solid gray";
         env.element.style.borderRadius = "4px";
-    }
+    }*/
+
+    boxes.DynamicModuleBox = async (args, env) => {
+        return await interpretate(args[1], {...env, context: boxes});
+      }
+      
+      boxes.PaneSelectorBox = async (args, env) => {
+        const list = await interpretate(args[0], {...env, hold:true});
+        return await interpretate(list[0], env);
+      }
+      
+      boxes.GridBox = async (args, env) => {
+        return await interpretate(args[0], env);
+      }
+      
+      boxes.TagBox = async (args, env) => {
+        const name = await interpretate(args[1], env);
+        const data = await interpretate(args[0], env);
+        return await boxes.TagBox[name](data, env);
+      }
+      
+      boxes.TagBox['SummaryItem'] = async (data, env) => {
+        env.element.innerText = data.slice(1,-1);
+        env.element.style.paddingLeft = "0.5em";
+        env.element.style.paddingRight = "0.5em";
+        env.element.style.borderRadius = "4px";
+        env.element.style.border = "1px solid gray";
+      }
+
 }
