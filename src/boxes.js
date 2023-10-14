@@ -114,6 +114,7 @@
         env.element.style.paddingRight = "0.5em";
         env.element.style.borderRadius = "4px";
         env.element.style.border = "1px solid gray";
+        env.element.style.verticalAlign = "initial";
       }
 
 }
