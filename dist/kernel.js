@@ -72181,6 +72181,13 @@ window.EditorExtensions = [
   () => editorCustomTheme
 ];
 
+function unicodeToChar(text) {
+  return text.replace(/\\:[\da-f]{4}/gi, 
+         function (match) {
+              return String.fromCharCode(parseInt(match.replace(/\\:/g, ''), 16));
+         });
+}
+
 class CodeMirrorCell {
     origin = {}
     editor = {}
@@ -72207,7 +72214,7 @@ class CodeMirrorCell {
       const self = this;
 
       const editor = new EditorView({
-        doc: data,
+        doc: unicodeToChar(data),
         extensions: window.EditorExtensions.map((e) => e(self, initialLang)),
         parent: this.origin.element
       });
