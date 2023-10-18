@@ -2,3 +2,13 @@
     display: inline-flex;
     vertical-align: sub;
 }
+
+.cm-tooltip {
+    font-family: var(--font-editor-family);
+    line-height:1.2;
+}
+
+
+.cm-tooltip.cm-tooltip-autocomplete ul li {
+    font-family: var(--font-editor-family);
+}
