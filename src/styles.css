@@ -4,11 +4,11 @@
 }
 
 .cm-tooltip {
-    font-family: var(--font-editor-family);
+    font-family: var(--font-code-family);
     line-height:1.2;
 }
 
 
 .cm-tooltip.cm-tooltip-autocomplete ul li {
-    font-family: var(--font-editor-family);
+    font-family: var(--font-code-family);
 }
