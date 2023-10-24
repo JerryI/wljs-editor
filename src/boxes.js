@@ -95,7 +95,22 @@
       
       boxes.PaneSelectorBox = async (args, env) => {
         const list = await interpretate(args[0], {...env, hold:true});
-        return await interpretate(list[0], env);
+        //env.element.innerText = data.slice(1,-1);
+        env.element.style.paddingLeft = "0.5em";
+        env.element.style.paddingRight = "0.5em";
+        env.element.style.borderRadius = "4px";
+        env.element.style.border = "1px solid gray";
+        env.element.style.verticalAlign = "initial";
+
+        const data = await interpretate(list[0][2], env);
+
+        env.element.innerText = data.flat().join(',').slice(1,-1);
+      }
+
+      boxes.CM6Grid = async (args, env) => {
+        console.warn('this is an temporal fallback to boxes CM6Grid virtual type! Be careful!');
+        const data = await interpretate(args[0], env);
+        return data;
       }
       
       boxes.GridBox = async (args, env) => {
