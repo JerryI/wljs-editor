@@ -294,7 +294,7 @@ var BallancedMatchDecorator = /** @class */ (function () {
                 };
                 
                 if (fromLine == toLine) {
-                    console.warn("It migtht not works, since it did not implement it correctly");
+                    console.warn("It migtht not works, since it did not implement it correctly #1");
                     console.log({
                         fromLine: fromLine,
                         toLine: toLine,
@@ -303,7 +303,9 @@ var BallancedMatchDecorator = /** @class */ (function () {
                         'start_1': start_1, 
                         'end_1': end_1
                     });
-
+                    iterMatches(view.state.doc, this_1.regexp, start_1, end_1, function (from, m) {
+                        return _this.addMatch(m, view, from, add_1);
+                    });
                    
              
                     /*this.regexp.lastIndex = start - fromLine.from
@@ -313,10 +315,10 @@ var BallancedMatchDecorator = /** @class */ (function () {
                     
                 }
                 else {
-                    console.warn("It migtht not works, since it did not implement it correctly");
-                    /*iterMatches(view.state.doc, this_1.regexp, start_1, end_1, function (from, m) {
+                    console.warn("It migtht not works, since it did not implement it correctly #2");
+                    iterMatches(view.state.doc, this_1.regexp, start_1, end_1, function (from, m) {
                         return _this.addMatch(m, view, from, add_1);
-                    });*/
+                    });
                 }
                 deco = deco.update({
                     filterFrom: start_1,
