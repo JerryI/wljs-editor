@@ -53,18 +53,18 @@ import {
 import {StreamLanguage} from "@codemirror/language"
 import {spreadsheet} from "@codemirror/legacy-modes/mode/spreadsheet"
 
-import { wolframLanguage } from "priceless-mathematica/src/mathematica/mathematica"
-import { defaultFunctions } from "priceless-mathematica/src/mathematica/functions"
+import { wolframLanguage } from "../libs/priceless-mathematica/src/mathematica/mathematica"
+import { defaultFunctions } from "../libs/priceless-mathematica/src/mathematica/functions"
 
-import { Arrowholder, Greekholder } from "priceless-mathematica/src/sugar/misc"
-import { fractionsWidget } from "priceless-mathematica/src/sugar/fractions";
-import { subscriptWidget } from "priceless-mathematica/src/sugar/subscript";
-import { supscriptWidget } from "priceless-mathematica/src/sugar/supscript";
-import { squareRootWidget } from "priceless-mathematica/src/sugar/squareroot";
-import { matrixWidget } from "priceless-mathematica/src/sugar/matrix";
-import { cellTypesHighlight } from "priceless-mathematica/src/sugar/cells"
+import { Arrowholder, Greekholder } from "../libs/priceless-mathematica/src/sugar/misc"
+import { fractionsWidget } from "../libs/priceless-mathematica/src/sugar/fractions";
+import { subscriptWidget } from "../libs/priceless-mathematica/src/sugar/subscript";
+import { supscriptWidget } from "../libs/priceless-mathematica/src/sugar/supscript";
+import { squareRootWidget } from "../libs/priceless-mathematica/src/sugar/squareroot";
+import { matrixWidget } from "../libs/priceless-mathematica/src/sugar/matrix";
+import { cellTypesHighlight } from "../libs/priceless-mathematica/src/sugar/cells"
 
-import { BallancedMatchDecorator } from "priceless-mathematica/src/sugar/matcher";
+import { BallancedMatchDecorator } from "../libs/priceless-mathematica/src/sugar/matcher";
 
 const languageConf = new Compartment
 

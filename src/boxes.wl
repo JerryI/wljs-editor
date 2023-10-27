@@ -136,4 +136,5 @@ TemplateBox[{PaneSelectorBox[{False -> GridBox[{{GridBox[{{TagBox["\\\"3 bytes\\
 
 JerryI`WolframJSFrontend`Evaluator`KeepExpression[Graphics]
 JerryI`WolframJSFrontend`Evaluator`KeepExpression[Graphics3D]
+JerryI`WolframJSFrontend`Evaluator`KeepExpression[GraphicsBox, "Epilog"->True]
 JerryI`WolframJSFrontend`Evaluator`KeepExpression[Image]

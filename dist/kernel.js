@@ -68903,385 +68903,385 @@ let defaultFunctions = [
 	{
 		"label":"ECcaEC",
 		"type":"text",
-		"apply":"$CapitalAlpha$",
+		"apply":"\\[CapitalAlpha]",
 		"detail":"CapitalAlpha"
 	},
 	{
 		"label":"ECcbEC",
 		"type":"text",
-		"apply":"$CapitalBeta$",
+		"apply":"\\[CapitalBeta]",
 		"detail":"CapitalBeta"
 	},
 	{
 		"label":"ECcgEC",
 		"type":"text",
-		"apply":"$CapitalGamma$",
+		"apply":"\\[CapitalGamma]",
 		"detail":"CapitalGamma"
 	},
 	{
 		"label":"ECcdEC",
 		"type":"text",
-		"apply":"$CapitalDelta$",
+		"apply":"\\[CapitalDelta]",
 		"detail":"CapitalDelta"
 	},
 	{
 		"label":"ECceEC",
 		"type":"text",
-		"apply":"$CapitalEpsilon$",
+		"apply":"\\[CapitalEpsilon]",
 		"detail":"CapitalEpsilon"
 	},
 	{
 		"label":"ECczEC",
 		"type":"text",
-		"apply":"$CapitalZeta$",
+		"apply":"\\[CapitalZeta]",
 		"detail":"CapitalZeta"
 	},
 	{
 		"label":"ECceEC",
 		"type":"text",
-		"apply":"$CapitalEta$",
+		"apply":"\\[CapitalEta]",
 		"detail":"CapitalEta"
 	},
 	{
 		"label":"ECctEC",
 		"type":"text",
-		"apply":"$CapitalTheta$",
+		"apply":"\\[CapitalTheta]",
 		"detail":"CapitalTheta"
 	},
 	{
 		"label":"ECciEC",
 		"type":"text",
-		"apply":"$CapitalIota$",
+		"apply":"\\[CapitalIota]",
 		"detail":"CapitalIota"
 	},
 	{
 		"label":"ECckEC",
 		"type":"text",
-		"apply":"$CapitalKappa$",
+		"apply":"\\[CapitalKappa]",
 		"detail":"CapitalKappa"
 	},
 	{
 		"label":"ECclEC",
 		"type":"text",
-		"apply":"$CapitalLambda$",
+		"apply":"\\[CapitalLambda]",
 		"detail":"CapitalLambda"
 	},
 	{
 		"label":"ECcmEC",
 		"type":"text",
-		"apply":"$CapitalMu$",
+		"apply":"\\[CapitalMu]",
 		"detail":"CapitalMu"
 	},
 	{
 		"label":"ECcnEC",
 		"type":"text",
-		"apply":"$CapitalNu$",
+		"apply":"\\[CapitalNu]",
 		"detail":"CapitalNu"
 	},
 	{
 		"label":"ECcxEC",
 		"type":"text",
-		"apply":"$CapitalXi$",
+		"apply":"\\[CapitalXi]",
 		"detail":"CapitalXi"
 	},
 	{
 		"label":"ECcoEC",
 		"type":"text",
-		"apply":"$CapitalOmicron$",
+		"apply":"\\[CapitalOmicron]",
 		"detail":"CapitalOmicron"
 	},
 	{
 		"label":"ECcpEC",
 		"type":"text",
-		"apply":"$CapitalPi$",
+		"apply":"\\[CapitalPi]",
 		"detail":"CapitalPi"
 	},
 	{
 		"label":"ECcrEC",
 		"type":"text",
-		"apply":"$CapitalRho$",
+		"apply":"\\[CapitalRho]",
 		"detail":"CapitalRho"
 	},
 	{
 		"label":"ECcsEC",
 		"type":"text",
-		"apply":"$CapitalSigma$",
+		"apply":"\\[CapitalSigma]",
 		"detail":"CapitalSigma"
 	},
 	{
 		"label":"ECctEC",
 		"type":"text",
-		"apply":"$CapitalTau$",
+		"apply":"\\[CapitalTau]",
 		"detail":"CapitalTau"
 	},
 	{
 		"label":"ECcuEC",
 		"type":"text",
-		"apply":"$CapitalUpsilon$",
+		"apply":"\\[CapitalUpsilon]",
 		"detail":"CapitalUpsilon"
 	},
 	{
 		"label":"ECcpEC",
 		"type":"text",
-		"apply":"$CapitalPhi$",
+		"apply":"\\[CapitalPhi]",
 		"detail":"CapitalPhi"
 	},
 	{
 		"label":"ECccEC",
 		"type":"text",
-		"apply":"$CapitalChi$",
+		"apply":"\\[CapitalChi]",
 		"detail":"CapitalChi"
 	},
 	{
 		"label":"ECcpEC",
 		"type":"text",
-		"apply":"$CapitalPsi$",
+		"apply":"\\[CapitalPsi]",
 		"detail":"CapitalPsi"
 	},
 	{
 		"label":"ECcoEC",
 		"type":"text",
-		"apply":"$CapitalOmega$",
+		"apply":"\\[CapitalOmega]",
 		"detail":"CapitalOmega"
 	},
 	{
 		"label":"ECalEC",
 		"type":"text",
-		"apply":"$Alpha$",
+		"apply":"\\[Alpha]",
 		"detail":"Alpha"
 	},
 	{
 		"label":"ECbeEC",
 		"type":"text",
-		"apply":"$Beta$",
+		"apply":"\\[Beta]",
 		"detail":"Beta"
 	},
 	{
 		"label":"ECgaEC",
 		"type":"text",
-		"apply":"$Gamma$",
+		"apply":"\\[Gamma]",
 		"detail":"Gamma"
 	},
 	{
 		"label":"ECdeEC",
 		"type":"text",
-		"apply":"$Delta$",
+		"apply":"\\[Delta]",
 		"detail":"Delta"
 	},
 	{
 		"label":"ECceEC",
 		"type":"text",
-		"apply":"$CurlyEpsilon$",
+		"apply":"\\[CurlyEpsilon]",
 		"detail":"CurlyEpsilon"
 	},
 	{
 		"label":"ECzeEC",
 		"type":"text",
-		"apply":"$Zeta$",
+		"apply":"\\[Zeta]",
 		"detail":"Zeta"
 	},
 	{
 		"label":"ECetEC",
 		"type":"text",
-		"apply":"$Eta$",
+		"apply":"\\[Eta]",
 		"detail":"Eta"
 	},
 	{
 		"label":"ECthEC",
 		"type":"text",
-		"apply":"$Theta$",
+		"apply":"\\[Theta]",
 		"detail":"Theta"
 	},
 	{
 		"label":"ECioEC",
 		"type":"text",
-		"apply":"$Iota$",
+		"apply":"\\[Iota]",
 		"detail":"Iota"
 	},
 	{
 		"label":"ECkaEC",
 		"type":"text",
-		"apply":"$Kappa$",
+		"apply":"\\[Kappa]",
 		"detail":"Kappa"
 	},
 	{
 		"label":"EClaEC",
 		"type":"text",
-		"apply":"$Lambda$",
+		"apply":"\\[Lambda]",
 		"detail":"Lambda"
 	},
 	{
 		"label":"ECmuEC",
 		"type":"text",
-		"apply":"$Mu$",
+		"apply":"\\[Mu]",
 		"detail":"Mu"
 	},
 	{
 		"label":"ECnuEC",
 		"type":"text",
-		"apply":"$Nu$",
+		"apply":"\\[Nu]",
 		"detail":"Nu"
 	},
 	{
 		"label":"ECxiEC",
 		"type":"text",
-		"apply":"$Xi$",
+		"apply":"\\[Xi]",
 		"detail":"Xi"
 	},
 	{
 		"label":"EComEC",
 		"type":"text",
-		"apply":"$Omicron$",
+		"apply":"\\[Omicron]",
 		"detail":"Omicron"
 	},
 	{
 		"label":"ECpiEC",
 		"type":"text",
-		"apply":"$Pi$",
+		"apply":"\\[Pi]",
 		"detail":"Pi"
 	},
 	{
 		"label":"ECrhEC",
 		"type":"text",
-		"apply":"$Rho$",
+		"apply":"\\[Rho]",
 		"detail":"Rho"
 	},
 	{
 		"label":"ECfiEC",
 		"type":"text",
-		"apply":"$FinalSigma$",
+		"apply":"\\[FinalSigma]",
 		"detail":"FinalSigma"
 	},
 	{
 		"label":"ECsiEC",
 		"type":"text",
-		"apply":"$Sigma$",
+		"apply":"\\[Sigma]",
 		"detail":"Sigma"
 	},
 	{
 		"label":"ECtaEC",
 		"type":"text",
-		"apply":"$Tau$",
+		"apply":"\\[Tau]",
 		"detail":"Tau"
 	},
 	{
 		"label":"ECupEC",
 		"type":"text",
-		"apply":"$Upsilon$",
+		"apply":"\\[Upsilon]",
 		"detail":"Upsilon"
 	},
 	{
 		"label":"ECcpEC",
 		"type":"text",
-		"apply":"$CurlyPhi$",
+		"apply":"\\[CurlyPhi]",
 		"detail":"CurlyPhi"
 	},
 	{
 		"label":"ECchEC",
 		"type":"text",
-		"apply":"$Chi$",
+		"apply":"\\[Chi]",
 		"detail":"Chi"
 	},
 	{
 		"label":"ECpsEC",
 		"type":"text",
-		"apply":"$Psi$",
+		"apply":"\\[Psi]",
 		"detail":"Psi"
 	},
 	{
 		"label":"EComEC",
 		"type":"text",
-		"apply":"$Omega$",
+		"apply":"\\[Omega]",
 		"detail":"Omega"
 	},
 	{
 		"label":"ECctEC",
 		"type":"text",
-		"apply":"$CurlyTheta$",
+		"apply":"\\[CurlyTheta]",
 		"detail":"CurlyTheta"
 	},
 	{
 		"label":"ECccEC",
 		"type":"text",
-		"apply":"$CurlyCapitalUpsilon$",
+		"apply":"\\[CurlyCapitalUpsilon]",
 		"detail":"CurlyCapitalUpsilon"
 	},
 	{
 		"label":"ECphEC",
 		"type":"text",
-		"apply":"$Phi$",
+		"apply":"\\[Phi]",
 		"detail":"Phi"
 	},
 	{
 		"label":"ECcpEC",
 		"type":"text",
-		"apply":"$CurlyPi$",
+		"apply":"\\[CurlyPi]",
 		"detail":"CurlyPi"
 	},
 	{
 		"label":"ECcsEC",
 		"type":"text",
-		"apply":"$CapitalStigma$",
+		"apply":"\\[CapitalStigma]",
 		"detail":"CapitalStigma"
 	},
 	{
 		"label":"ECstEC",
 		"type":"text",
-		"apply":"$Stigma$",
+		"apply":"\\[Stigma]",
 		"detail":"Stigma"
 	},
 	{
 		"label":"ECcdEC",
 		"type":"text",
-		"apply":"$CapitalDigamma$",
+		"apply":"\\[CapitalDigamma]",
 		"detail":"CapitalDigamma"
 	},
 	{
 		"label":"ECdiEC",
 		"type":"text",
-		"apply":"$Digamma$",
+		"apply":"\\[Digamma]",
 		"detail":"Digamma"
 	},
 	{
 		"label":"ECckEC",
 		"type":"text",
-		"apply":"$CapitalKoppa$",
+		"apply":"\\[CapitalKoppa]",
 		"detail":"CapitalKoppa"
 	},
 	{
 		"label":"ECkoEC",
 		"type":"text",
-		"apply":"$Koppa$",
+		"apply":"\\[Koppa]",
 		"detail":"Koppa"
 	},
 	{
 		"label":"ECcsEC",
 		"type":"text",
-		"apply":"$CapitalSampi$",
+		"apply":"\\[CapitalSampi]",
 		"detail":"CapitalSampi"
 	},
 	{
 		"label":"ECsaEC",
 		"type":"text",
-		"apply":"$Sampi$",
+		"apply":"\\[Sampi]",
 		"detail":"Sampi"
 	},
 	{
 		"label":"ECckEC",
 		"type":"text",
-		"apply":"$CurlyKappa$",
+		"apply":"\\[CurlyKappa]",
 		"detail":"CurlyKappa"
 	},
 	{
 		"label":"ECcrEC",
 		"type":"text",
-		"apply":"$CurlyRho$",
+		"apply":"\\[CurlyRho]",
 		"detail":"CurlyRho"
 	},
 	{
 		"label":"ECepEC",
 		"type":"text",
-		"apply":"$Epsilon$",
+		"apply":"\\[Epsilon]",
 		"detail":"Epsilon"
 	}
                                                                 
@@ -69565,7 +69565,7 @@ wolframLanguage.reBuild = (vocabulary) => {
 };
 
 const GreekMatcher = new MatchDecorator({
-  regexp: /\$([a-zA-z]+)\$/g,
+  regexp: /\\\[([a-zA-z]+)\]/g,
   decoration: (match) => {
     //console.log(match);
     return Decoration.replace({
