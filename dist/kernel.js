@@ -69597,9 +69597,11 @@ class GreekWidget extends WidgetType {
     super();
     this.name = name;
   }
+
   eq(other) {
     return this.name === other.name;
   }
+
   toDOM() {
     //console.log('to DOM');
     let elt = document.createElement("span");
@@ -69647,10 +69649,10 @@ class ArrowWidget extends WidgetType {
   constructor(dir) {
     super();
     this.dir = dir;
-    this.instance = Math.random();
+    //this.instance = Math.random();
   }
   eq(other) {
-    return this.instance === other.instance;
+    return this.dir === other.dir;
   }
   toDOM() {
     let elt = document.createElement("span");
@@ -69860,6 +69862,8 @@ function iterMatches(doc, re, from, to, f) {
         _loop_1(cursor, pos);
     }
 }
+
+
 function matchRanges(view, maxLength) {
     var visible = view.visibleRanges;
     if (visible.length == 1 &&
@@ -69919,6 +69923,13 @@ var BallancedMatchDecorator = /** @class */ (function () {
         var build = new RangeSetBuilder(), add = build.add.bind(build);
         for (var _i = 0, _a = matchRanges(view, this.maxLength); _i < _a.length; _i++) {
             var _b = _a[_i], from = _b.from, to = _b.to;
+            /*console.log({
+                fromLine: from,
+                toLine: to,
+                'view.state.doc':view.state.doc, 
+                'this_1.regexp': this.regexp
+            });*/
+
             iterMatches(view.state.doc, this.regexp, from, to, function (from, m) {
                 return _this.addMatch(m, view, from, add);
             });
@@ -69944,7 +69955,6 @@ var BallancedMatchDecorator = /** @class */ (function () {
         return deco;
     };
     BallancedMatchDecorator.prototype.updateRange = function (view, deco, updateFrom, updateTo) {
-        var _this = this;
         var _loop_2 = function (r) {
             var from = Math.max(r.from, updateFrom), to = Math.min(r.to, updateTo);
             if (to > from) {
@@ -69963,26 +69973,31 @@ var BallancedMatchDecorator = /** @class */ (function () {
                         }
                 }
                 var ranges_1 = [];
-                var add_1 = function (from, to, deco) {
-                    return ranges_1.push(deco.range(from, to));
-                };
+                
                 if (fromLine == toLine) {
-                    console.log("It migtht not works, since it did not implement it correctly");
+                    console.warn("It migtht not works, since it did not implement it correctly");
+                    console.log({
+                        fromLine: fromLine,
+                        toLine: toLine,
+                        'view.state.doc':view.state.doc, 
+                        'this_1.regexp': this_1.regexp, 
+                        'start_1': start_1, 
+                        'end_1': end_1
+                    });
+
+                   
+             
                     /*this.regexp.lastIndex = start - fromLine.from
                     while ((m = this.regexp.exec(fromLine.text)) && m.index < end - fromLine.from)
                       this.addMatch(m, view, m.index + fromLine.from, add)*/
 
-                    /*iterMatches(view.state.doc, this.regexp, from, to, function (from, m) {
-                        return _this.addMatch(m, view, from, add);
-                    });  */
-                    iterMatches(view.state.doc, this_1.regexp, start_1, end_1, function (from, m) {
-                        return _this.addMatch(m, view, from, add_1);
-                    });
+                    
                 }
                 else {
-                    iterMatches(view.state.doc, this_1.regexp, start_1, end_1, function (from, m) {
+                    console.warn("It migtht not works, since it did not implement it correctly");
+                    /*iterMatches(view.state.doc, this_1.regexp, start_1, end_1, function (from, m) {
                         return _this.addMatch(m, view, from, add_1);
-                    });
+                    });*/
                 }
                 deco = deco.update({
                     filterFrom: start_1,

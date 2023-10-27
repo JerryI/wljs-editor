@@ -163,6 +163,22 @@ function iterMatches(doc, re, from, to, f) {
         _loop_1(cursor, pos, m);
     }
 }
+
+function iterMatches2(doc, re, from, to, f, fromLine, toLine) {
+    re.lastIndex = 0;
+    var _loop_1 = function (cursor, pos, m) {
+        if (!cursor.lineBreak) {
+
+            explodeArgs(re, cursor, pos, f);        
+            
+        }
+    };
+    for (var cursor = doc.iterRange(fromLine.from, to), pos = fromLine.from, m = void 0; !cursor.next().done; pos += cursor.value.length) {
+        _loop_1(cursor, pos, m);
+    }
+}
+
+
 function matchRanges(view, maxLength) {
     var visible = view.visibleRanges;
     if (visible.length == 1 &&
@@ -222,6 +238,13 @@ var BallancedMatchDecorator = /** @class */ (function () {
         var build = new RangeSetBuilder(), add = build.add.bind(build);
         for (var _i = 0, _a = matchRanges(view, this.maxLength); _i < _a.length; _i++) {
             var _b = _a[_i], from = _b.from, to = _b.to;
+            /*console.log({
+                fromLine: from,
+                toLine: to,
+                'view.state.doc':view.state.doc, 
+                'this_1.regexp': this.regexp
+            });*/
+
             iterMatches(view.state.doc, this.regexp, from, to, function (from, m) {
                 return _this.addMatch(m, view, from, add);
             });
@@ -269,23 +292,31 @@ var BallancedMatchDecorator = /** @class */ (function () {
                 var add_1 = function (from, to, deco) {
                     return ranges_1.push(deco.range(from, to));
                 };
+                
                 if (fromLine == toLine) {
-                    console.log("It migtht not works, since it did not implement it correctly");
+                    console.warn("It migtht not works, since it did not implement it correctly");
+                    console.log({
+                        fromLine: fromLine,
+                        toLine: toLine,
+                        'view.state.doc':view.state.doc, 
+                        'this_1.regexp': this_1.regexp, 
+                        'start_1': start_1, 
+                        'end_1': end_1
+                    });
+
+                   
+             
                     /*this.regexp.lastIndex = start - fromLine.from
                     while ((m = this.regexp.exec(fromLine.text)) && m.index < end - fromLine.from)
                       this.addMatch(m, view, m.index + fromLine.from, add)*/
 
-                    /*iterMatches(view.state.doc, this.regexp, from, to, function (from, m) {
-                        return _this.addMatch(m, view, from, add);
-                    });  */
-                    iterMatches(view.state.doc, this_1.regexp, start_1, end_1, function (from, m) {
-                        return _this.addMatch(m, view, from, add_1);
-                    });
+                    
                 }
                 else {
-                    iterMatches(view.state.doc, this_1.regexp, start_1, end_1, function (from, m) {
+                    console.warn("It migtht not works, since it did not implement it correctly");
+                    /*iterMatches(view.state.doc, this_1.regexp, start_1, end_1, function (from, m) {
                         return _this.addMatch(m, view, from, add_1);
-                    });
+                    });*/
                 }
                 deco = deco.update({
                     filterFrom: start_1,

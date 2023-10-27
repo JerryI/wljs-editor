@@ -39,9 +39,11 @@ class GreekWidget extends WidgetType {
     super();
     this.name = name;
   }
+
   eq(other) {
     return this.name === other.name;
   }
+
   toDOM() {
     //console.log('to DOM');
     let elt = document.createElement("span");
@@ -89,10 +91,10 @@ class ArrowWidget extends WidgetType {
   constructor(dir) {
     super();
     this.dir = dir;
-    this.instance = Math.random();
+    //this.instance = Math.random();
   }
   eq(other) {
-    return this.instance === other.instance;
+    return this.dir === other.dir;
   }
   toDOM() {
     let elt = document.createElement("span");
