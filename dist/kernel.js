@@ -69565,7 +69565,7 @@ wolframLanguage.reBuild = (vocabulary) => {
 };
 
 const GreekMatcher = new MatchDecorator({
-  regexp: /\\\[([a-zA-z]+)\]/g,
+  regexp: /\\\[(\w+)\]/g,
   decoration: (match) => {
     //console.log(match);
     return Decoration.replace({
