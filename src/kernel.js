@@ -57,11 +57,13 @@ import { wolframLanguage } from "../libs/priceless-mathematica/src/mathematica/m
 import { defaultFunctions } from "../libs/priceless-mathematica/src/mathematica/functions"
 
 import { Arrowholder, Greekholder } from "../libs/priceless-mathematica/src/sugar/misc"
-import { fractionsWidget } from "../libs/priceless-mathematica/src/sugar/fractions";
-import { subscriptWidget } from "../libs/priceless-mathematica/src/sugar/subscript";
-import { supscriptWidget } from "../libs/priceless-mathematica/src/sugar/supscript";
-import { squareRootWidget } from "../libs/priceless-mathematica/src/sugar/squareroot";
-import { matrixWidget } from "../libs/priceless-mathematica/src/sugar/matrix";
+
+import {FractionBoxWidget} from "../libs/priceless-mathematica/src/boxes/fractionbox"
+import {SqrtBoxWidget} from "../libs/priceless-mathematica/src/boxes/sqrtbox"
+import {SubscriptBoxWidget} from "../libs/priceless-mathematica/src/boxes/subscriptbox"
+import {SupscriptBoxWidget} from "../libs/priceless-mathematica/src/boxes/supscriptbox"
+import {GridBoxWidget} from "../libs/priceless-mathematica/src/boxes/gridbox"
+
 import { cellTypesHighlight } from "../libs/priceless-mathematica/src/sugar/cells"
 
 import { BallancedMatchDecorator } from "../libs/priceless-mathematica/src/sugar/matcher";
@@ -748,11 +750,11 @@ compactWLEditor = (args) => {
     wolframLanguage.of(window.EditorAutocomplete),
     ExecutableHolder,
     ExecutableInlineHolder,
-    fractionsWidget(compactWLEditor),
-    subscriptWidget(compactWLEditor),
-    supscriptWidget(compactWLEditor),
-    matrixWidget(compactWLEditor),
-    squareRootWidget(compactWLEditor),
+    FractionBoxWidget(compactWLEditor),
+    SqrtBoxWidget(compactWLEditor),
+    SubscriptBoxWidget(compactWLEditor),
+    SupscriptBoxWidget(compactWLEditor),
+    GridBoxWidget(compactWLEditor),
     bracketMatching(),
     rainbowBrackets(),
     BoxesHolder,
@@ -780,11 +782,11 @@ const mathematicaPlugins = [
   wolframLanguage.of(window.EditorAutocomplete), 
   ExecutableHolder, 
   ExecutableInlineHolder,
-  fractionsWidget(compactWLEditor),
-  subscriptWidget(compactWLEditor),
-  supscriptWidget(compactWLEditor),
-  matrixWidget(compactWLEditor),
-  squareRootWidget(compactWLEditor),
+  FractionBoxWidget(compactWLEditor),
+  SqrtBoxWidget(compactWLEditor),
+  SubscriptBoxWidget(compactWLEditor),
+  SupscriptBoxWidget(compactWLEditor),
+  GridBoxWidget(compactWLEditor),
   bracketMatching(),
   rainbowBrackets(),
   Greekholder,
