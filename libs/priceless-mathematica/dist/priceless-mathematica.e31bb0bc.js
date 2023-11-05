@@ -65159,7 +65159,7 @@ exports.matches = function (config) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.explodeArgs = exports.BallancedMatchDecorator2 = void 0;
+exports.matchArguments = exports.explodeArgs = exports.BallancedMatchDecorator2 = void 0;
 var _state = require("@codemirror/state");
 var _nodeBalanced = require("node-balanced");
 var matchHeadExcluding = function matchHeadExcluding(regexp, string, ignoreRanges) {
@@ -65208,59 +65208,69 @@ String.prototype.splitNoQuotes = function (expr) {
   }
   return arr;
 };
+var matchArguments = exports.matchArguments = function matchArguments(target, separator) {
+  var ignoreInner = new _nodeBalanced.Balanced({
+    open: /\(\*\w+\[\*\)/,
+    close: /\(\*\]\w+\*\)/
+  }).matchContentsInBetweenBrackets(target, []);
+
+  //console.log(ignoreInner);
+
+  var separators = matchHeadExcluding(separator, target, ignoreInner);
+
+  //console.log(separators);
+  //console.log(target);
+  /*if (separators.length == 0) return ({
+    index: m.index,
+    content: target
+  });*/
+
+  var args = [];
+  var index = 0;
+  var stop = target.length;
+  var prev;
+  var s;
+  while (s = separators.shift()) {
+    if (prev) index = prev.index + prev.length;
+    var sliced = target.slice(index, s.index);
+    args.push({
+      from: index,
+      //to: s.index,
+      length: sliced.length,
+      body: sliced
+    }
+    //target.slice(index, s.index)
+    );
+    //index = s.index;
+    prev = s;
+  }
+  var lastIndex = 0;
+  if (prev) lastIndex = prev.index + prev.length;
+  if (lastIndex != target.length) {
+    var _sliced = target.slice(lastIndex);
+    args.push({
+      from: lastIndex,
+      //to: target.length,
+      length: _sliced.length,
+      body: _sliced
+    }
+    //target.slice(lastIndex)
+    );
+  }
+
+  ;
+  return args;
+};
 var explodeArgs = exports.explodeArgs = function explodeArgs(tag, cursor, pos, f) {
   new _nodeBalanced.Balanced({
-    open: "(*" + tag.tag + "[*)",
-    close: "(*]" + tag.tag + "*)",
+    open: "(*" + tag + "[*)",
+    close: "(*]" + tag + "*)",
     balance: false
   }).matchContentsInBetweenBrackets(cursor.value, []).forEach(function (m) {
     //console.log(m);
 
     var target = cursor.value.slice(m.index + m.head.length, m.index + m.length - m.tail.length);
     //console.log(target);
-
-    var ignoreInner = new _nodeBalanced.Balanced({
-      open: /\(\*\w+\[\*\)/,
-      close: /\(\*\]\w+\*\)/
-    }).matchContentsInBetweenBrackets(target, []);
-
-    //console.log(ignoreInner);
-
-    var separators = matchHeadExcluding(tag.separator, target, ignoreInner);
-
-    //console.log(separators);
-    //console.log(target);
-    /*if (separators.length == 0) return ({
-      index: m.index,
-      content: target
-    });*/
-
-    var args = [];
-    var index = 0;
-    var stop = target.length;
-    var prev;
-    var s;
-    while (s = separators.shift()) {
-      if (prev) index = prev.index + prev.length;
-      args.push({
-        from: index + m.index + m.head.length + pos,
-        to: s.index + m.index + m.head.length + pos,
-        body: target.slice(index, s.index)
-      }
-      //target.slice(index, s.index)
-      );
-      //index = s.index;
-      prev = s;
-    }
-    var lastIndex = 0;
-    if (prev) lastIndex = prev.index + prev.length;
-    if (lastIndex != target.length) args.push({
-      from: lastIndex + m.index + m.head.length + pos,
-      to: m.index + m.head.length + pos + target.length,
-      body: target.slice(lastIndex)
-    }
-    //target.slice(lastIndex)
-    );
 
     //console.log(args);
     //console.log('working');
@@ -65269,13 +65279,12 @@ var explodeArgs = exports.explodeArgs = function explodeArgs(tag, cursor, pos, f
       length: m.length,
       pos: pos + m.index,
       argsPos: pos + m.index + m.head.length,
-      args: args,
       str: target
     });
   });
 };
 function iterMatches(doc, re, from, to, f) {
-  re.lastIndex = 0;
+  //re.lastIndex = 0;
   var _loop_1 = function _loop_1(cursor, pos, m) {
     if (!cursor.lineBreak) {
       explodeArgs(re, cursor, pos, f);
@@ -65286,7 +65295,7 @@ function iterMatches(doc, re, from, to, f) {
   }
 }
 function iterMatches2(doc, re, from, to, f, fromLine, toLine) {
-  re.lastIndex = 0;
+  //re.lastIndex = 0;
   var _loop_1 = function _loop_1(cursor, pos, m) {
     if (!cursor.lineBreak) {
       explodeArgs(re, cursor, pos, f);
@@ -65474,9 +65483,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
-function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -65513,7 +65519,7 @@ function snippet() {
           changes: {
             from: from,
             to: to,
-            insert: "(*SqrtBox[*)Sqrt[_](*]SqrtBox*)"
+            insert: "(*SqB[*)Sqrt[_](*]SqB*)"
           },
           range: _state.EditorSelection.cursor(from)
         };
@@ -65522,7 +65528,7 @@ function snippet() {
         changes: {
           from: from,
           to: to,
-          insert: "(*SqrtBox[*)Sqrt[" + prev + "](*]SqrtBox*)"
+          insert: "(*SqB[*)Sqrt[" + prev + "](*]SqB*)"
         },
         range: _state.EditorSelection.cursor(from)
       };
@@ -65536,15 +65542,16 @@ function snippet() {
 }
 var EditorInstance = /*#__PURE__*/function () {
   function EditorInstance(visibleValue, view, dom, sliceRanges) {
-    var _visibleValue$args$0$;
+    var _visibleValue$str;
     _classCallCheck(this, EditorInstance);
     this.view = view;
     this.visibleValue = visibleValue;
     var self = this;
+    this.length = visibleValue.str.length;
     console.log('creating InstanceWidget');
     this.editor = compactCMEditor({
-      //slice SqrtBox[...]
-      doc: (_visibleValue$args$0$ = visibleValue.args[0].body).slice.apply(_visibleValue$args$0$, _toConsumableArray(sliceRanges)),
+      //slice SqB[...]
+      doc: (_visibleValue$str = visibleValue.str).slice.apply(_visibleValue$str, _toConsumableArray(sliceRanges)),
       parent: dom,
       update: function update(upd) {
         return self.applyChanges(upd);
@@ -65570,15 +65577,17 @@ var EditorInstance = /*#__PURE__*/function () {
   _createClass(EditorInstance, [{
     key: "applyChanges",
     value: function applyChanges(update) {
-      var args = this.visibleValue.args;
+      //const args = this.visibleValue.args;
       var data = "Sqrt[" + update + "]";
 
       //const old = this.visibleValue.str;
 
       //console.log(this.visibleValue.pos);
-      var changes = _objectSpread(_objectSpread({}, args[0]), {}, {
+      var changes = {
+        from: this.visibleValue.argsPos,
+        to: this.visibleValue.argsPos + this.length,
         insert: data
-      });
+      };
       //console.log(args);
       //const changes = {from: this.visibleValue.argsPos + args[0], to: this.visibleValue.argsPos + args[0].from + args[0].body.length - 1, insert: data};
       //console.warn('changes will be applied to...');
@@ -65590,6 +65599,7 @@ var EditorInstance = /*#__PURE__*/function () {
 
       //console.log('insert change');
       //console.log(changes);
+      this.length = data.length;
       this.view.dispatch({
         changes: changes
       });
@@ -65600,7 +65610,7 @@ var EditorInstance = /*#__PURE__*/function () {
       //console.log('Update instance: new ranges & arguments');
       this.visibleValue.pos = visibleValue.pos;
       this.visibleValue.argsPos = visibleValue.argsPos;
-      this.visibleValue.args = visibleValue.args;
+      //this.visibleValue.args = visibleValue.args;
     }
   }, {
     key: "destroy",
@@ -65670,10 +65680,7 @@ var Widget = /*#__PURE__*/function (_WidgetType) {
 }(_view.WidgetType);
 var matcher = function matcher(ref, view) {
   return new _matcher.BallancedMatchDecorator2({
-    tag: {
-      tag: 'SqrtBox',
-      separator: /\(\*,\*\)/gm
-    },
+    tag: 'SqB',
     decoration: function decoration(match) {
       return _view.Decoration.replace({
         widget: new Widget(match, ref, view)
@@ -65737,9 +65744,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
-function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
@@ -65770,7 +65774,7 @@ function snippet() {
           changes: {
             from: from,
             to: to,
-            insert: "(*FractionBox[*)((_)(*,*)/(*,*)(_))(*]FractionBox*)"
+            insert: "(*FB[*)((_)(*,*)/(*,*)(_))(*]FB*)"
           },
           range: _state.EditorSelection.cursor(from)
         };
@@ -65779,7 +65783,7 @@ function snippet() {
         changes: {
           from: from,
           to: to,
-          insert: "(*FractionBox[*)((" + prev + ")(*,*)/(*,*)(_))(*]FractionBox*)"
+          insert: "(*FB[*)((" + prev + ")(*,*)/(*,*)(_))(*]FB*)"
         },
         range: _state.EditorSelection.cursor(from)
       };
@@ -65797,6 +65801,7 @@ var EditorInstance = /*#__PURE__*/function () {
     _classCallCheck(this, EditorInstance);
     this.view = view;
     this.visibleValue = visibleValue;
+    this.args = (0, _matcher.matchArguments)(visibleValue.str, /\(\*,\*\)/gm);
     var self = this;
 
     //console.log(visibleValue);
@@ -65804,7 +65809,7 @@ var EditorInstance = /*#__PURE__*/function () {
     console.log('creating InstanceWidget');
     var topEditor, bottomEditor;
     topEditor = compactCMEditor({
-      doc: self.visibleValue.args[0].body.slice(2, -1),
+      doc: self.args[0].body.slice(2, -1),
       parent: enumenator,
       update: function update(upd) {
         return _this.applyChanges(upd, 0);
@@ -65833,7 +65838,7 @@ var EditorInstance = /*#__PURE__*/function () {
       }])]
     });
     bottomEditor = compactCMEditor({
-      doc: self.visibleValue.args[2].body.slice(1, -2),
+      doc: self.args[2].body.slice(1, -2),
       parent: denumenator,
       update: function update(upd) {
         return _this.applyChanges(upd, 2);
@@ -65861,25 +65866,54 @@ var EditorInstance = /*#__PURE__*/function () {
         }
       }])]
     });
+    self.args[0].length = self.args[0].body.length;
+    self.args[2].length = self.args[2].body.length;
+
+    //dont store strings...
+    delete self.args[2].body;
+    delete self.args[1].body;
+    delete self.args[0].body;
     this.topEditor = topEditor;
     this.bottomEditor = bottomEditor;
   }
   _createClass(EditorInstance, [{
     key: "applyChanges",
     value: function applyChanges(update, pos) {
-      var args = this.visibleValue.args;
+      var args = this.args;
+      var relative = this.visibleValue.argsPos;
       if (pos == 0) {
         //uppder one
-        var changes = _objectSpread(_objectSpread({}, args[pos]), {}, {
-          insert: '((' + update + ')'
-        });
+        var data = '((' + update + ')';
+        var changes = {
+          from: relative + args[0].from,
+          to: relative + args[0].from + args[0].length,
+          insert: data
+        };
+
+        //shift other positions
+        args[0].to = args[0].to + (data.length - args[0].length);
+        args[2].from = args[2].from + (data.length - args[0].length);
+        args[0].length = data.length;
+
+        //console.log(changes);
+
         this.view.dispatch({
           changes: changes
         });
       } else {
-        var _changes = _objectSpread(_objectSpread({}, args[pos]), {}, {
-          insert: '(' + update + '))'
-        });
+        var _data = '(' + update + '))';
+        var _changes = {
+          from: relative + args[2].from,
+          to: relative + args[2].from + args[2].length,
+          insert: _data
+        };
+
+        //shift other positions
+        args[2].to = args[2].to + (_data.length - args[2].length);
+        args[2].length = _data.length;
+
+        //console.log(changes);
+
         this.view.dispatch({
           changes: _changes
         });
@@ -65892,7 +65926,6 @@ var EditorInstance = /*#__PURE__*/function () {
       //console.log('Update instance: new ranges & arguments');
       this.visibleValue.pos = visibleValue.pos;
       this.visibleValue.argsPos = visibleValue.argsPos;
-      this.visibleValue.args = visibleValue.args;
     }
   }, {
     key: "destroy",
@@ -65972,10 +66005,7 @@ var Widget = /*#__PURE__*/function (_WidgetType) {
 }(_view.WidgetType);
 var matcher = function matcher(ref, view) {
   return new _matcher.BallancedMatchDecorator2({
-    tag: {
-      tag: 'FractionBox',
-      separator: /\(\*,\*\)/gm
-    },
+    tag: 'FB',
     decoration: function decoration(match) {
       return _view.Decoration.replace({
         widget: new Widget(match, ref, view)
@@ -66039,9 +66069,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
-function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
@@ -66072,7 +66099,7 @@ function snippet() {
           changes: {
             from: from,
             to: to,
-            insert: "(*SubscriptBox[*)Subscript[_(*|*),(*|*)_](*]SubscriptBox*)"
+            insert: "(*SbB[*)Subscript[_(*|*),(*|*)_](*]SbB*)"
           },
           range: _state.EditorSelection.cursor(from)
         };
@@ -66081,7 +66108,7 @@ function snippet() {
         changes: {
           from: from,
           to: to,
-          insert: "(*SubscriptBox[*)Subscript[" + prev + "(*|*),(*|*)_](*]SubscriptBox*)"
+          insert: "(*SbB[*)Subscript[" + prev + "(*|*),(*|*)_](*]SbB*)"
         },
         range: _state.EditorSelection.cursor(from)
       };
@@ -66100,6 +66127,7 @@ var EditorInstance = /*#__PURE__*/function () {
     this.view = view;
     this.visibleValue = visibleValue;
     var self = this;
+    this.args = (0, _matcher.matchArguments)(visibleValue.str, /\(\*\|\*\)/gm);
 
     //console.log(visibleValue);
 
@@ -66107,7 +66135,7 @@ var EditorInstance = /*#__PURE__*/function () {
     var topEditor, bottomEditor;
     console.log(self.visibleValue);
     topEditor = compactCMEditor({
-      doc: self.visibleValue.args[0].body.slice(10),
+      doc: self.args[0].body.slice(10),
       parent: head,
       update: function update(upd) {
         return _this.applyChanges(upd, 0);
@@ -66127,7 +66155,7 @@ var EditorInstance = /*#__PURE__*/function () {
       }])]
     });
     bottomEditor = compactCMEditor({
-      doc: self.visibleValue.args[2].body.slice(0, -1),
+      doc: self.args[2].body.slice(0, -1),
       parent: sub,
       update: function update(upd) {
         return _this.applyChanges(upd, 2);
@@ -66152,23 +66180,52 @@ var EditorInstance = /*#__PURE__*/function () {
 
     this.topEditor = topEditor;
     this.bottomEditor = bottomEditor;
+    self.args[0].length = self.args[0].body.length;
+    self.args[2].length = self.args[2].body.length;
+
+    //dont store strings...
+    delete self.args[2].body;
+    delete self.args[1].body;
+    delete self.args[0].body;
   }
   _createClass(EditorInstance, [{
     key: "applyChanges",
     value: function applyChanges(update, pos) {
-      var args = this.visibleValue.args;
+      var args = this.args;
+      var relative = this.visibleValue.argsPos;
       if (pos == 0) {
         //uppder one
-        var changes = _objectSpread(_objectSpread({}, args[pos]), {}, {
-          insert: 'Subscript[' + update
-        });
+        var data = 'Subscript[' + update;
+        var changes = {
+          from: relative + args[0].from,
+          to: relative + args[0].from + args[0].length,
+          insert: data
+        };
+
+        //shift other positions
+        args[0].to = args[0].to + (data.length - args[0].length);
+        args[2].from = args[2].from + (data.length - args[0].length);
+        args[0].length = data.length;
+
+        //console.log(changes);
+
         this.view.dispatch({
           changes: changes
         });
       } else {
-        var _changes = _objectSpread(_objectSpread({}, args[pos]), {}, {
-          insert: update + ']'
-        });
+        var _data = update + ']';
+        var _changes = {
+          from: relative + args[2].from,
+          to: relative + args[2].from + args[2].length,
+          insert: _data
+        };
+
+        //shift other positions
+        args[2].to = args[2].to + (_data.length - args[2].length);
+        args[2].length = _data.length;
+
+        //console.log(changes);
+
         this.view.dispatch({
           changes: _changes
         });
@@ -66181,7 +66238,7 @@ var EditorInstance = /*#__PURE__*/function () {
       //console.log('Update instance: new ranges & arguments');
       this.visibleValue.pos = visibleValue.pos;
       this.visibleValue.argsPos = visibleValue.argsPos;
-      this.visibleValue.args = visibleValue.args;
+      //this.visibleValue.args = visibleValue.args;
     }
   }, {
     key: "destroy",
@@ -66249,10 +66306,7 @@ var Widget = /*#__PURE__*/function (_WidgetType) {
 }(_view.WidgetType);
 var matcher = function matcher(ref, view) {
   return new _matcher.BallancedMatchDecorator2({
-    tag: {
-      tag: 'SubscriptBox',
-      separator: /\(\*\|\*\)/gm
-    },
+    tag: 'SbB',
     decoration: function decoration(match) {
       return _view.Decoration.replace({
         widget: new Widget(match, ref, view)
@@ -66316,9 +66370,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
-function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
@@ -66349,7 +66400,7 @@ function snippet() {
           changes: {
             from: from,
             to: to,
-            insert: "(*SupscriptBox[*)Power[_(*|*),(*|*)_](*]SupscriptBox*)"
+            insert: "(*SpB[*)Power[_(*|*),(*|*)_](*]SpB*)"
           },
           range: _state.EditorSelection.cursor(from)
         };
@@ -66358,7 +66409,7 @@ function snippet() {
         changes: {
           from: from,
           to: to,
-          insert: "(*SupscriptBox[*)Power[" + prev + "(*|*),(*|*)_](*]SupscriptBox*)"
+          insert: "(*SpB[*)Power[" + prev + "(*|*),(*|*)_](*]SpB*)"
         },
         range: _state.EditorSelection.cursor(from)
       };
@@ -66379,12 +66430,14 @@ var EditorInstance = /*#__PURE__*/function () {
     var self = this;
 
     //console.log(visibleValue);
-
+    this.args = (0, _matcher.matchArguments)(visibleValue.str, /\(\*\|\*\)/gm);
     console.log('creating InstanceWidget');
     var topEditor, bottomEditor;
-    console.log(self.visibleValue);
+
+    //console.log(self.visibleValue);
+
     topEditor = compactCMEditor({
-      doc: self.visibleValue.args[0].body.slice(6),
+      doc: self.args[0].body.slice(6),
       parent: head,
       update: function update(upd) {
         return _this.applyChanges(upd, 0);
@@ -66404,7 +66457,7 @@ var EditorInstance = /*#__PURE__*/function () {
       }])]
     });
     bottomEditor = compactCMEditor({
-      doc: self.visibleValue.args[2].body.slice(0, -1),
+      doc: self.args[2].body.slice(0, -1),
       parent: sub,
       update: function update(upd) {
         return _this.applyChanges(upd, 2);
@@ -66429,23 +66482,52 @@ var EditorInstance = /*#__PURE__*/function () {
 
     this.topEditor = topEditor;
     this.bottomEditor = bottomEditor;
+    self.args[0].length = self.args[0].body.length;
+    self.args[2].length = self.args[2].body.length;
+
+    //dont store strings...
+    delete self.args[2].body;
+    delete self.args[1].body;
+    delete self.args[0].body;
   }
   _createClass(EditorInstance, [{
     key: "applyChanges",
     value: function applyChanges(update, pos) {
-      var args = this.visibleValue.args;
+      var args = this.args;
+      var relative = this.visibleValue.argsPos;
       if (pos == 0) {
         //uppder one
-        var changes = _objectSpread(_objectSpread({}, args[pos]), {}, {
-          insert: 'Power[' + update
-        });
+        var data = 'Power[' + update;
+        var changes = {
+          from: relative + args[0].from,
+          to: relative + args[0].from + args[0].length,
+          insert: data
+        };
+
+        //shift other positions
+        args[0].to = args[0].to + (data.length - args[0].length);
+        args[2].from = args[2].from + (data.length - args[0].length);
+        args[0].length = data.length;
+
+        //console.log(changes);
+
         this.view.dispatch({
           changes: changes
         });
       } else {
-        var _changes = _objectSpread(_objectSpread({}, args[pos]), {}, {
-          insert: update + ']'
-        });
+        var _data = update + ']';
+        var _changes = {
+          from: relative + args[2].from,
+          to: relative + args[2].from + args[2].length,
+          insert: _data
+        };
+
+        //shift other positions
+        args[2].to = args[2].to + (_data.length - args[2].length);
+        args[2].length = _data.length;
+
+        //console.log(changes);
+
         this.view.dispatch({
           changes: _changes
         });
@@ -66458,7 +66540,6 @@ var EditorInstance = /*#__PURE__*/function () {
       //console.log('Update instance: new ranges & arguments');
       this.visibleValue.pos = visibleValue.pos;
       this.visibleValue.argsPos = visibleValue.argsPos;
-      this.visibleValue.args = visibleValue.args;
     }
   }, {
     key: "destroy",
@@ -66526,10 +66607,318 @@ var Widget = /*#__PURE__*/function (_WidgetType) {
 }(_view.WidgetType);
 var matcher = function matcher(ref, view) {
   return new _matcher.BallancedMatchDecorator2({
-    tag: {
-      tag: 'SupscriptBox',
-      separator: /\(\*\|\*\)/gm
-    },
+    tag: 'SpB',
+    decoration: function decoration(match) {
+      return _view.Decoration.replace({
+        widget: new Widget(match, ref, view)
+      });
+    }
+  });
+};
+var placeholder = _view.ViewPlugin.fromClass( /*#__PURE__*/function () {
+  function _class(view) {
+    _classCallCheck(this, _class);
+    this.disposable = [];
+    this.placeholder = matcher(this.disposable, view).createDeco(view);
+  }
+  _createClass(_class, [{
+    key: "update",
+    value: function update(_update) {
+      //console.log('update Deco');
+      //console.log(this.disposable );
+      this.placeholder = matcher(this.disposable, _update).updateDeco(_update, this.placeholder);
+    }
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      console.log("removed holder");
+      console.log("disposable");
+      console.log(this.disposable);
+      this.disposable.forEach(function (el) {
+        el.dispose();
+      });
+    }
+  }]);
+  return _class;
+}(), {
+  decorations: function decorations(instance) {
+    return instance.placeholder;
+  },
+  provide: function provide(plugin) {
+    return _view.EditorView.atomicRanges.of(function (view) {
+      var _a;
+      return ((_a = view.plugin(plugin)) === null || _a === void 0 ? void 0 : _a.placeholder) || _view.Decoration.none;
+    });
+  }
+});
+},{"@codemirror/view":"node_modules/@codemirror/view/dist/index.js","./utils":"src/boxes/utils.js","./matcher":"src/boxes/matcher.js","@codemirror/state":"node_modules/@codemirror/state/dist/index.js","node-balanced":"node_modules/node-balanced/index.js"}],"src/boxes/gridbox.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.GridBoxWidget = GridBoxWidget;
+var _view = require("@codemirror/view");
+var _utils = require("./utils");
+var _matcher = require("./matcher");
+var _state = require("@codemirror/state");
+var _nodeBalanced = require("node-balanced");
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var compactCMEditor;
+function GridBoxWidget(viewEditor) {
+  compactCMEditor = viewEditor;
+  return [
+  //mathematicaMathDecoration,
+  placeholder
+  //keymap.of([{ key: "Ctrl-m", run: snippet() }])
+  ];
+}
+
+function snippet() {
+  return function (_ref) {
+    var state = _ref.state,
+      dispatch = _ref.dispatch;
+    if (state.readOnly) return false;
+    var changes = state.changeByRange(function (range) {
+      var from = range.from,
+        to = range.to;
+      //if (atEof) from = to = (to <= line.to ? line : state.doc.lineAt(to)).to
+      var prev = state.sliceDoc(from, to);
+      if (prev.length === 0) {
+        return {
+          changes: {
+            from: from,
+            to: to,
+            insert: "(*GridBox[*)Subscript[_(*|*),(*|*)_](*]SubscriptBox*)"
+          },
+          range: _state.EditorSelection.cursor(from)
+        };
+      }
+      return {
+        changes: {
+          from: from,
+          to: to,
+          insert: "(*GridBox[*)Subscript[" + prev + "(*|*),(*|*)_](*]SubscriptBox*)"
+        },
+        range: _state.EditorSelection.cursor(from)
+      };
+    });
+    dispatch(state.update(changes, {
+      scrollIntoView: true,
+      userEvent: "input"
+    }));
+    return true;
+  };
+}
+var EditorInstance = /*#__PURE__*/function () {
+  function EditorInstance(visibleValue, view, tbody) {
+    var _this = this;
+    _classCallCheck(this, EditorInstance);
+    this.view = view;
+    this.visibleValue = visibleValue;
+    var self = this;
+    this.tbody = tbody;
+    this.args = (0, _matcher.matchArguments)(visibleValue.str, /\(\*\|\|\*\)/gm).map(function (arg, index) {
+      if (index % 2 != 0) return arg;
+      return _objectSpread(_objectSpread({}, arg), {}, {
+        body: (0, _matcher.matchArguments)(arg.body, /\(\*\|\*\)/gm)
+      });
+    });
+
+    //console.log(this.args);
+    //return;
+    var args = this.args;
+    console.log('creating InstanceWidget');
+    var _loop = function _loop(i) {
+      var tr = document.createElement("tr");
+      var cols = _this.args[i].body;
+      var _loop2 = function _loop2(j) {
+        var td = document.createElement("td");
+        var text = cols[j].body;
+        if (j == 0 && i == 0) text = text.slice(2);
+        if (j == 0 && i != 0) text = text.slice(1);
+        if (j == cols.length - 1 && i == _this.args.length - 1) text = text.slice(0, -2);
+        if (j == cols.length - 1 && i != _this.args.length - 1) text = text.slice(0, -1);
+        cols[j].editor = compactCMEditor({
+          doc: text,
+          parent: td,
+          update: function update(upd) {
+            return _this.applyChanges(upd, i, j);
+          },
+          extensions: [_view.keymap.of([{
+            key: "ArrowLeft",
+            run: function run(editor, key) {
+              if ((editor === null || editor === void 0 ? void 0 : editor.editorLastCursor) === editor.state.selection.ranges[0].to) if (j - 2 >= 0) cols[j - 2].editor.focus();else view.focus();
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;
+            }
+          }, {
+            key: "ArrowRight",
+            run: function run(editor, key) {
+              if ((editor === null || editor === void 0 ? void 0 : editor.editorLastCursor) === editor.state.selection.ranges[0].to) if (j + 2 < cols.length) cols[j + 2].editor.focus();else view.focus();
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;
+            }
+          }, {
+            key: "ArrowUp",
+            run: function run(editor, key) {
+              if ((editor === null || editor === void 0 ? void 0 : editor.editorLastCursor) === editor.state.selection.ranges[0].to) if (i - 2 >= 0) args[i - 2].body[j].editor.focus();else view.focus();
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;
+            }
+          }, {
+            key: "ArrowDown",
+            run: function run(editor, key) {
+              if ((editor === null || editor === void 0 ? void 0 : editor.editorLastCursor) === editor.state.selection.ranges[0].to) if (i + 2 < args.length) args[i + 2].body[j].editor.focus();else view.focus();
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;
+            }
+          }])]
+        });
+
+        //remove unnecesary
+        delete cols[j].body;
+        tr.appendChild(td);
+      };
+      for (var j = 0; j < cols.length; j += 2) {
+        _loop2(j);
+      }
+      tbody.appendChild(tr);
+    };
+    for (var i = 0; i < this.args.length; i += 2) {
+      _loop(i);
+    }
+    console.log(this.args);
+  }
+  _createClass(EditorInstance, [{
+    key: "applyChanges",
+    value: function applyChanges(update, i, j) {
+      var args = this.args;
+      var parent = this.args[i].body;
+      var relative1 = this.visibleValue.argsPos;
+      var relative2 = this.args[i].from;
+      var text = update;
+      if (j == 0 && i == 0) text = '{{' + text;
+      if (j == 0 && i != 0) text = '{' + text;
+      if (j == parent.length - 1 && i == args.length - 1) text = text + '}}';
+      if (j == parent.length - 1 && i != args.length - 1) text = text + '}';
+      var oldLength = parent[j].length;
+      var changes = {
+        from: relative1 + relative2 + parent[j].from,
+        to: relative1 + relative2 + parent[j].from + oldLength,
+        insert: text
+      };
+
+      //shift the next in a row
+      for (var jj = j + 1; jj < parent.length; jj += 1) {
+        parent[jj].from += text.length - oldLength;
+      }
+
+      //shift the next in the col
+      for (var ii = i + 1; ii < args.length; ii += 1) {
+        args[ii].from += text.length - oldLength;
+      }
+      this.args[i].length += text.length - oldLength;
+
+      //apply 
+      parent[j].length = text.length;
+      console.log(changes);
+      //console.log(this.args);
+
+      this.view.dispatch({
+        changes: changes
+      });
+    }
+  }, {
+    key: "update",
+    value: function update(visibleValue) {
+      //console.log('Update instance: new ranges & arguments');
+      this.visibleValue.pos = visibleValue.pos;
+      this.visibleValue.argsPos = visibleValue.argsPos;
+      //this.visibleValue.args = visibleValue.args;
+    }
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      console.warn('destroy Instance of Widget!');
+      for (var i = 0; i < this.args.length; i += 2) {
+        var cols = this.args[i].body;
+        for (var j = 0; j < cols.length; j += 2) {
+          cols[j].editor.destroy();
+        }
+      }
+    }
+  }]);
+  return EditorInstance;
+}();
+var Widget = /*#__PURE__*/function (_WidgetType) {
+  _inherits(Widget, _WidgetType);
+  var _super = _createSuper(Widget);
+  function Widget(visibleValue, ref, view) {
+    var _this2;
+    _classCallCheck(this, Widget);
+    _this2 = _super.call(this);
+    _this2.view = view;
+    _this2.visibleValue = visibleValue;
+    //console.log('construct');
+    return _this2;
+  }
+  _createClass(Widget, [{
+    key: "eq",
+    value: function eq(other) {
+      return false;
+      return this.visibleValue.str === other.visibleValue.str;
+    }
+  }, {
+    key: "updateDOM",
+    value: function updateDOM(dom, view) {
+      //console.log(this.visibleValue);
+      //console.log(this);
+      console.log('update widget DOM');
+      dom.EditorInstance.update(this.visibleValue);
+      return true;
+    }
+  }, {
+    key: "toDOM",
+    value: function toDOM(view) {
+      console.log('Create a new one!');
+      var span = document.createElement("span");
+      span.classList.add('matrix');
+      var table = document.createElement("table");
+      table.classList.add('container');
+      span.appendChild(table);
+      var tbody = document.createElement("tbody");
+      table.appendChild(tbody);
+      span.EditorInstance = new EditorInstance(this.visibleValue, view, tbody);
+      return span;
+    }
+  }, {
+    key: "ignoreEvent",
+    value: function ignoreEvent() {
+      return true;
+    }
+  }, {
+    key: "destroy",
+    value: function destroy(dom) {
+      dom.EditorInstance.destroy();
+    }
+  }]);
+  return Widget;
+}(_view.WidgetType);
+var matcher = function matcher(ref, view) {
+  return new _matcher.BallancedMatchDecorator2({
+    tag: 'GB',
     decoration: function decoration(match) {
       return _view.Decoration.replace({
         widget: new Widget(match, ref, view)
@@ -66848,6 +67237,7 @@ var _sqrtbox = require("./src/boxes/sqrtbox");
 var _fractionbox = require("./src/boxes/fractionbox");
 var _subscriptbox = require("./src/boxes/subscriptbox");
 var _supscriptbox = require("./src/boxes/supscriptbox");
+var _gridbox = require("./src/boxes/gridbox");
 var _misc = require("./src/sugar/misc");
 var _language = require("@codemirror/language");
 var _rainbowbrackets = _interopRequireDefault(require("rainbowbrackets"));
@@ -66892,7 +67282,7 @@ var editorCustomThemeCompact = _codemirror.EditorView.theme({
     "overflow": 'overlay'
   }
 });
-var doc = " \n(*FractionBox[*)((1)(*,*)/(*,*)(2))(*]FractionBox*)\n";
+var doc = " \n(*GB[*){{1(*|*),(*|*)0}(*||*),(*||*){0(*|*),(*|*)1}}(*]GB*)\n";
 var _compactWLEditor = null;
 _compactWLEditor = function compactWLEditor(p) {
   var editor = new _codemirror.EditorView({
@@ -66910,7 +67300,7 @@ _compactWLEditor = function compactWLEditor(p) {
         p.eval();
         return true;
       }
-    }]), p.extensions || [], _codemirror.minimalSetup, editorCustomThemeCompact, _mathematica.wolframLanguage, (0, _sqrtbox.SqrtBoxWidget)(_compactWLEditor), (0, _fractionbox.FractionBoxWidget)(_compactWLEditor), (0, _subscriptbox.SubscriptBoxWidget)(_compactWLEditor), (0, _supscriptbox.SupscriptBoxWidget)(_compactWLEditor), (0, _language.bracketMatching)(), (0, _rainbowbrackets.default)(), _misc.Greekholder, _misc.Arrowholder, _codemirror.EditorView.updateListener.of(function (v) {
+    }]), p.extensions || [], _codemirror.minimalSetup, editorCustomThemeCompact, _mathematica.wolframLanguage, (0, _sqrtbox.SqrtBoxWidget)(_compactWLEditor), (0, _fractionbox.FractionBoxWidget)(_compactWLEditor), (0, _subscriptbox.SubscriptBoxWidget)(_compactWLEditor), (0, _supscriptbox.SupscriptBoxWidget)(_compactWLEditor), (0, _gridbox.GridBoxWidget)(_compactWLEditor), (0, _language.bracketMatching)(), (0, _rainbowbrackets.default)(), _misc.Greekholder, _misc.Arrowholder, _codemirror.EditorView.updateListener.of(function (v) {
       if (v.docChanged) {
         p.update(v.state.doc.toString());
       }
@@ -66922,13 +67312,13 @@ _compactWLEditor = function compactWLEditor(p) {
 };
 var mainEditor = new _codemirror.EditorView({
   doc: doc,
-  extensions: [_codemirror.minimalSetup, editorCustomTheme, _mathematica.wolframLanguage, (0, _sqrtbox.SqrtBoxWidget)(_compactWLEditor), (0, _fractionbox.FractionBoxWidget)(_compactWLEditor), (0, _subscriptbox.SubscriptBoxWidget)(_compactWLEditor), (0, _supscriptbox.SupscriptBoxWidget)(_compactWLEditor), (0, _language.bracketMatching)(), (0, _rainbowbrackets.default)(), _misc.Greekholder, _misc.Arrowholder],
+  extensions: [_codemirror.minimalSetup, editorCustomTheme, _mathematica.wolframLanguage, (0, _sqrtbox.SqrtBoxWidget)(_compactWLEditor), (0, _fractionbox.FractionBoxWidget)(_compactWLEditor), (0, _subscriptbox.SubscriptBoxWidget)(_compactWLEditor), (0, _supscriptbox.SupscriptBoxWidget)(_compactWLEditor), (0, _gridbox.GridBoxWidget)(_compactWLEditor), (0, _language.bracketMatching)(), (0, _rainbowbrackets.default)(), _misc.Greekholder, _misc.Arrowholder],
   parent: document.querySelector("#editor")
 });
 mainEditor.viewState.state.config.eval = function () {
   alert('eval');
 };
-},{"codemirror":"node_modules/codemirror/dist/index.js","@codemirror/view":"node_modules/@codemirror/view/dist/index.js","./src/mathematica/mathematica":"src/mathematica/mathematica.js","./src/boxes/sqrtbox":"src/boxes/sqrtbox.js","./src/boxes/fractionbox":"src/boxes/fractionbox.js","./src/boxes/subscriptbox":"src/boxes/subscriptbox.js","./src/boxes/supscriptbox":"src/boxes/supscriptbox.js","./src/sugar/misc":"src/sugar/misc.js","@codemirror/language":"node_modules/@codemirror/language/dist/index.js","rainbowbrackets":"node_modules/rainbowbrackets/rainbowBrackets.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"codemirror":"node_modules/codemirror/dist/index.js","@codemirror/view":"node_modules/@codemirror/view/dist/index.js","./src/mathematica/mathematica":"src/mathematica/mathematica.js","./src/boxes/sqrtbox":"src/boxes/sqrtbox.js","./src/boxes/fractionbox":"src/boxes/fractionbox.js","./src/boxes/subscriptbox":"src/boxes/subscriptbox.js","./src/boxes/supscriptbox":"src/boxes/supscriptbox.js","./src/boxes/gridbox":"src/boxes/gridbox.js","./src/sugar/misc":"src/sugar/misc.js","@codemirror/language":"node_modules/@codemirror/language/dist/index.js","rainbowbrackets":"node_modules/rainbowbrackets/rainbowBrackets.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -66953,7 +67343,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49561" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49438" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

@@ -35,12 +35,12 @@ import {
         const prev = state.sliceDoc(from, to);
         if (prev.length === 0) {
           return {
-            changes: { from, to, insert: "(*SqrtBox[*)Sqrt[_](*]SqrtBox*)" },
+            changes: { from, to, insert: "(*SqB[*)Sqrt[_](*]SqB*)" },
             range: EditorSelection.cursor(from)
           };
         }
         return {
-          changes: { from, to, insert: "(*SqrtBox[*)Sqrt["+prev+"](*]SqrtBox*)" },
+          changes: { from, to, insert: "(*SqB[*)Sqrt["+prev+"](*]SqB*)" },
           range: EditorSelection.cursor(from)
         };
       });
@@ -59,11 +59,13 @@ import {
       this.visibleValue = visibleValue;
       const self = this;
 
+      this.length = visibleValue.str.length;
+
       console.log('creating InstanceWidget');
 
       this.editor = compactCMEditor({
-        //slice SqrtBox[...]
-        doc: visibleValue.args[0].body.slice(...sliceRanges),
+        //slice SqB[...]
+        doc: visibleValue.str.slice(...sliceRanges),
         parent: dom,
         update: (upd) => self.applyChanges(upd),
         eval: () => {
@@ -88,13 +90,13 @@ import {
 
     applyChanges(update) {
 
-      const args = this.visibleValue.args;
+      //const args = this.visibleValue.args;
       const data = "Sqrt[" + update + "]";
 
       //const old = this.visibleValue.str;
       
       //console.log(this.visibleValue.pos);
-      const changes = {...args[0], insert: data};
+      const changes = {from: this.visibleValue.argsPos, to: this.visibleValue.argsPos + this.length, insert: data};
       //console.log(args);
       //const changes = {from: this.visibleValue.argsPos + args[0], to: this.visibleValue.argsPos + args[0].from + args[0].body.length - 1, insert: data};
       //console.warn('changes will be applied to...');
@@ -106,6 +108,8 @@ import {
 
       //console.log('insert change');
       //console.log(changes);
+      this.length = data.length;
+      
       this.view.dispatch({changes: changes});
     }
 
@@ -114,7 +118,7 @@ import {
       //console.log('Update instance: new ranges & arguments');
       this.visibleValue.pos = visibleValue.pos;
       this.visibleValue.argsPos = visibleValue.argsPos;
-      this.visibleValue.args = visibleValue.args;
+      //this.visibleValue.args = visibleValue.args;
     }
 
     destroy() {
@@ -177,10 +181,7 @@ import {
   
   const matcher = (ref, view) => {
     return new BallancedMatchDecorator2({
-      tag: {
-        tag: 'SqrtBox',
-        separator: /\(\*,\*\)/gm
-      },
+      tag: 'SqB',
       decoration: (match) => {
         
         return Decoration.replace({

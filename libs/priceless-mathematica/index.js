@@ -8,6 +8,7 @@ import { SqrtBoxWidget } from "./src/boxes/sqrtbox";
 import { FractionBoxWidget } from "./src/boxes/fractionbox";
 import { SubscriptBoxWidget } from "./src/boxes/subscriptbox";
 import { SupscriptBoxWidget } from "./src/boxes/supscriptbox";
+import { GridBoxWidget } from "./src/boxes/gridbox";
 
 import { Greekholder, Arrowholder } from "./src/sugar/misc";
  
@@ -59,7 +60,7 @@ let editorCustomThemeCompact = EditorView.theme({
 });
 
 let doc = ` 
-(*FractionBox[*)((1)(*,*)/(*,*)(2))(*]FractionBox*)
+(*GB[*){{1(*|*),(*|*)0}(*||*),(*||*){0(*|*),(*|*)1}}(*]GB*)
 `;
 
 
@@ -90,6 +91,7 @@ compactWLEditor = (p) => {
       FractionBoxWidget(compactWLEditor),
       SubscriptBoxWidget(compactWLEditor),
       SupscriptBoxWidget(compactWLEditor),
+      GridBoxWidget(compactWLEditor),
       bracketMatching(),
       rainbowBrackets(),
       Greekholder,
@@ -120,6 +122,7 @@ let mainEditor = new EditorView({
     FractionBoxWidget(compactWLEditor),
     SubscriptBoxWidget(compactWLEditor),
     SupscriptBoxWidget(compactWLEditor),
+    GridBoxWidget(compactWLEditor),
     bracketMatching(),
     rainbowBrackets(),
     Greekholder,

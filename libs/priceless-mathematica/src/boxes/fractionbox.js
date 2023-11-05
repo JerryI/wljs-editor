@@ -7,7 +7,7 @@ import {
 } from "@codemirror/view";
 import { isCursorInside } from "./utils";
 
-import { BallancedMatchDecorator2 } from "./matcher";
+import { BallancedMatchDecorator2, matchArguments } from "./matcher";
 
 import { keymap } from "@codemirror/view";
  
@@ -35,12 +35,12 @@ function snippet() {
       const prev = state.sliceDoc(from, to);
       if (prev.length === 0) {
         return {
-          changes: { from, to, insert: "(*FractionBox[*)((_)(*,*)/(*,*)(_))(*]FractionBox*)" },
+          changes: { from, to, insert: "(*FB[*)((_)(*,*)/(*,*)(_))(*]FB*)" },
           range: EditorSelection.cursor(from)
         };
       }
       return {
-        changes: { from, to, insert: "(*FractionBox[*)(("+prev+")(*,*)/(*,*)(_))(*]FractionBox*)" },
+        changes: { from, to, insert: "(*FB[*)(("+prev+")(*,*)/(*,*)(_))(*]FB*)" },
         range: EditorSelection.cursor(from)
       };
     });
@@ -57,6 +57,9 @@ class EditorInstance {
   constructor(visibleValue, view, enumenator, denumenator) {
     this.view = view;
     this.visibleValue = visibleValue;
+
+    this.args = matchArguments(visibleValue.str, /\(\*,\*\)/gm);
+
     const self = this;
 
     //console.log(visibleValue);
@@ -66,7 +69,7 @@ class EditorInstance {
     let topEditor, bottomEditor;
 
     topEditor = compactCMEditor({
-      doc: self.visibleValue.args[0].body.slice(2,-1),
+      doc: self.args[0].body.slice(2,-1),
       parent: enumenator,
       update: (upd) => this.applyChanges(upd, 0),
       eval: () => {
@@ -94,7 +97,7 @@ class EditorInstance {
     });
 
     bottomEditor = compactCMEditor({
-      doc: self.visibleValue.args[2].body.slice(1,-2),
+      doc: self.args[2].body.slice(1,-2),
       parent: denumenator,
       update: (upd) => this.applyChanges(upd, 2),
       eval: () => {
@@ -121,7 +124,15 @@ class EditorInstance {
       ]  
     });  
 
-    
+    self.args[0].length = self.args[0].body.length;
+    self.args[2].length = self.args[2].body.length;
+
+    //dont store strings...
+    delete self.args[2].body;
+    delete self.args[1].body;
+    delete self.args[0].body;
+
+
     
     this.topEditor = topEditor;
     this.bottomEditor = bottomEditor;
@@ -130,14 +141,34 @@ class EditorInstance {
   }
 
   applyChanges(update, pos) {
-    const args = this.visibleValue.args;
+    const args = this.args;
+    const relative = this.visibleValue.argsPos;
 
     if (pos == 0) {
       //uppder one
-      const changes = {...args[pos], insert: '(('+update+')'};
+      const data = '(('+update+')';
+      const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
+
+      //shift other positions
+      args[0].to = args[0].to + (data.length - args[0].length);
+      args[2].from = args[2].from + (data.length - args[0].length);
+
+      args[0].length = data.length;
+
+      //console.log(changes);
+
       this.view.dispatch({changes: changes});
     } else {
-      const changes = {...args[pos], insert: '('+update+'))'};
+      const data = '('+update+'))';
+
+      const changes = {from: relative + args[2].from, to: relative + args[2].from + args[2].length, insert: data};
+
+      //shift other positions
+      args[2].to = args[2].to + (data.length - args[2].length);
+      args[2].length = data.length;
+
+      //console.log(changes);
+
       this.view.dispatch({changes: changes});
       //lower one
     }
@@ -148,7 +179,6 @@ class EditorInstance {
     //console.log('Update instance: new ranges & arguments');
     this.visibleValue.pos = visibleValue.pos;
     this.visibleValue.argsPos = visibleValue.argsPos;
-    this.visibleValue.args = visibleValue.args;
   }
 
   destroy() {
@@ -224,10 +254,7 @@ class Widget extends WidgetType {
 
 const matcher = (ref, view) => {
   return new BallancedMatchDecorator2({
-    tag: {
-      tag: 'FractionBox',
-      separator: /\(\*,\*\)/gm
-    },
+    tag: 'FB',
     decoration: (match) => {
       
       return Decoration.replace({

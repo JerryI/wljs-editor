@@ -7,7 +7,7 @@ import {
 } from "@codemirror/view";
 import { isCursorInside } from "./utils";
 
-import { BallancedMatchDecorator2 } from "./matcher";
+import { BallancedMatchDecorator2, matchArguments } from "./matcher";
 
 import { keymap } from "@codemirror/view";
  
@@ -35,12 +35,12 @@ function snippet() {
       const prev = state.sliceDoc(from, to);
       if (prev.length === 0) {
         return {
-          changes: { from, to, insert: "(*SubscriptBox[*)Subscript[_(*|*),(*|*)_](*]SubscriptBox*)" },
+          changes: { from, to, insert: "(*SbB[*)Subscript[_(*|*),(*|*)_](*]SbB*)" },
           range: EditorSelection.cursor(from)
         };
       }
       return {
-        changes: { from, to, insert: "(*SubscriptBox[*)Subscript["+ prev +"(*|*),(*|*)_](*]SubscriptBox*)" },
+        changes: { from, to, insert: "(*SbB[*)Subscript["+ prev +"(*|*),(*|*)_](*]SbB*)" },
         range: EditorSelection.cursor(from)
       };
     });
@@ -59,6 +59,8 @@ class EditorInstance {
     this.visibleValue = visibleValue;
     const self = this;
 
+    this.args = matchArguments(visibleValue.str, /\(\*\|\*\)/gm);
+
     //console.log(visibleValue);
 
     console.log('creating InstanceWidget');
@@ -68,7 +70,7 @@ class EditorInstance {
     console.log(self.visibleValue);
 
     topEditor = compactCMEditor({
-      doc: self.visibleValue.args[0].body.slice(10),
+      doc: self.args[0].body.slice(10),
       parent: head,
       update: (upd) => this.applyChanges(upd, 0),
       extensions: [
@@ -88,7 +90,7 @@ class EditorInstance {
     });
 
     bottomEditor = compactCMEditor({
-      doc: self.visibleValue.args[2].body.slice(0, -1),
+      doc: self.args[2].body.slice(0, -1),
       parent: sub,
       update: (upd) => this.applyChanges(upd, 2),
       extensions: [
@@ -113,18 +115,45 @@ class EditorInstance {
     this.topEditor = topEditor;
     this.bottomEditor = bottomEditor;
 
+    self.args[0].length = self.args[0].body.length;
+    self.args[2].length = self.args[2].body.length;
+
+    //dont store strings...
+    delete self.args[2].body;
+    delete self.args[1].body;
+    delete self.args[0].body;
     
   }
 
   applyChanges(update, pos) {
-    const args = this.visibleValue.args;
+    const args = this.args;
+    const relative = this.visibleValue.argsPos;
 
     if (pos == 0) {
       //uppder one
-      const changes = {...args[pos], insert: 'Subscript['+update};
+      const data = 'Subscript['+update;
+      const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
+
+      //shift other positions
+      args[0].to = args[0].to + (data.length - args[0].length);
+      args[2].from = args[2].from + (data.length - args[0].length);
+
+      args[0].length = data.length;
+
+      //console.log(changes);
+
       this.view.dispatch({changes: changes});
     } else {
-      const changes = {...args[pos], insert: update+']'};
+      const data = update+']';
+
+      const changes = {from: relative + args[2].from, to: relative + args[2].from + args[2].length, insert: data};
+
+      //shift other positions
+      args[2].to = args[2].to + (data.length - args[2].length);
+      args[2].length = data.length;
+
+      //console.log(changes);
+
       this.view.dispatch({changes: changes});
       //lower one
     }
@@ -135,7 +164,7 @@ class EditorInstance {
     //console.log('Update instance: new ranges & arguments');
     this.visibleValue.pos = visibleValue.pos;
     this.visibleValue.argsPos = visibleValue.argsPos;
-    this.visibleValue.args = visibleValue.args;
+    //this.visibleValue.args = visibleValue.args;
   }
 
   destroy() {
@@ -197,10 +226,7 @@ class Widget extends WidgetType {
 
 const matcher = (ref, view) => {
   return new BallancedMatchDecorator2({
-    tag: {
-      tag: 'SubscriptBox',
-      separator: /\(\*\|\*\)/gm
-    },
+    tag: 'SbB',
     decoration: (match) => {
       
       return Decoration.replace({

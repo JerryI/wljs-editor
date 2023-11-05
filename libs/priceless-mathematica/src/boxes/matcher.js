@@ -59,11 +59,70 @@ if (index < source.length) {
 return arr;
 }
 
+export const matchArguments = (target, separator) => {
+    const ignoreInner = new Balanced({
+        open: /\(\*\w+\[\*\)/,
+        close: /\(\*\]\w+\*\)/
+      }).matchContentsInBetweenBrackets(target, []);
+
+      //console.log(ignoreInner);
+      
+      const separators = matchHeadExcluding(separator, target, ignoreInner);
+
+      //console.log(separators);
+      //console.log(target);
+      /*if (separators.length == 0) return ({
+        index: m.index,
+        content: target
+      });*/
+
+      const args = [];
+
+      let index = 0;
+      let stop = target.length; 
+      let prev;
+      let s;
+      
+      while (s = separators.shift()) {
+        if (prev) index = prev.index + prev.length;
+        const sliced = target.slice(index, s.index);
+        args.push(
+        {
+          from: index,
+          //to: s.index,
+          length: sliced.length, 
+          body: sliced
+        }
+          //target.slice(index, s.index)
+        );
+        //index = s.index;
+        prev = s;
+      }
+      
+      let lastIndex = 0;
+      if (prev) lastIndex = prev.index + prev.length;        
+
+      if (lastIndex != target.length) {
+        const sliced = target.slice(lastIndex);
+        args.push(
+        {
+          from: lastIndex, 
+          //to: target.length,
+          length: sliced.length,
+          body: sliced
+        }
+        //target.slice(lastIndex)
+        )
+      };
+
+      return args;
+}
+
 export const explodeArgs = (tag, cursor, pos, f) => {
 
     new Balanced({
-        open: "(*"+tag.tag+"[*)",
-        close: "(*]"+tag.tag+"*)",
+        open: "(*"+tag+"[*)",
+        close: "(*]"+tag+"*)",
         balance: false
     })
         .matchContentsInBetweenBrackets(cursor.value, [])
@@ -73,55 +132,6 @@ export const explodeArgs = (tag, cursor, pos, f) => {
           const target = cursor.value.slice(m.index+m.head.length, m.index + m.length - m.tail.length);
           //console.log(target);
   
-          const ignoreInner = new Balanced({
-            open: /\(\*\w+\[\*\)/,
-            close: /\(\*\]\w+\*\)/
-          }).matchContentsInBetweenBrackets(target, []);
-  
-          //console.log(ignoreInner);
-          
-          const separators = matchHeadExcluding(tag.separator, target, ignoreInner);
-  
-          //console.log(separators);
-          //console.log(target);
-          /*if (separators.length == 0) return ({
-            index: m.index,
-            content: target
-          });*/
-  
-          const args = [];
-  
-          let index = 0;
-          let stop = target.length; 
-          let prev;
-          let s;
-          
-          while (s = separators.shift()) {
-            if (prev) index = prev.index + prev.length;
-            args.push(
-            {
-              from: index + m.index+m.head.length + pos,
-              to: s.index + m.index+m.head.length + pos,
-              body: target.slice(index, s.index)
-            }
-              //target.slice(index, s.index)
-            );
-            //index = s.index;
-            prev = s;
-          }
-          
-          let lastIndex = 0;
-          if (prev) lastIndex = prev.index + prev.length;        
-  
-          if (lastIndex != target.length) args.push(
-            {
-              from: lastIndex + m.index+m.head.length + pos, 
-              to: m.index+m.head.length + pos + target.length,
-              body: target.slice(lastIndex)
-            }
-            //target.slice(lastIndex)
-          );
-  
           //console.log(args);
           //console.log('working');
 
@@ -129,14 +139,13 @@ export const explodeArgs = (tag, cursor, pos, f) => {
             length: m.length,
             pos: pos + m.index,
             argsPos: pos + m.index+m.head.length,
-            args: args,
             str: target
           });
     });
 }
 
 function iterMatches(doc, re, from, to, f) {
-    re.lastIndex = 0;
+    //re.lastIndex = 0;
     var _loop_1 = function (cursor, pos, m) {
         if (!cursor.lineBreak) {
 
@@ -150,7 +159,7 @@ function iterMatches(doc, re, from, to, f) {
 }
 
 function iterMatches2(doc, re, from, to, f, fromLine, toLine) {
-    re.lastIndex = 0;
+    //re.lastIndex = 0;
     var _loop_1 = function (cursor, pos, m) {
         if (!cursor.lineBreak) {
 
