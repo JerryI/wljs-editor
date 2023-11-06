@@ -72,6 +72,8 @@ ExpressionMaker[FrontEndInlineExecutable -> FrontEndInlineExecutableExpression, 
 Unprotect[TagBox]
 TagBox[x_, opts___] := x
 
+TagBox["ByteArray", "SummaryHead"] = ""
+
 Unprotect[FrameBox]
 FrameBox[x_, opts__]  := RowBox[{"(*BB[*)(", x, ")(*,*)(*", ToString[Compress[Hold[FrameBox[opts]]], InputForm], "*)(*]BB*)"}]
 
@@ -108,6 +110,13 @@ TemplateBox[expr_List, "DateObject", __] := With[{date = expr[[1]][[1]][[1]]},
    RowBox[{"(*VB[*)(", expr[[2]], ")(*,*)(*", ToString[Compress[Hold[DateObjectTemplate[date]]], InputForm], "*)(*]VB*)"}]
 ]
 
+TemplateBox[expr_List, "SummaryPanel"] := RowBox[expr]
+
+
+Unprotect[PaneSelectorBox]
+
+PaneSelectorBox[list_, opts___] := list[[1]][[2]]
+
 Unprotect[InterpretationBox]
 
 (* ToString[, InputForm] is IMPORTANT!!! *)
@@ -117,14 +126,17 @@ InterpretationBox[placeholder_, expr_, opts___] := With[{data = expr, v = Editor
 ]
 
 
-(*InterpretationBox[RowBox[view_List], expr_, opts___] := With[{data = expr, v = InterpretationBoxView[view]},
+(*
+InterpretationBox[RowBox[view_List], expr_, opts___] := With[{data = expr, v = InterpretationBoxView[view]},
   Print[view];
   Print["Bytes!!!!!"];
   RowBox[{"(*VB[*)(", ToString[expr, InputForm], ")(*,*)(*", ToString[Compress[Hold[v]], InputForm], "*)(*]VB*)"}]
 ]
 
+
 InterpretationBoxView[{TagBox["ByteArray", "SummaryHead"], "[", content_, "]"}] := (Print["Bytes!!!!!"]; content)
-InterpretationBoxView[list_] := (Print["Bytes!!!!!"]; EditorView[ToString[RowBox[list] /. {RowBox->RowBoxFlatten}], ReadOnly->True])
+InterpretationBoxView[list_] := (Print["Bytes!!!!!"]; EditorView[ToString[RowBox[list] /. {RowBox->RowBoFlxatten}], ReadOnly->True])
+
 
 FrontEndView /: ToString[FrontEndView[x_, y_], arg___] := ToString[FrontEndView, arg]<>"["<>ExportString[x, "Text"]<>","<>ToString[y, arg]<>"]";
 *)
