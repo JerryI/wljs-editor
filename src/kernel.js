@@ -28,8 +28,6 @@ import { codeblock } from './../JSLibs/markword/codeblock';
 import { webkitPlugins } from './../JSLibs/markword/webkit';
 
 import { frontMatter } from './../JSLibs/markword/frontMatter';*/
-import { Balanced } from "node-balanced";
-import { Mma } from "mma-uncompress/src/mma";
 
 import {
   highlightSpecialChars, drawSelection, highlightActiveLine, dropCursor,
@@ -57,14 +55,18 @@ import { wolframLanguage } from "../libs/priceless-mathematica/src/mathematica/m
 import { defaultFunctions } from "../libs/priceless-mathematica/src/mathematica/functions"
 
 import { Arrowholder, Greekholder } from "../libs/priceless-mathematica/src/sugar/misc"
-import { fractionsWidget } from "../libs/priceless-mathematica/src/sugar/fractions";
-import { subscriptWidget } from "../libs/priceless-mathematica/src/sugar/subscript";
-import { supscriptWidget } from "../libs/priceless-mathematica/src/sugar/supscript";
-import { squareRootWidget } from "../libs/priceless-mathematica/src/sugar/squareroot";
-import { matrixWidget } from "../libs/priceless-mathematica/src/sugar/matrix";
+
+import {FractionBoxWidget} from "../libs/priceless-mathematica/src/boxes/fractionbox"
+import {SqrtBoxWidget} from "../libs/priceless-mathematica/src/boxes/sqrtbox"
+import {SubscriptBoxWidget} from "../libs/priceless-mathematica/src/boxes/subscriptbox"
+import {SupscriptBoxWidget} from "../libs/priceless-mathematica/src/boxes/supscriptbox"
+import {GridBoxWidget} from "../libs/priceless-mathematica/src/boxes/gridbox"
+
+import {ViewBoxWidget} from "../libs/priceless-mathematica/src/boxes/viewbox"
+import {BoxBoxWidget} from "../libs/priceless-mathematica/src/boxes/boxbox"
+
 import { cellTypesHighlight } from "../libs/priceless-mathematica/src/sugar/cells"
 
-import { BallancedMatchDecorator } from "../libs/priceless-mathematica/src/sugar/matcher";
 
 const languageConf = new Compartment
 
@@ -125,12 +127,6 @@ window.EditorAutocomplete.extend = (list) => {
 
 console.log('loaded!');
 
-const validator = new Balanced({
-  open: ['{', '[', '('],
-  close: ['}', ']', ')'],
-  balance: true
-});
-
 const unknownLanguage = StreamLanguage.define(spreadsheet);
 const regLang = new RegExp(/^[\w]*\.[\w]+/);
 
@@ -186,232 +182,6 @@ const autoLanguage = EditorState.transactionExtender.of(tr => {
     }
   }
 })
-
-/*const markdownPlugins = [
-  markdown(),
-  /*wordmarkTheme(),
-  markdown(),
-  listTask(),
-  phraseEmphasis(),
-  heading(),
-  link(),
-  image(),
-  blockquote(),
-  codeblock(),
-  frontMatter()
-]*/
-
-const BoxesMatcher = (ref, view) => { return new BallancedMatchDecorator({
-  regexp: /FrontEndBox\[/,
-  decoration: match => Decoration.replace({
-    widget: new BoxesWidget(match, ref, view),
-  })
-}) };
-
-const BoxesHolder = ViewPlugin.fromClass(class {
-  constructor(view) {
-    this.disposable = [];
-    this.BoxesHolder = BoxesMatcher(this.disposable, view).createDeco(view);
-    
-  }
-  update(update) {
-    this.BoxesHolder = BoxesMatcher(this.disposable, update).updateDeco(update, this.BoxesHolder);
-  }
-  destroy() {
-    console.log('removed holder');
-    console.log('disposable');
-    console.log(this.disposable);
-    this.disposable.forEach((el)=>{
-        el.dispose();
-    });
-  }
-}, {
-  decorations: instance => instance.BoxesHolder,
-  provide: plugin => EditorView.atomicRanges.of(view => {
-    var _a;
-    return ((_a = view.plugin(plugin)) === null || _a === void 0 ? void 0 : _a.BoxesHolder) || Decoration.none;
-  })
-});   
-
-class BoxesWidget extends WidgetType {
-  constructor(visibleValue, ref, view) {
-    super();
-    this.view = view;
-    this.visibleValue = visibleValue;
-    this.ref = ref;
-    this.subEditor = compactWLEditor;
-  }
-  eq(other) {
-    return this.visibleValue.str === other.visibleValue.str;
-  }
-  updateDOM(dom, view) {
-    console.log('update widget DOM');
-    return true
-  }
-  toDOM(view) {
-    let span = document.createElement("span");
-    span.classList.add("subscript-tail");
- 
-    const args = this.visibleValue.args;
-    const visibleValue = this.visibleValue;
-    
-    const recreateString = (args) => {
-      this.visibleValue.str =  'FrontEndBox['+args[0]+','+args[1]+']';
-      console.log('recreated');
-      console.log(this.visibleValue.str);
-      const changes = {from: visibleValue.pos, to: visibleValue.pos + visibleValue.length, insert: this.visibleValue.str};
-      this.visibleValue.length = this.visibleValue.str.length;
-
-      return changes;
-    }
-
-    this.subEditor({
-      doc: args[0],
-      parent: span,
-      update: (upd) => {
-        const valid = validator.matchContentsInBetweenBrackets(upd, []);
-        if (!valid) return;
-
-        this.visibleValue.args[0] = upd;
-        const change = recreateString(this.visibleValue.args);
-        console.log('insert change');
-        console.log(change);
-        view.dispatch({changes: change});
-      },
-      eval: () => {
-        view.viewState.state.config.eval();
-      }
-    });
-
-    console.log("args:");
-    console.log(args);
-    const decoded = Mma.DecompressDecode(args[1]);
-    const json = Mma.toArray(decoded.parts[0]);
-
-    const cuid = Date.now() + Math.floor(Math.random() * 100);
-    var global = {call: cuid};
-    let env = {global: global, element: span}; //Created in CM6
-    interpretate(json, env);
-
-
-    return span;
-  }
-
-  ignoreEvent() {
-    return true;
-  }
-
-  destroy() {
-    console.error('not implemented');
-  }
-}
-//-----
-const BoxesMatcherT = (ref, view) => { return new BallancedMatchDecorator({
-  regexp: /FrontEndBoxTemporal\[/,
-  decoration: match => Decoration.replace({
-    widget: new BoxesWidgetT(match, ref, view),
-  })
-}) };
-
-const BoxesHolderT = ViewPlugin.fromClass(class {
-  constructor(view) {
-    this.disposable = [];
-    this.BoxesHolderT = BoxesMatcherT(this.disposable, view).createDeco(view);
-    
-  }
-  update(update) {
-    this.BoxesHolderT = BoxesMatcherT(this.disposable, update).updateDeco(update, this.BoxesHolderT);
-  }
-  destroy() {
-    console.log('removed holder');
-    console.log('disposable');
-    console.log(this.disposable);
-    this.disposable.forEach((el)=>{
-        el.dispose();
-    });
-  }
-}, {
-  decorations: instance => instance.BoxesHolderT,
-  provide: plugin => EditorView.atomicRanges.of(view => {
-    var _a;
-    return ((_a = view.plugin(plugin)) === null || _a === void 0 ? void 0 : _a.BoxesHolderT) || Decoration.none;
-  })
-});   
-
-class BoxesWidgetT extends WidgetType {
-  constructor(visibleValue, ref, view) {
-    super();
-    this.view = view;
-    this.visibleValue = visibleValue;
-    this.ref = ref;
-    this.subEditor = compactWLEditor;
-  }
-  eq(other) {
-    return this.visibleValue.str === other.visibleValue.str;
-  }
-  updateDOM(dom, view) {
-    console.log('update widget DOM');
-    return true
-  }
-  toDOM(view) {
-    let span = document.createElement("span");
-    span.classList.add("subscript-tail");
- 
-    const args = this.visibleValue.args;
-    const visibleValue = this.visibleValue;
-    
-    const recreateString = (args) => {
-      this.visibleValue.str =  'FrontEndBoxTemporal['+args[0]+','+args[1]+']';
-      console.log('recreated');
-      console.log(this.visibleValue.str);
-      const changes = {from: visibleValue.pos, to: visibleValue.pos + visibleValue.length, insert: this.visibleValue.str};
-      this.visibleValue.length = this.visibleValue.str.length;
-
-      return changes;
-    }
-
-    this.subEditor({
-      doc: args[0],
-      parent: span,
-      update: (upd) => {
-        const valid = validator.matchContentsInBetweenBrackets(upd, []);
-        if (!valid) return;
-
-        this.visibleValue.args[0] = upd;
-        const change = recreateString(this.visibleValue.args);
-        console.log('insert change');
-        console.log(change);
-        view.dispatch({changes: change});
-      },
-      eval: () => {
-        view.viewState.state.config.eval();
-      }
-    });
-
-    console.log("args:");
-    console.log(args);
-    const decoded = Mma.DecompressDecode(args[1]);
-    const json = Mma.toArray(decoded.parts[0]);
-
-    const cuid = Date.now() + Math.floor(Math.random() * 100);
-    var global = {call: cuid};
-    let env = {global: global, element: span}; //Created in CM6
-    interpretate(json, env);
-
-
-    return span;
-  }
-
-  ignoreEvent() {
-    return true;
-  }
-
-  destroy() {
-    console.error('not implemented');
-  }
-}
-
-//----
 
 const ExecutableMatcher = (ref) => { return new MatchDecorator({
   regexp: /FrontEndExecutable\["([^"]+)"\]/g,
@@ -489,79 +259,7 @@ class ExecutableWidget extends WidgetType {
 //----
 
 
-const BoxViewMatcher = (ref, view) => { return new BallancedMatchDecorator({
-  regexp: /FrontEndView\[/,
-  decoration: match => Decoration.replace({
-    widget: new BoxViewWidget(match, ref, view),
-  })
-}) };
 
-const BoxViewHolder = ViewPlugin.fromClass(class {
-  constructor(view) {
-    this.disposable = [];
-    this.BoxViewHolder = BoxViewMatcher(this.disposable, view).createDeco(view);
-    
-  }
-  update(update) {
-    this.BoxViewHolder = BoxViewMatcher(this.disposable, update).updateDeco(update, this.BoxViewHolder);
-  }
-  destroy() {
-    console.log('removed holder');
-    console.log('disposable');
-    console.log(this.disposable);
-    this.disposable.forEach((el)=>{
-        el.dispose();
-    });
-  }
-}, {
-  decorations: instance => instance.BoxViewHolder,
-  provide: plugin => EditorView.atomicRanges.of(view => {
-    var _a;
-    return ((_a = view.plugin(plugin)) === null || _a === void 0 ? void 0 : _a.BoxViewHolder) || Decoration.none;
-  })
-});   
-
-class BoxViewWidget extends WidgetType {
-  constructor(visibleValue, ref, view) {
-    super();
-    this.view = view;
-    this.visibleValue = visibleValue;
-    this.ref = ref;
-  }
-  eq(other) {
-    return this.visibleValue.str === other.visibleValue.str;
-  }
-
-  toDOM(view) {
-    let span = document.createElement("span");
-    span.classList.add("frontend-view");
- 
-    const args = this.visibleValue.args;
-  
-    console.log("args:");
-    console.log(args);
-    const decoded = Mma.DecompressDecode(args[1]);
-    const json = Mma.toArray(decoded.parts[0]);
-
-    console.log(json);
-
-    const cuid = Date.now() + Math.floor(Math.random() * 100);
-    var global = {call: cuid};
-    let env = {global: global, element: span}; //Created in CM6
-    interpretate(json, env);
-
-
-    return span;
-  }
-
-  ignoreEvent() {
-    return true;
-  }
-
-  destroy() {
-    console.error('not implemented');
-  }
-}
 
 
 //----
@@ -748,16 +446,15 @@ compactWLEditor = (args) => {
     wolframLanguage.of(window.EditorAutocomplete),
     ExecutableHolder,
     ExecutableInlineHolder,
-    fractionsWidget(compactWLEditor),
-    subscriptWidget(compactWLEditor),
-    supscriptWidget(compactWLEditor),
-    matrixWidget(compactWLEditor),
-    squareRootWidget(compactWLEditor),
+    FractionBoxWidget(compactWLEditor),
+    SqrtBoxWidget(compactWLEditor),
+    SubscriptBoxWidget(compactWLEditor),
+    SupscriptBoxWidget(compactWLEditor),
+    GridBoxWidget(compactWLEditor),
+    ViewBoxWidget(compactWLEditor),
+    BoxBoxWidget(compactWLEditor),
     bracketMatching(),
     rainbowBrackets(),
-    BoxesHolder,
-    BoxesHolderT,
-    BoxViewHolder,
     Greekholder,
     Arrowholder,
     extras,
@@ -780,18 +477,17 @@ const mathematicaPlugins = [
   wolframLanguage.of(window.EditorAutocomplete), 
   ExecutableHolder, 
   ExecutableInlineHolder,
-  fractionsWidget(compactWLEditor),
-  subscriptWidget(compactWLEditor),
-  supscriptWidget(compactWLEditor),
-  matrixWidget(compactWLEditor),
-  squareRootWidget(compactWLEditor),
+  FractionBoxWidget(compactWLEditor),
+  SqrtBoxWidget(compactWLEditor),
+  SubscriptBoxWidget(compactWLEditor),
+  SupscriptBoxWidget(compactWLEditor),
+  GridBoxWidget(compactWLEditor),
+  ViewBoxWidget(compactWLEditor),
+  BoxBoxWidget(compactWLEditor),  
   bracketMatching(),
   rainbowBrackets(),
   Greekholder,
   Arrowholder,
-  BoxesHolder,
-  BoxesHolderT,
-  BoxViewHolder,
   extras
 ]
 

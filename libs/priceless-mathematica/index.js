@@ -3,11 +3,12 @@ import { minimalSetup, EditorView } from "codemirror";
 import { keymap } from "@codemirror/view";
 
 import { wolframLanguage } from "./src/mathematica/mathematica";
-import { fractionsWidget } from "./src/sugar/fractions";
-import { subscriptWidget } from "./src/sugar/subscript";
-import { supscriptWidget } from "./src/sugar/supscript";
-import { squareRootWidget } from "./src/sugar/squareroot";
-import { matrixWidget } from "./src/sugar/matrix";
+
+import { SqrtBoxWidget } from "./src/boxes/sqrtbox";
+import { FractionBoxWidget } from "./src/boxes/fractionbox";
+import { SubscriptBoxWidget } from "./src/boxes/subscriptbox";
+import { SupscriptBoxWidget } from "./src/boxes/supscriptbox";
+import { GridBoxWidget } from "./src/boxes/gridbox";
 
 import { Greekholder, Arrowholder } from "./src/sugar/misc";
  
@@ -58,14 +59,8 @@ let editorCustomThemeCompact = EditorView.theme({
   }
 });
 
-let doc = `
-CM6Sqrt[CM6Fraction[Table[RandomInteger[5], {i,1,5}], 2]]
-
-{0,CM6Sqrt[2],CM6Sqrt[CM6Fraction[3, 2]],CM6Sqrt[CM6Fraction[5, 2]],1}
-
-(CM6Grid[{{0, 1}, {1, 0}}, RowSpacings -> 1, ColumnSpacings -> 1, RowAlignments -> Baseline, ColumnAlignments -> Center])
-
-CM6Subscript[x, 3,8]
+let doc = ` 
+(*GB[*){{1(*|*),(*|*)0}(*||*),(*||*){0(*|*),(*|*)1}}(*]GB*)
 `;
 
 
@@ -92,11 +87,11 @@ compactWLEditor = (p) => {
       minimalSetup,
       editorCustomThemeCompact,      
       wolframLanguage, 
-      fractionsWidget(compactWLEditor),
-      subscriptWidget(compactWLEditor),
-      supscriptWidget(compactWLEditor),
-      matrixWidget(compactWLEditor),
-      squareRootWidget(compactWLEditor),
+      SqrtBoxWidget(compactWLEditor),
+      FractionBoxWidget(compactWLEditor),
+      SubscriptBoxWidget(compactWLEditor),
+      SupscriptBoxWidget(compactWLEditor),
+      GridBoxWidget(compactWLEditor),
       bracketMatching(),
       rainbowBrackets(),
       Greekholder,
@@ -123,11 +118,11 @@ let mainEditor = new EditorView({
     minimalSetup,
     editorCustomTheme,   
     wolframLanguage, 
-    fractionsWidget(compactWLEditor),
-    subscriptWidget(compactWLEditor),
-    supscriptWidget(compactWLEditor),
-    matrixWidget(compactWLEditor),
-    squareRootWidget(compactWLEditor),
+    SqrtBoxWidget(compactWLEditor),
+    FractionBoxWidget(compactWLEditor),
+    SubscriptBoxWidget(compactWLEditor),
+    SupscriptBoxWidget(compactWLEditor),
+    GridBoxWidget(compactWLEditor),
     bracketMatching(),
     rainbowBrackets(),
     Greekholder,
