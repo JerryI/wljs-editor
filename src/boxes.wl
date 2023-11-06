@@ -117,15 +117,17 @@ InterpretationBox[placeholder_, expr_, opts___] := With[{data = expr, v = Editor
 ]
 
 
-InterpretationBox[RowBox[view_List], expr_, opts___] := With[{data = expr, v = InterpretationBoxView[view]},
+(*InterpretationBox[RowBox[view_List], expr_, opts___] := With[{data = expr, v = InterpretationBoxView[view]},
   Print[view];
+  Print["Bytes!!!!!"];
   RowBox[{"(*VB[*)(", ToString[expr, InputForm], ")(*,*)(*", ToString[Compress[Hold[v]], InputForm], "*)(*]VB*)"}]
 ]
 
-InterpretationBoxView[{TagBox["ByteArray", "SummaryHead"], "[", content_, "]"}] := content
-InterpretationBoxView[list_] := EditorView[ToString[RowBox[list] /. {RowBox->RowBoxFlatten}], ReadOnly->True]
+InterpretationBoxView[{TagBox["ByteArray", "SummaryHead"], "[", content_, "]"}] := (Print["Bytes!!!!!"]; content)
+InterpretationBoxView[list_] := (Print["Bytes!!!!!"]; EditorView[ToString[RowBox[list] /. {RowBox->RowBoxFlatten}], ReadOnly->True])
 
 FrontEndView /: ToString[FrontEndView[x_, y_], arg___] := ToString[FrontEndView, arg]<>"["<>ExportString[x, "Text"]<>","<>ToString[y, arg]<>"]";
+*)
 
 FrontEndViewExpression[expr_, a_] := expr;
 ExpressionMaker[FrontEndView -> FrontEndViewExpression, StandardForm]

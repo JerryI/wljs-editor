@@ -4,8 +4,15 @@
   
     interpretate.contextExpand(boxes);
 
+    boxes.NumberMarks = () => "NumberMarks"
+    boxes.ShowStringCharacters = () => "ShowStringCharacters"
+
     boxes.Background = () => "Background"
-  
+
+    boxes.RowBox = async (args, env) => {
+      console.log(args);
+    }
+
     boxes.FrameBox = async (args, env) => {
         env.element.classList.add('frame-box');
         env.context = boxes;
