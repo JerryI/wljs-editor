@@ -80,9 +80,6 @@ FrameBox[x_, opts__]  := RowBox[{"(*BB[*)(", x, ")(*,*)(*", ToString[Compress[Ho
 Unprotect[StyleBox]
 StyleBox[x_, opts__]  := RowBox[{"(*BB[*)(", x, ")(*,*)(*", ToString[Compress[Hold[StyleBox[opts]]], InputForm], "*)(*]BB*)"}]
 
-CustomBox[x_, opts__] := RowBox[{"(*BB[*)(", x, ")(*,*)(*", ToString[Compress[Hold[opts]], InputForm], "*)(*]BB*)"}]
-
-
 
 (*InterpretationBox[boxes,expr]	interpret boxes as representing the expression expr - replace expressions with a box instead of styling*)
 
@@ -103,7 +100,7 @@ Unprotect[DynamicModuleBox]
 DynamicModuleBox[vars_, body_] := body
 
 TemplateBox[assoc_Association, "RGBColorSwatchTemplate"] := With[{color = assoc["color"]//N},
-    RowBox[{"(*VB[*)(", assoc["color"], ")(*,*)(*", ToString[Compress[Hold[RGBColorSwatchTemplate[color]]], InputForm], "*)(*]VB*)"}]
+   RowBox[{"(*VB[*)(", ToString[assoc["color"], InputForm], ")(*,*)(*", ToString[Compress[Hold[RGBColorSwatchTemplate[color]]], InputForm], "*)(*]VB*)"}]
 ]
 
 TemplateBox[expr_List, "DateObject", __] := With[{date = expr[[1]][[1]][[1]]},
@@ -111,6 +108,10 @@ TemplateBox[expr_List, "DateObject", __] := With[{date = expr[[1]][[1]][[1]]},
 ]
 
 TemplateBox[expr_List, "SummaryPanel"] := RowBox[expr]
+
+(*internal*)
+ViewBox[expr_, display_] := RowBox[{"(*VB[*)(", ToString[expr, InputForm], ")(*,*)(*", ToString[Compress[Hold[display]], InputForm], "*)(*]VB*)"}]
+BoxBox[expr_, display_] := RowBox[{"(*BB[*)(", expr, ")(*,*)(*", ToString[Compress[Hold[display]], InputForm], "*)(*]BB*)"}]
 
 
 Unprotect[PaneSelectorBox]

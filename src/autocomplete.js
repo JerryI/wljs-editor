@@ -1,24 +1,14 @@
 window.EditorAutocomplete.extend([  
     {
-        "label": "CM6Form",
+        "label": "ViewBox",
         "type": "keyword",
-        "info": "An output postprocessor. Use only upvalues!"  
-    },  
-    {
-        "label": "ToCM6Boxes",
-        "type": "keyword",
-        "info": "Create a representation with 2D math and etc, styling"  
+        "info": "ViewBox[expr_, decorator_] low-level box used by InterpretationBox. It keeps `expr` in its original form, while visially covers it with DOM element to which `decorator` expression will be attached and executed"
     },
     {
-        "label": "NoBoxes",
+        "label": "BoxBox",
         "type": "keyword",
-        "info": "Returns pure InputForm expressions (no 2D output)"
-    },
-    {
-        "label": "CustomBox",
-        "type": "keyword",
-        "info": "Make a decoration box for a symbol"
-    },
+        "info": "BoxBox[expr_Box | _String, decorator_] low-level box used by Style, Framed... It places a subeditor with `expr` inside and decorates the container using `decorator` expression will be attached and executed."
+    },    
     {
         "label": "MiddlewareHandler",
         "type": "keyword",
