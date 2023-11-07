@@ -89,7 +89,6 @@ ExpressionMaker[FrontEndBoxTemporal -> FrontEndBoxTemporalExpression, StandardFo
 FrontEndBoxTemporalExpression[expr_, a_] := expr
 (*FrontEndBoxTemporal /: CMCrawler[FrontEndBoxTemporal[expr_, a_], StandardForm] := expr*)
 
-Normal[FrontEndBox[expr_, view_]] ^:= expr
 
 Unprotect[TemplateBox]
 
