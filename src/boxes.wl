@@ -86,7 +86,7 @@ CustomBox[x_, opts__] := RowBox[{"(*BB[*)(", x, ")(*,*)(*", ToString[Compress[Ho
 
 (*InterpretationBox[boxes,expr]	interpret boxes as representing the expression expr - replace expressions with a box instead of styling*)
 
-iHighlight[expr_] := Style[expr, Background->LightYellow]
+iHighlight[expr_] := Style[expr, Background->Yellow]
 
 ExpressionMaker[FrontEndBoxTemporal -> FrontEndBoxTemporalExpression, StandardForm]
 FrontEndBoxTemporalExpression[expr_, a_] := expr
