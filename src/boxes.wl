@@ -27,7 +27,7 @@ ExpressionMaker[CM6Superscript -> Power, StandardForm]
 (*CM6Superscript /: CMCrawler[CM6Superscript[a_, b_], StandardForm] := Power[CMCrawler[a, StandardForm], CMCrawler[b, StandardForm]]*)
 
 Unprotect[SubscriptBox]
-SubscriptBox[a_, b_] := RowBox[{"(*SbB*)Subscript[", a, "(*|*),(*|*)",  b, "](*]SbB*)"}]
+SubscriptBox[a_, b_] := RowBox[{"(*SbB[*)Subscript[", a, "(*|*),(*|*)",  b, "](*]SbB*)"}]
 
 (*depricated!!! only for compatibillity with older notebooks*)
 ExpressionMaker[CM6Subscript -> Subscript, StandardForm]
