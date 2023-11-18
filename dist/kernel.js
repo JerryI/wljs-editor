@@ -71431,28 +71431,7 @@ var compactCMEditor;
       const self = this;
       //console.log(visibleValue);
 
-      this.editor = compactCMEditor({
-        doc: self.args[0].body.slice(1,-1),
-        parent: span,
-        update: (upd) => this.applyChanges(upd),
-        eval: () => {
-          view.viewState.state.config.eval();
-        },
-        extensions: [
-          keymap.of([
-            { key: "ArrowLeft", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                view.focus();
-              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
-            } }, 
-            { key: "ArrowRight", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                view.focus();
-              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
-            } }
-          ])
-        ]
-      });      
+    
 
       const string = this.args[1].body.slice(3,-3);
       //console.log(string);
@@ -71462,10 +71441,33 @@ var compactCMEditor;
       this.data = json;
   
       const cuid = uuidv4();
-      let global = {call: cuid};
+      let global = {call: cuid, element: span, origin: self};
       let env = {global: global, element: span}; //Created in CM6
-      interpretate(json, env);
-   
+      interpretate(json, env).then(() => {
+        self.editor = compactCMEditor({
+          doc: self.args[0].body.slice(1,-1),
+          parent: env.global.element,
+          update: (upd) => this.applyChanges(upd),
+          eval: () => {
+            view.viewState.state.config.eval();
+          },
+          extensions: [
+            keymap.of([
+              { key: "ArrowLeft", run: function (editor, key) {  
+                if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+                  view.focus();
+                editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+              } }, 
+              { key: "ArrowRight", run: function (editor, key) {  
+                if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+                  view.focus();
+                editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+              } }
+            ])
+          ]
+        });  
+      });
+
     }
 
     applyChanges(update, pos) {
