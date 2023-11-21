@@ -139,4 +139,41 @@
         env.element.style.verticalAlign = "initial";
       }
 
+
+      boxes.BraDecorator = async (args, env) => {
+        const pre = document.createElement('span');
+        const post = document.createElement('span');
+      
+        post.innerHTML = "|";
+        pre.innerHTML = "&#10216;";
+      
+        const editor = document.createElement('span');
+        env.global.element = editor;
+      
+        env.element.style.display = "inline-flex";
+        env.element.style.alignItems = "baseline";
+      
+        env.element.appendChild(pre);
+        env.element.appendChild(editor);
+        env.element.appendChild(post);
+      }
+      
+      boxes.KetDecorator = async (args, env) => {
+        const pre = document.createElement('span');
+        const post = document.createElement('span');
+      
+        pre.innerHTML = "|";
+        post.innerHTML = "&#10217;";
+      
+        const editor = document.createElement('span');
+        env.global.element = editor;
+      
+        env.element.style.display = "inline-flex";
+        env.element.style.alignItems = "baseline";
+      
+        env.element.appendChild(pre);
+        env.element.appendChild(editor);
+        env.element.appendChild(post);
+      }
+
 }

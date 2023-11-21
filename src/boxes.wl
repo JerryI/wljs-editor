@@ -94,6 +94,9 @@ Unprotect[TemplateBox]
 
 TemplateBox[list_List, "RowDefault"] := GridBox[{list}]
 
+TemplateBox[expr_, "Bra"] := RowBox[{"(*BB[*)(", expr, ")(*,*)(*", ToString[Compress[Hold[BraDecorator]], InputForm], "*)(*]BB*)"}]
+TemplateBox[expr_, "Ket"] := RowBox[{"(*BB[*)(", expr, ")(*,*)(*", ToString[Compress[Hold[KetDecorator]], InputForm], "*)(*]BB*)"}]
+
 Unprotect[DynamicModuleBox]
 (* fallback *)
 DynamicModuleBox[vars_, body_] := body
