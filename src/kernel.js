@@ -649,7 +649,8 @@ window.EditorExtensions = [
   
   (self, initialLang) => EditorView.updateListener.of((v) => {
     if (v.docChanged) {
-      self.origin.save(v.state.doc.toString().replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"'));
+      //TODO: TOO SLOW FIXME!!!
+      self.origin.save(v.state.doc.toString().replaceAll('\\\\', '\\\\\\\\').replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"'));
     }
     if (v.selectionSet) {
       selectedCell = self;
