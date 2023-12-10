@@ -71666,7 +71666,7 @@ const cellTypesHighlight = ViewPlugin.fromClass(
     getDecorationsFor(from, to, decorations) {
       let { doc } = this.view.state;
 
-      let r = /^\.[\w| |-|=|\d|.]+\s*$/g;
+      let r = /^[\w|\d]*\.[\w| |-|=|\d|.]+\s*$/g;
       for (
         let pos = from, cursor = doc.iterRange(from, to), m;
         !cursor.next().done;
@@ -72313,6 +72313,7 @@ window.EditorExtensions = [
   
   (self, initialLang) => EditorView.updateListener.of((v) => {
     if (v.docChanged) {
+      //TODO: TOO SLOW FIXME!!!
       self.origin.save(v.state.doc.toString().replaceAll('\\\\', '\\\\\\\\').replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"'));
     }
     if (v.selectionSet) {

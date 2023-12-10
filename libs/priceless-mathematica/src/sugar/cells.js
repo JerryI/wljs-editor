@@ -54,7 +54,7 @@ export const cellTypesHighlight = ViewPlugin.fromClass(
     getDecorationsFor(from, to, decorations) {
       let { doc } = this.view.state;
 
-      let r = /^\.[\w| |-|=|\d|.]+\s*$/g;
+      let r = /^[\w|\d]*\.[\w| |-|=|\d|.]+\s*$/g;
       for (
         let pos = from, cursor = doc.iterRange(from, to), m;
         !cursor.next().done;
