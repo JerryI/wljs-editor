@@ -52,7 +52,7 @@ import {
     };
   }
   
-  class EditorInstance {
+  class EditorWidget {
   
     constructor(visibleValue, view, tbody) {
       this.view = view;
@@ -226,7 +226,7 @@ import {
       //console.log(this.visibleValue);
       //console.log(this);
       console.log('update widget DOM');
-      dom.EditorInstance.update(this.visibleValue);
+      dom.EditorWidget.update(this.visibleValue);
   
       return true
     }
@@ -244,7 +244,7 @@ import {
       const tbody      = document.createElement("tbody");
       table.appendChild(tbody);
   
-      span.EditorInstance = new EditorInstance(this.visibleValue, view, tbody);
+      span.EditorWidget = new EditorWidget(this.visibleValue, view, tbody);
   
   
       return span;
@@ -255,7 +255,7 @@ import {
     }
   
     destroy(dom) {
-      dom.EditorInstance.destroy();
+      dom.EditorWidget.destroy();
     }
   }
   

@@ -13,6 +13,11 @@
       console.log(args);
     }
 
+    boxes.ProvidedOptions = async (args, env) => {
+      env.options = await core._getRules(args.slice(1), env);
+      return await interpretate(args[0], env);
+    }
+
     boxes.FrameBox = async (args, env) => {
         env.element.classList.add('frame-box');
         env.context = boxes;

@@ -62794,7 +62794,7 @@ function snippet$3() {
   };
 }
 
-let EditorInstance$6 = class EditorInstance {
+let EditorWidget$6 = class EditorWidget {
 
   constructor(visibleValue, view, enumenator, denumenator) {
     this.view = view;
@@ -62946,7 +62946,7 @@ let Widget$6 = class Widget extends WidgetType {
     //console.log(this.visibleValue);
     //console.log(this);
     console.log('update widget DOM');
-    dom.EditorInstance.update(this.visibleValue);
+    dom.EditorWidget.update(this.visibleValue);
 
     return true
   }
@@ -62978,7 +62978,7 @@ let Widget$6 = class Widget extends WidgetType {
     const denumenator = document.createElement("td");
     trd.appendChild(denumenator);
 
-    span.EditorInstance = new EditorInstance$6(this.visibleValue, view, enumenator, denumenator);
+    span.EditorWidget = new EditorWidget$6(this.visibleValue, view, enumenator, denumenator);
 
 
     return span;
@@ -62989,7 +62989,7 @@ let Widget$6 = class Widget extends WidgetType {
   }
 
   destroy(dom) {
-    dom.EditorInstance.destroy();
+    dom.EditorWidget.destroy();
   }
 };
 
@@ -63080,7 +63080,7 @@ var compactCMEditor$4;
     };
   }
 
-  let EditorInstance$5 = class EditorInstance {
+  let EditorWidget$5 = class EditorWidget {
 
     constructor(visibleValue, view, dom, sliceRanges) {
       this.view = view;
@@ -63171,7 +63171,7 @@ var compactCMEditor$4;
       //console.log(this.visibleValue);
       //console.log(this);
       //console.log('update widget DOM');
-      dom.EditorInstance.update(this.visibleValue);
+      dom.EditorWidget.update(this.visibleValue);
 
       return true
     }
@@ -63185,7 +63185,7 @@ var compactCMEditor$4;
       const head = document.createElement("span");
       head.classList.add("radicand");
       
-      span.EditorInstance = new EditorInstance$5(this.visibleValue, view, head, [5,-1]);
+      span.EditorWidget = new EditorWidget$5(this.visibleValue, view, head, [5,-1]);
 
       span.appendChild(head);
 
@@ -63197,7 +63197,7 @@ var compactCMEditor$4;
     }
 
     destroy(dom) {
-      dom.EditorInstance.destroy();
+      dom.EditorWidget.destroy();
     }
   };
   
@@ -63288,7 +63288,7 @@ function snippet$1() {
   };
 }
 
-let EditorInstance$4 = class EditorInstance {
+let EditorWidget$4 = class EditorWidget {
 
   constructor(visibleValue, view, head, sub) {
     this.view = view;
@@ -63426,7 +63426,7 @@ let Widget$4 = class Widget extends WidgetType {
     //console.log(this.visibleValue);
     //console.log(this);
     console.log('update widget DOM');
-    dom.EditorInstance.update(this.visibleValue);
+    dom.EditorWidget.update(this.visibleValue);
 
     return true
   }
@@ -63444,7 +63444,7 @@ let Widget$4 = class Widget extends WidgetType {
     span.appendChild(head);
     span.appendChild(sub);
 
-    span.EditorInstance = new EditorInstance$4(this.visibleValue, view, head, sub);
+    span.EditorWidget = new EditorWidget$4(this.visibleValue, view, head, sub);
 
 
     return span;
@@ -63455,7 +63455,7 @@ let Widget$4 = class Widget extends WidgetType {
   }
 
   destroy(dom) {
-    dom.EditorInstance.destroy();
+    dom.EditorWidget.destroy();
   }
 };
 
@@ -63546,7 +63546,7 @@ var compactCMEditor$2;
     };
   }
   
-  let EditorInstance$3 = class EditorInstance {
+  let EditorWidget$3 = class EditorWidget {
   
     constructor(visibleValue, view, head, sub) {
       this.view = view;
@@ -63682,7 +63682,7 @@ var compactCMEditor$2;
       //console.log(this.visibleValue);
       //console.log(this);
       console.log('update widget DOM');
-      dom.EditorInstance.update(this.visibleValue);
+      dom.EditorWidget.update(this.visibleValue);
   
       return true
     }
@@ -63700,7 +63700,7 @@ var compactCMEditor$2;
       span.appendChild(head);
       span.appendChild(sub);
   
-      span.EditorInstance = new EditorInstance$3(this.visibleValue, view, head, sub);
+      span.EditorWidget = new EditorWidget$3(this.visibleValue, view, head, sub);
   
   
       return span;
@@ -63711,7 +63711,7 @@ var compactCMEditor$2;
     }
   
     destroy(dom) {
-      dom.EditorInstance.destroy();
+      dom.EditorWidget.destroy();
     }
   };
   
@@ -63776,7 +63776,7 @@ var compactCMEditor$1;
     ];
   }
   
-  let EditorInstance$2 = class EditorInstance {
+  let EditorWidget$2 = class EditorWidget {
   
     constructor(visibleValue, view, tbody) {
       this.view = view;
@@ -63948,7 +63948,7 @@ var compactCMEditor$1;
       //console.log(this.visibleValue);
       //console.log(this);
       console.log('update widget DOM');
-      dom.EditorInstance.update(this.visibleValue);
+      dom.EditorWidget.update(this.visibleValue);
   
       return true
     }
@@ -63966,7 +63966,7 @@ var compactCMEditor$1;
       const tbody      = document.createElement("tbody");
       table.appendChild(tbody);
   
-      span.EditorInstance = new EditorInstance$2(this.visibleValue, view, tbody);
+      span.EditorWidget = new EditorWidget$2(this.visibleValue, view, tbody);
   
   
       return span;
@@ -63977,7 +63977,7 @@ var compactCMEditor$1;
     }
   
     destroy(dom) {
-      dom.EditorInstance.destroy();
+      dom.EditorWidget.destroy();
     }
   };
   
@@ -71275,13 +71275,15 @@ const uuidv4$1 = () => {
     ];
   }
   
-  let EditorInstance$1 = class EditorInstance {
+  let EditorWidget$1 = class EditorWidget {
   
     constructor(visibleValue, view, span) {
       this.view = view;
       this.visibleValue = visibleValue;
   
       this.args = matchArguments(visibleValue.str, /\(\*,\*\)/gm);
+  
+      const self = this;
       //console.log(this.args);
 
       const string = this.args[1].body.slice(3,-3);
@@ -71292,11 +71294,29 @@ const uuidv4$1 = () => {
       this.data = json;
   
       const cuid = uuidv4$1();
-      let global = {call: cuid};
+      let global = {call: cuid, EditorWidget: self};
       let env = {global: global, element: span}; //Created in CM6
       interpretate(json, env);
    
     }
+
+    getDoc() {
+      return this.args[0].body.slice(1,-1);
+    }
+
+    applyChanges(update, pos) {
+      const args = this.args;
+      const relative = this.visibleValue.argsPos;
+  
+      const data = '('+update+')';
+      const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
+
+  
+      args[0].length = data.length;
+
+
+      this.view.dispatch({changes: changes});
+  }      
   
   
     update(visibleValue) {
@@ -71327,7 +71347,7 @@ const uuidv4$1 = () => {
       //console.log(this.visibleValue);
       //console.log(this);
       console.log('update widget DOM');
-      dom.EditorInstance.update(this.visibleValue);
+      dom.EditorWidget.update(this.visibleValue);
   
       return true
     }
@@ -71338,7 +71358,7 @@ const uuidv4$1 = () => {
       let span = document.createElement("span");
       span.classList.add("frontend-view");
   
-      span.EditorInstance = new EditorInstance$1(this.visibleValue, view, span);
+      span.EditorWidget = new EditorWidget$1(this.visibleValue, view, span);
   
   
       return span;
@@ -71349,7 +71369,7 @@ const uuidv4$1 = () => {
     }
   
     destroy(dom) {
-      dom.EditorInstance.destroy();
+      dom.EditorWidget.destroy();
     }
   };
   
@@ -71420,7 +71440,7 @@ var compactCMEditor;
     ];
   }
   
-  class EditorInstance {
+  class EditorWidget {
   
     constructor(visibleValue, view, span) {
       this.view = view;
@@ -71431,6 +71451,16 @@ var compactCMEditor;
       const self = this;
       //console.log(visibleValue);
 
+      
+      this.epilog = {
+          offset: 0,
+          string: ''
+        };
+
+      this.prolog = {
+          offset: 0,
+          string: ''          
+      };
     
 
       const string = this.args[1].body.slice(3,-3);
@@ -71443,9 +71473,17 @@ var compactCMEditor;
       const cuid = uuidv4();
       let global = {call: cuid, element: span, origin: self};
       let env = {global: global, element: span}; //Created in CM6
+
       interpretate(json, env).then(() => {
+        if (env.options?.Head) {
+          self.prolog.offset = env.options.Head.length + 1;
+          self.prolog.string = env.options.Head + "[";
+          self.epilog.offset = 1;
+          self.epilog.string = "]";
+        }
+
         self.editor = compactCMEditor({
-          doc: self.args[0].body.slice(1,-1),
+          doc: self.args[0].body.slice(1 + self.prolog.offset, -1 - self.epilog.offset),
           parent: env.global.element,
           update: (upd) => this.applyChanges(upd),
           eval: () => {
@@ -71474,7 +71512,7 @@ var compactCMEditor;
         const args = this.args;
         const relative = this.visibleValue.argsPos;
     
-        const data = '('+update+')';
+        const data = '('+this.prolog.string+update+this.epilog.string+')';
         const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
   
     
@@ -71482,7 +71520,7 @@ var compactCMEditor;
   
   
         this.view.dispatch({changes: changes});
-      }    
+    }    
   
     update(visibleValue) {
       //console.log('Update instance: new ranges & arguments');
@@ -71513,7 +71551,7 @@ var compactCMEditor;
       //console.log(this.visibleValue);
       //console.log(this);
       console.log('update widget DOM');
-      dom.EditorInstance.update(this.visibleValue);
+      dom.EditorWidget.update(this.visibleValue);
   
       return true
     }
@@ -71524,7 +71562,7 @@ var compactCMEditor;
       let span = document.createElement("span");
       span.classList.add("subscript-tail");
   
-      span.EditorInstance = new EditorInstance(this.visibleValue, view, span);
+      span.EditorWidget = new EditorWidget(this.visibleValue, view, span);
   
   
       return span;
@@ -71535,7 +71573,7 @@ var compactCMEditor;
     }
   
     destroy(dom) {
-      dom.EditorInstance.destroy();
+      dom.EditorWidget.destroy();
     }
   }
   

@@ -52,7 +52,7 @@ import {
     };
   }
 
-  class EditorInstance {
+  class EditorWidget {
 
     constructor(visibleValue, view, dom, sliceRanges) {
       this.view = view;
@@ -144,7 +144,7 @@ import {
       //console.log(this.visibleValue);
       //console.log(this);
       //console.log('update widget DOM');
-      dom.EditorInstance.update(this.visibleValue);
+      dom.EditorWidget.update(this.visibleValue);
 
       return true
     }
@@ -163,7 +163,7 @@ import {
       const head = document.createElement("span");
       head.classList.add("radicand");
       
-      span.EditorInstance = new EditorInstance(this.visibleValue, view, head, [5,-1]);
+      span.EditorWidget = new EditorWidget(this.visibleValue, view, head, [5,-1]);
 
       span.appendChild(head);
 
@@ -175,7 +175,7 @@ import {
     }
 
     destroy(dom) {
-      dom.EditorInstance.destroy();
+      dom.EditorWidget.destroy();
     }
   }
   

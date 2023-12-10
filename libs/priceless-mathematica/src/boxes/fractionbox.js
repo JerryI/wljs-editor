@@ -52,7 +52,7 @@ function snippet() {
   };
 }
 
-class EditorInstance {
+class EditorWidget {
 
   constructor(visibleValue, view, enumenator, denumenator) {
     this.view = view;
@@ -205,7 +205,7 @@ class Widget extends WidgetType {
     //console.log(this.visibleValue);
     //console.log(this);
     console.log('update widget DOM');
-    dom.EditorInstance.update(this.visibleValue);
+    dom.EditorWidget.update(this.visibleValue);
 
     return true
   }
@@ -237,7 +237,7 @@ class Widget extends WidgetType {
     const denumenator = document.createElement("td");
     trd.appendChild(denumenator);
 
-    span.EditorInstance = new EditorInstance(this.visibleValue, view, enumenator, denumenator);
+    span.EditorWidget = new EditorWidget(this.visibleValue, view, enumenator, denumenator);
 
 
     return span;
@@ -248,7 +248,7 @@ class Widget extends WidgetType {
   }
 
   destroy(dom) {
-    dom.EditorInstance.destroy();
+    dom.EditorWidget.destroy();
   }
 }
 

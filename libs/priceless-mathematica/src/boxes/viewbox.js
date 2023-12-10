@@ -34,7 +34,7 @@ import {
     ];
   }
   
-  class EditorInstance {
+  class EditorWidget {
   
     constructor(visibleValue, view, span) {
       this.view = view;
@@ -53,11 +53,29 @@ import {
       this.data = json;
   
       const cuid = uuidv4();
-      let global = {call: cuid};
+      let global = {call: cuid, EditorWidget: self};
       let env = {global: global, element: span}; //Created in CM6
       interpretate(json, env);
    
     }
+
+    getDoc() {
+      return this.args[0].body.slice(1,-1);
+    }
+
+    applyChanges(update, pos) {
+      const args = this.args;
+      const relative = this.visibleValue.argsPos;
+  
+      const data = '('+update+')';
+      const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
+
+  
+      args[0].length = data.length;
+
+
+      this.view.dispatch({changes: changes});
+  }      
   
   
     update(visibleValue) {
@@ -89,7 +107,7 @@ import {
       //console.log(this.visibleValue);
       //console.log(this);
       console.log('update widget DOM');
-      dom.EditorInstance.update(this.visibleValue);
+      dom.EditorWidget.update(this.visibleValue);
   
       return true
     }
@@ -100,7 +118,7 @@ import {
       let span = document.createElement("span");
       span.classList.add("frontend-view");
   
-      span.EditorInstance = new EditorInstance(this.visibleValue, view, span);
+      span.EditorWidget = new EditorWidget(this.visibleValue, view, span);
   
   
       return span;
@@ -111,7 +129,7 @@ import {
     }
   
     destroy(dom) {
-      dom.EditorInstance.destroy();
+      dom.EditorWidget.destroy();
     }
   }
   

@@ -34,7 +34,7 @@ import {
     ];
   }
   
-  class EditorInstance {
+  class EditorWidget {
   
     constructor(visibleValue, view, span) {
       this.view = view;
@@ -45,6 +45,16 @@ import {
       const self = this;
       //console.log(visibleValue);
 
+      
+      this.epilog = {
+          offset: 0,
+          string: ''
+        };
+
+      this.prolog = {
+          offset: 0,
+          string: ''          
+      };
     
 
       const string = this.args[1].body.slice(3,-3);
@@ -57,9 +67,17 @@ import {
       const cuid = uuidv4();
       let global = {call: cuid, element: span, origin: self};
       let env = {global: global, element: span}; //Created in CM6
+
       interpretate(json, env).then(() => {
+        if (env.options?.Head) {
+          self.prolog.offset = env.options.Head.length + 1;
+          self.prolog.string = env.options.Head + "["
+          self.epilog.offset = 1;
+          self.epilog.string = "]"
+        }
+
         self.editor = compactCMEditor({
-          doc: self.args[0].body.slice(1,-1),
+          doc: self.args[0].body.slice(1 + self.prolog.offset, -1 - self.epilog.offset),
           parent: env.global.element,
           update: (upd) => this.applyChanges(upd),
           eval: () => {
@@ -88,7 +106,7 @@ import {
         const args = this.args;
         const relative = this.visibleValue.argsPos;
     
-        const data = '('+update+')';
+        const data = '('+this.prolog.string+update+this.epilog.string+')';
         const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
   
     
@@ -96,7 +114,7 @@ import {
   
   
         this.view.dispatch({changes: changes});
-      }    
+    }    
   
     update(visibleValue) {
       //console.log('Update instance: new ranges & arguments');
@@ -128,7 +146,7 @@ import {
       //console.log(this.visibleValue);
       //console.log(this);
       console.log('update widget DOM');
-      dom.EditorInstance.update(this.visibleValue);
+      dom.EditorWidget.update(this.visibleValue);
   
       return true
     }
@@ -139,7 +157,7 @@ import {
       let span = document.createElement("span");
       span.classList.add("subscript-tail");
   
-      span.EditorInstance = new EditorInstance(this.visibleValue, view, span);
+      span.EditorWidget = new EditorWidget(this.visibleValue, view, span);
   
   
       return span;
@@ -150,7 +168,7 @@ import {
     }
   
     destroy(dom) {
-      dom.EditorInstance.destroy();
+      dom.EditorWidget.destroy();
     }
   }
   

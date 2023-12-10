@@ -94,8 +94,8 @@ Unprotect[TemplateBox]
 
 TemplateBox[list_List, "RowDefault"] := GridBox[{list}]
 
-TemplateBox[expr_, "Bra"] := RowBox[{"(*BB[*)(", expr, ")(*,*)(*", ToString[Compress[Hold[BraDecorator]], InputForm], "*)(*]BB*)"}]
-TemplateBox[expr_, "Ket"] := RowBox[{"(*BB[*)(", expr, ")(*,*)(*", ToString[Compress[Hold[KetDecorator]], InputForm], "*)(*]BB*)"}]
+TemplateBox[expr_, "Bra"] := With[{dp = ProvidedOptions[BraDecorator, "Head"->"Bra"]}, RowBox[{"(*BB[*)(Bra[", RowBox[Riffle[expr, ","]], "])(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]]
+TemplateBox[expr_, "Ket"] := With[{dp = ProvidedOptions[KetDecorator, "Head"->"Ket"]}, RowBox[{"(*BB[*)(Ket[", RowBox[Riffle[expr, ","]], "])(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]]
 
 Unprotect[DynamicModuleBox]
 (* fallback *)
@@ -113,8 +113,16 @@ TemplateBox[expr_List, "SummaryPanel"] := RowBox[expr]
 
 (*internal*)
 ViewBox[expr_, display_] := RowBox[{"(*VB[*)(", ToString[expr, InputForm], ")(*,*)(*", ToString[Compress[Hold[display]], InputForm], "*)(*]VB*)"}]
-BoxBox[expr_, display_] := RowBox[{"(*BB[*)(", expr, ")(*,*)(*", ToString[Compress[Hold[display]], InputForm], "*)(*]BB*)"}]
+BoxBox[expr_, display_, OptionsPattern[]] := 
+  If[OptionValue[Head] =!= Null,
+    With[{dp = ProvidedOptions[Hold[display], "Head"->ToString[OptionValue[Head], InputForm]]},
+      RowBox[{"(*BB[*)(", ToString[OptionValue[Head], InputForm], "[", expr, "]", ")(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]
+    ]
+  ,
+    RowBox[{"(*BB[*)(", expr, ")(*,*)(*", ToString[Compress[Hold[display]], InputForm], "*)(*]BB*)"}]
+  ]
 
+Options[BoxBox] = {Head -> Null}
 
 Unprotect[PaneSelectorBox]
 
