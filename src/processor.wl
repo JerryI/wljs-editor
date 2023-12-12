@@ -29,10 +29,10 @@ WolframCheckSyntax[str_String] :=
 
 (* assign available Evaluators to the processsors *)
 
-WolframProcessor[expr_String, signature_String, callback_] := Module[{str = StringTrim[expr], block = False},
+WolframProcessor[expr_String, signature_String, parentid_String, callback_] := Module[{str = StringTrim[expr], block = False},
   Print["WolframProcessor!"];
   If[StringTake[str, -1] === ";", block = True; str = StringDrop[str, -1]];
-  JerryI`WolframJSFrontend`Notebook`Notebooks[signature]["kernel"][JerryI`WolframJSFrontend`Evaluator`WolframEvaluator[str, block, signature], callback, "Link"->"WSTP"];
+  JerryI`WolframJSFrontend`Notebook`Notebooks[signature]["kernel"][JerryI`WolframJSFrontend`Evaluator`WolframEvaluator[str, block, signature, parentid], callback, "Link"->"WSTP"];
 ];    
 
 JerryI`WolframJSFrontend`Notebook`NotebookAddEvaluator[((True&)    ->  <|"SyntaxChecker"->WolframCheckSyntax,    "Epilog"->SplitExpression,  "Prolog"->(#&), "Evaluator"->WolframProcessor   |>), "LowestPriority"];
