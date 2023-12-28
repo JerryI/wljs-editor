@@ -119,11 +119,36 @@ const defaultHighlightStyle = HighlightStyle.define([
 
 
 
-window.EditorAutocomplete = defaultFunctions;
-window.EditorAutocomplete.extend = (list) => {
+const EditorAutocomplete = defaultFunctions;
+EditorAutocomplete.extend = (list) => {
   window.EditorAutocomplete.push(...list);
   wolframLanguage.reBuild(window.EditorAutocomplete);
 }
+
+core.FrontAddDefinition = async (args, env) => {
+  const data = await interpretate(args[0], env);
+  console.log(data);
+  
+  data.forEach((element)=>{
+    const name = element[0];
+    const context = element[1];
+
+    if (!(name in core.FrontAddDefinition.symbols)) {
+      window.EditorAutocomplete.extend([  
+        {
+            "label": name,
+            "type": "keyword",
+            "info": "User's defined symbol in "+context  
+        }]);
+
+      core.FrontAddDefinition.symbols[name] = context;
+    }
+  });
+
+
+}
+
+core.FrontAddDefinition.symbols = {};
 
 console.log('loaded!');
 
@@ -368,7 +393,7 @@ class ExecutableInlineWidget extends WidgetType {
 let compactWLEditor = null;
 let selectedCell = undefined;
 
-window.EditorSelected = {
+const EditorSelected = {
   get: () => {
     if (!selectedCell) return '';
     if (!selectedCell.editor.viewState) return '';
@@ -807,3 +832,16 @@ class CodeMirrorCell {
 
   if (window.OfflineMode)
     extras.push(window.EditorState.readOnly.of(true))
+
+
+core.FrontEditorSelected = async (args, env) => {
+  const op = await interpretate(args[0], env);
+  if (op == "Get")
+    return EditorSelected.get();
+  
+  if (op == "Set") {
+    let data = await interpretate(args[1], env);
+    if (data.charAt(0) == '"') data = data.slice(1,-1);
+    EditorSelected.set(data);
+  }
+}

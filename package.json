@@ -8,9 +8,15 @@
   },
   "defaultPackage": true,
   "wljs-meta": {
-    "jsmodule": [
+    "js": [
       "dist/kernel.js",
       "src/boxes.js"
+    ],
+    "frontend": [
+      "src/Frontend.wl"
+    ],
+    "kernel": [
+      "src/Kernel.wl"
     ],
     "wlkernel": "src/boxes.wl",
     "wl": "src/processor.wl",
