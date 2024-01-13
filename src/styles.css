@@ -1,6 +1,7 @@
 .frontend-view {
     display: inline-flex;
     vertical-align: sub;
+    position: relative;
 }
 
 .cm-tooltip {
