@@ -10,16 +10,19 @@
   "wljs-meta": {
     "js": [
       "dist/kernel.js",
-      "src/boxes.js"
+      "src/boxes.js",
+      "src/objects.js"
     ],
     "frontend": [
-      "src/Frontend.wl"
+      "src/Frontend.wl",
+      "src/FrontendObject.wl",
+      "src/FrontendObjectSync.wl"
     ],
     "kernel": [
-      "src/Kernel.wl"
+      "src/StandardForm.wl",
+      "src/FrontendObject.wl",
+      "src/Boxes.wl"
     ],
-    "wlkernel": "src/boxes.wl",
-    "wl": "src/processor.wl",
     "styles": "src/styles.css",
     "autocomplete": "src/autocomplete.js",
     "header": "src/header.wsp",

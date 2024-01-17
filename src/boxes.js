@@ -43,32 +43,38 @@
   }
 
   boxes.DateObjectTemplate = async (args, env) => {
-      env.element.class = "";
-      env.element.style.paddingLeft = "1em";
-      env.element.style.paddingRight = "1em";
-      env.element.style.border = "1px solid gray";
-      env.element.style.borderRadius = "4px";
-      env.element.style.fontSize = "x-small";
+      const element = document.createElement('span');
+      element.class = "";
+      element.style.paddingLeft = "1em";
+      element.style.paddingRight = "1em";
+      element.style.border = "1px solid gray";
+      element.style.borderRadius = "4px";
+      element.style.fontSize = "x-small";
 
       //env.element.classList.add('frame-box');
       env.context = boxes;
 
       const date = await interpretate(args[0], env);
-      env.element.innerText = date.slice(1,-1); 
+      element.innerText = date.slice(1,-1); 
+      env.element.appendChild(element);
   }
 
   boxes.RGBColorSwatchTemplate = async (args, env) => {
-      env.element.class = "";
-      env.element.style.width = "1em";
-      env.element.style.height = "1em";
-      env.element.style.border = "1px solid gray";
-      env.element.style.borderRadius = "4px";
+      const element = document.createElement('span');
+
+      element.class = "";
+      element.style.width = "1em";
+      element.style.height = "1em";
+      element.style.border = "1px solid gray";
+      element.style.borderRadius = "4px";
 
       //env.element.classList.add('frame-box');
       env.context = boxes;
 
       const color = await interpretate(args[0], env);
-      env.element.style.backgroundColor = color;
+      element.style.backgroundColor = color;
+
+      env.element.appendChild(element);
   }
 
   boxes.Opacity = async (args, env) => {
@@ -132,7 +138,10 @@
     boxes.TagBox = async (args, env) => {
       const name = await interpretate(args[1], env);
       const data = await interpretate(args[0], env);
-      return await boxes.TagBox[name](data, env);
+      const doc = document.createElement('div');
+      const result = await boxes.TagBox[name](data, {...env, element:doc});
+      env.element.appendChild(doc);
+      return result;
     }
     
     boxes.TagBox['SummaryItem'] = async (data, env) => {

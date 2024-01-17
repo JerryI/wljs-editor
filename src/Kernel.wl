@@ -1,2 +1,0 @@
-<<CodeParser`;
-<<JerryI`WSP`;

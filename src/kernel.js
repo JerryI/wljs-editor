@@ -641,7 +641,7 @@ window.EditorExtensions = [
   
   (self, initialLang) => keymap.of([indentWithTab,
     { key: "Backspace", run: function (editor, key) { 
-      if(editor.state.doc.length === 0) { self.origin.remove() }  
+      if(editor.state.doc.length === 0) { self.origin.remove(); return true; }  
     } },
     { key: "ArrowLeft", run: function (editor, key) {  
       editor.editorLastCursor = editor.state.selection.ranges[0].to;  

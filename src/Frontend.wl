@@ -1,16 +1,38 @@
-Begin["Notebook`Editor`"]
+BeginPackage["Notebook`Editor`", {
+    "CodeParser`", 
+    "JerryI`Notebook`", 
+    "JerryI`Notebook`Evaluator`", 
+    "JerryI`Notebook`Kernel`", 
+    "JerryI`Notebook`Transactions`",
+    "JerryI`Misc`Events`"
+}]
 
-<<CodeParser`;
+Begin["`Internal`"]
 
-evaluator = StaticEvaluator["Q"->(True&), "Priority"->-1]
-evaluator /: StandardEvaluator`Evaluate[evaluator, k_Kernel, t_Transaction] := Module[{list},
-    With[{check = CheckSyntax[t["Data"] ]},
+evaluator  = StandardEvaluator["Name" -> "Wolfram Evaluator", "InitKernel" -> init, "Priority"->(999)];
+
+    StandardEvaluator`ReadyQ[evaluator, k_] := (
+        If[! TrueQ[k["ReadyQ"] ] || ! TrueQ[k["ContainerReadyQ"] ],
+            EventFire[t, "Error", "Kernel is not ready"];
+            StandardEvaluator`Print[evaluator, "Kernel is not ready"];
+            False
+        ,
+            True
+        ]
+    );
+
+    StandardEvaluator`Evaluate[evaluator, k_, t_] := Module[{list},
+     t["Evaluator"] = Notebook`Editor`WolframEvaluator;
+
+     With[{check = CheckSyntax[t["Data"] ]},
         If[! TrueQ[check],
             EventFire[t, "Error", check];
+            Echo["Syntax Error!"];
             Return[$Failed];
         ];
 
         If[! TrueQ[k["ReadyQ"] ],
+            Echo[k["ReadyQ"] ];
             EventFire[t, "Error", "Kernel is not ready"];
             Return[$Failed];
         ];
@@ -18,30 +40,47 @@ evaluator /: StandardEvaluator`Evaluate[evaluator, k_Kernel, t_Transaction] := M
         list = SplitExpression[t["Data"] ];
         MapIndexed[
             With[{message = StringTrim[#1], index = #2[[1]], transaction = Transaction[]},
-                If[StringTake[message, -1] === ";", transaction["Nohup"] = True];
+                (*If[StringTake[message, -1] === ";", transaction["Nohup"] = True];*)
                 transaction["Data"] = message;
-                transaction["Evaluator"] = "JerryI`Notebook`Private`WolframEvaluator";
+                transaction["Evaluator"] = Notebook`Editor`WolframEvaluator;
                 
                 (* check if it is the last one *)
                 If[index === Length[list],
-                    EventHandler[transaction // EventClone, {
-                        name_ :> Function[data, EventFire[t, name, data] ];
-                    }]; 
-
-                    (* capture successfull event of the last transaction to end the process *)
-                    EventHandler[transaction // EventClone, {
-                        "Result" -> Function[Null, EventFire[t, "Finished", True] ];
-                    }];             
+                    EventHandler[transaction, {
+                        (* capture successfull event of the last transaction to end the process *)  
+                        "Result" -> Function[data, 
+                            EventFire[t, "Result", data];
+                            EventFire[t, "Finished", True];
+                        ],
+                        (* fwd the rest *)
+                        name_ :> Function[data, EventFire[t, name, data] ]
+                    }];          
                 ,
                     EventHandler[transaction, {
-                        name_ :> Function[data, EventFire[t, name, data] ];
+                        name_ :> Function[data, EventFire[t, name, data] ]
                     }];                
                 ];
 
+                StandardEvaluator`Print[evaluator, "Kernel`Submit!"];
+                StandardEvaluator`Print[evaluator, transaction["Data"] ];
                 Kernel`Submit[k, transaction];
             ]&
         ,  list];
-    ];
+    ];      
+  ];  
+
+init[k_] := Module[{},
+    Print["Kernel init..."];
+    Kernel`Init[k, 
+        Print["Init normal Kernel (Local)"];
+        Notebook`Editor`WolframEvaluator = Function[t, 
+            Print["Got it!"];
+            With[{result = ToExpression[ t["Data"], InputForm, Hold] // ReleaseHold },
+                EventFire[Internal`Kernel`Stdout[ t["Hash"] ], "Result", <|"Data" -> ToString[result, StandardForm] |> ];
+                result
+            ]
+        ];
+    ]
 ]
 
 SplitExpression[astr_] := With[{str = StringReplace[astr, {"%"->"Global`$out", "$Pi$"->"\[Pi]"}]},
@@ -69,5 +108,6 @@ CheckSyntax[str_String] :=
         Return[True, Module];
     ];
 
-
 End[]
+
+EndPackage[]
