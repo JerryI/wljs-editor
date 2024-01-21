@@ -9,10 +9,9 @@ EventHandler[AppExtensions`AppEvents// EventClone, {
     "Loader:LoadNotebook" -> (Once[ attachListeners[#] ] &)
 }];
 
-
 attachListeners[notebook_Notebook] := With[{},
     Echo["Attach event listeners to notebook from EXTENSION"];
-    EventHandler[notebook, {
+    EventHandler[notebook // EventClone, {
         "OnBeforeLoad" -> Function[opts,
             If[MemberQ[notebook["Properties"], "Objects"],
                 Echo["FrontendObject`Sync >> restored!"];

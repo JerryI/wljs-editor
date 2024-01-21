@@ -807,6 +807,13 @@ class CodeMirrorCell {
     name: 'mathematica'
   });
 
+  window.SupportedLanguages.push({
+    check: (r) => {return(r[0].match(/\w+\.(wl|wls)$/) != null)},
+    plugins:  mathematicaPlugins,
+    legacy: true, 
+    name: 'mathematica'
+  });
+
   window.EditorMathematicaPlugins = mathematicaPlugins
 
   window.SupportedCells['codemirror'] = {

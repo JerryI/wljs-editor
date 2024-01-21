@@ -62,7 +62,6 @@ evaluator  = StandardEvaluator["Name" -> "Wolfram Evaluator", "InitKernel" -> in
                 ];
 
                 StandardEvaluator`Print[evaluator, "Kernel`Submit!"];
-                StandardEvaluator`Print[evaluator, transaction["Data"] ];
                 Kernel`Submit[k, transaction];
             ]&
         ,  list];
@@ -74,7 +73,6 @@ init[k_] := Module[{},
     Kernel`Init[k, 
         Print["Init normal Kernel (Local)"];
         Notebook`Editor`WolframEvaluator = Function[t, 
-            Print["Got it!"];
             With[{result = ToExpression[ t["Data"], InputForm, Hold] // ReleaseHold },
                 EventFire[Internal`Kernel`Stdout[ t["Hash"] ], "Result", <|"Data" -> ToString[result, StandardForm] |> ];
                 result
@@ -83,7 +81,7 @@ init[k_] := Module[{},
     ]
 ]
 
-SplitExpression[astr_] := With[{str = StringReplace[astr, {"%"->"Global`$out", "$Pi$"->"\[Pi]"}]},
+SplitExpression[astr_] := With[{str = StringReplace[astr, {"$Pi$"->"\[Pi]"}]},
   Select[Select[(StringTake[str, Partition[Join[{1}, #, {StringLength[str]}], 2]] &@
    Flatten[{#1 - 1, #2 + 1} & @@@ 
      Sort@

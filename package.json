@@ -25,7 +25,6 @@
     ],
     "styles": "src/styles.css",
     "autocomplete": "src/autocomplete.js",
-    "header": "src/header.wsp",
     "priority": -10,
     "important": true
   },
