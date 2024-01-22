@@ -13,24 +13,6 @@ SubscriptBox[a_, b_] := RowBox[{"(*SbB[*)Subscript[", a, "(*|*),(*|*)",  b, "](*
 Unprotect[GridBox]
 GridBox[list_List, a___] := RowBox@(Join@@(Join[{{"(*GB[*){"}}, Riffle[#, {{"(*||*),(*||*)"}}] &@ (Join[{"{"}, Riffle[#, "(*|*),(*|*)"], {"}"}] &/@ list), {{"}(*]GB*)"}}]))
 
-FrontEndExecutableExpression[uid_] :=  (Print["Importing string"]; ImportString[
-  Function[res, If[!StringQ[res], 
-                  Print["nope!"];
-                  JerryI`WolframJSFrontend`Evaluator`objects[uid] = AskMaster[Global`NotebookGetObjectForMe[uid]];
-                  JerryI`WolframJSFrontend`Evaluator`objects[uid]["json"]
-                  ,
-                  Print["got it!"];
-                  res
-    ]
-  ] @ (JerryI`WolframJSFrontend`Evaluator`objects[uid]["json"])
-, "ExpressionJSON"] // ReleaseHold );
-
-FrontEndInlineExecutableExpression[str_String] := Uncompress[str]
-
-ExpressionMaker[FrontEndExecutable -> FrontEndExecutableExpression, StandardForm]
-ExpressionMaker[FrontEndInlineExecutable -> FrontEndInlineExecutableExpression, StandardForm]
-
-
 Unprotect[TagBox]
 TagBox[x_, opts___] := x
 
@@ -46,10 +28,6 @@ Unprotect[PanelBox]
 PanelBox[x_, opts__]  := RowBox[{"(*BB[*)(Panel[", x, "])(*,*)(*", ToString[Compress[Hold[ProvidedOptions[PanelBox[opts], "Head"->"Panel"]]], InputForm], "*)(*]BB*)"}]
 
 iHighlight[expr_] := Style[expr, Background->Yellow]
-
-ExpressionMaker[FrontEndBoxTemporal -> FrontEndBoxTemporalExpression, StandardForm]
-FrontEndBoxTemporalExpression[expr_, a_] := expr
-
 
 Unprotect[TemplateBox]
 
@@ -98,13 +76,9 @@ InterpretationBox[placeholder_, expr_, opts___] := With[{data = expr, v = Editor
   RowBox[{"(*VB[*)(", ToString[expr, InputForm], ")(*,*)(*", ToString[Compress[Hold[v]], InputForm], "*)(*]VB*)"}]
 ]
 
-FrontEndViewExpression[expr_, a_] := expr;
-ExpressionMaker[FrontEndView -> FrontEndViewExpression, StandardForm]
-
 TemplateBox[v_List, "SummaryPanel"] := v
 
 EventObjectHasView[assoc_Association] := KeyExistsQ[assoc, "view"]
 EventObject /: MakeBoxes[EventObject[a_?EventObjectHasView], StandardForm] := With[{o = CreateFrontEndObject[a["view"]]}, MakeBoxes[o, StandardForm]]
-
 
 FrontEndTruncated /: MakeBoxes[FrontEndTruncated[a__], StandardForm] := With[{o = CreateFrontEndObject[FrontEndTruncated[a]]}, MakeBoxes[o, StandardForm]]

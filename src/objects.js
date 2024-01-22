@@ -1,6 +1,6 @@
 window.ObjectHashMap = {}
 //storage for the frontend objects / executables
-class ObjectStorage {
+window.ObjectStorage = class {
     refs = {}
     uid = ''
     cached = false
