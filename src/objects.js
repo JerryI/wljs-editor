@@ -51,7 +51,7 @@ window.ObjectStorage = class {
       console.log(target);
       getObject(target, self.uid).then((result) => {
         self.cache = result;
-        console.log('resolved');
+        //console.log('resolved');
         console.log(self.cache);
         promise.resolve(self.cache);
       }, (rejected) => {
@@ -67,7 +67,7 @@ window.ObjectStorage = class {
         
         getObject(target, self.uid).then((result) => {
             self.cache = result;
-            console.log('resolved');
+            //console.log('resolved');
             console.log(self.cache);
             promise.resolve(self.cache);
         }, (rejected) => {

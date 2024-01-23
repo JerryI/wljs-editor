@@ -40,8 +40,17 @@ evaluator  = StandardEvaluator["Name" -> "Wolfram Evaluator", "InitKernel" -> in
         list = SplitExpression[t["Data"] ];
         MapIndexed[
             With[{message = StringTrim[#1], index = #2[[1]], transaction = Transaction[]},
-                (*If[StringTake[message, -1] === ";", transaction["Nohup"] = True];*)
-                transaction["Data"] = message;
+                If[StringTake[message, -1] === ";", 
+                    transaction["Nohup"] = True;
+                    transaction["Data"] = StringDrop[StringReplace[message, "%" -> "Global`$$out"], -1];
+                ,
+                    transaction["Data"] = StringReplace[message, "%" -> "Global`$$out"];
+                ];
+                (*  FIXME TODO Normal OUT Support *)
+                (*  FIXME TODO Normal OUT Support *)
+                (*  FIXME TODO Normal OUT Support *)
+                (*  FIXME TODO Normal OUT Support *)
+                
                 transaction["Evaluator"] = Notebook`Editor`WolframEvaluator;
                 
                 (* check if it is the last one *)
@@ -74,9 +83,15 @@ init[k_] := Module[{},
         Print["Init normal Kernel (Local)"];
         Notebook`Editor`WolframEvaluator = Function[t, 
             With[{result = ToExpression[ t["Data"], InputForm, Hold] // ReleaseHold },
-                EventFire[Internal`Kernel`Stdout[ t["Hash"] ], "Result", <|"Data" -> ToString[result, StandardForm] |> ];
-                result
-            ]
+                If[KeyExistsQ[t, "Nohup"],
+                    EventFire[Internal`Kernel`Stdout[ t["Hash"] ], "Result", <|"Data" -> Null |> ];
+                ,   
+                    EventFire[Internal`Kernel`Stdout[ t["Hash"] ], "Result", <|"Data" -> ToString[result, StandardForm] |> ];
+                ];
+                
+                (*  FIXME TODO Normal OUT Support *)
+                Global`$$out = result;
+            ];
         ];
     ]
 ]
