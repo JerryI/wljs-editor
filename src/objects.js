@@ -52,7 +52,7 @@ window.ObjectStorage = class {
       getObject(target, self.uid).then((result) => {
         self.cache = result;
         //console.log('resolved');
-        console.log(self.cache);
+        //console.log(self.cache);
         promise.resolve(self.cache);
       }, (rejected) => {
         console.warn('Rejected! Trying evaluation server instance');
@@ -68,7 +68,7 @@ window.ObjectStorage = class {
         getObject(target, self.uid).then((result) => {
             self.cache = result;
             //console.log('resolved');
-            console.log(self.cache);
+            //console.log(self.cache);
             promise.resolve(self.cache);
         }, (rejected) => {
             console.error('Did not manage to get frontend object '+self.uid);
@@ -86,7 +86,7 @@ window.ObjectStorage = class {
 
 //Extend Server Class
 function getObject(server, id) {
-    console.log(server);
+    //console.log(server);
     return server.ask('Notebook`Editor`FrontendObject`GetObject["'+id+'"]'); 
 }
 
@@ -102,7 +102,7 @@ core.FrontEndExecutable = async (args, env) => {
     } else {
         obj = new ObjectStorage(uid);
     }
-    console.log(obj);
+    //console.log(obj);
 
     const copy = {...env};
     const store = await obj.get();

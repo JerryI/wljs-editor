@@ -1,4 +1,4 @@
-BeginPackage["Notebook`Editor`Autocomplete`", {
+BeginPackage["Notebook`Editor`FrontSubmitService`", {
     "JerryI`Misc`Events`",
     "JerryI`Misc`Events`Promise`", 
     "JerryI`Notebook`", 
@@ -17,15 +17,13 @@ EventHandler[AppExtensions`AppEvents// EventClone, {
 }];
 
 attachListeners[notebook_Notebook] := With[{},
-    Echo["Attach event listeners to notebook from EXTENSION"];
+    Echo["Attach event listeners to notebook from EXTENSION FrontSubmit"];
     EventHandler[notebook // EventClone, {
         "OnWebSocketConnected" -> Function[payload,
-            Kernel`Init[notebook["Evaluator"]["Kernel"], Unevaluated[
-                Notebook`Autocomplete`Private`BuildVocabular;
-                Notebook`Autocomplete`Private`StartTracking;
-            ], "Once"->True];
-
-            WebUISubmit[ Global`UIAutocompleteConnect[], payload["Client"] ];
+            Echo["Requesting socket object for client..."];
+            Then[WebUIFetch[Global`FSAskKernelSocket[], payload["Client"] ], Function[data,
+                notebook["EvaluationContext", "KernelWebSocket"] = data;
+            ] ];
         ]
     }]; 
 ]

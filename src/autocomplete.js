@@ -1,19 +1,29 @@
-window.EditorAutocomplete.extend([  
-    {
-        "label": "ViewBox",
-        "type": "keyword",
-        "info": "ViewBox[expr_, decorator_] low-level box used by InterpretationBox. It keeps `expr` in its original form, while visially covers it with DOM element to which `decorator` expression will be attached and executed"
-    },
-    {
-        "label": "BoxBox",
-        "type": "keyword",
-        "info": "BoxBox[expr_Box | _String, decorator_] low-level box used by Style, Framed... It places a subeditor with `expr` inside and decorates the container using `decorator` expression will be attached and executed."
-    },    
-    {
-        "label": "MiddlewareHandler",
-        "type": "keyword",
-        "info": "MiddlewareHandler[exp, \"type\"->handler, opts...] captures event from container"
-    }       
-])
+core.UIAutocompleteConnect = async (args, env) => {
+    server.kernel.emitt('autocomplete', 'True', 'Connect');
+}
 
-console.log('loaded!');
+core.UIAutocompleteExtend = async (args, env) => {
+    const data = await interpretate(args[0], env);
+ 
+    
+    data.forEach((element)=>{
+      const name = element[0];
+      const usage = element[1];
+  
+      if (!(name in core.UIAutocompleteExtend.symbols)) {
+        window.EditorAutocomplete.extend([  
+          {
+              "label": name,
+              "type": "keyword",
+              "info": usage 
+          }]);
+  
+        core.UIAutocompleteExtend.symbols[name] = usage;
+      }
+    });
+}
+
+core["Notebook`Autocomplete`UIAutocompleteExtend"] = core.UIAutocompleteExtend
+
+
+core.UIAutocompleteExtend.symbols = {};

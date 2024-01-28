@@ -1,4 +1,4 @@
-BeginPackage["Notebook`Editor`Autocomplete`", {
+BeginPackage["Notebook`Editor`NotebookDirectory`", {
     "JerryI`Misc`Events`",
     "JerryI`Misc`Events`Promise`", 
     "JerryI`Notebook`", 
@@ -20,12 +20,11 @@ attachListeners[notebook_Notebook] := With[{},
     Echo["Attach event listeners to notebook from EXTENSION"];
     EventHandler[notebook // EventClone, {
         "OnWebSocketConnected" -> Function[payload,
-            Kernel`Init[notebook["Evaluator"]["Kernel"], Unevaluated[
-                Notebook`Autocomplete`Private`BuildVocabular;
-                Notebook`Autocomplete`Private`StartTracking;
-            ], "Once"->True];
-
-            WebUISubmit[ Global`UIAutocompleteConnect[], payload["Client"] ];
+            With[{dir = FileNameSplit[ notebook["Path"] // DirectoryName ]},
+                Kernel`Init[notebook["Evaluator"]["Kernel"], Unevaluated[
+                    Notebook`DirectorySetter`Private`NotebookDirectoryAppend[dir];
+                ] ];
+            ];
         ]
     }]; 
 ]

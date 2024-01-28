@@ -7,7 +7,11 @@ BeginPackage["Notebook`Editor`", {
     "JerryI`Misc`Events`"
 }]
 
+NotebookEditorChannel::usage = "used to transfer extra events"
+
 Begin["`Internal`"]
+
+NotebookEditorChannel = CreateUUID[];
 
 evaluator  = StandardEvaluator["Name" -> "Wolfram Evaluator", "InitKernel" -> init, "Priority"->(999)];
 
@@ -42,8 +46,10 @@ evaluator  = StandardEvaluator["Name" -> "Wolfram Evaluator", "InitKernel" -> in
             With[{message = StringTrim[#1], index = #2[[1]], transaction = Transaction[]},
                 If[StringTake[message, -1] === ";", 
                     transaction["Nohup"] = True;
+                    transaction["EvaluationContext"] = t["EvaluationContext"];
                     transaction["Data"] = StringDrop[StringReplace[message, "%" -> "Global`$$out"], -1];
                 ,
+                    transaction["EvaluationContext"] = t["EvaluationContext"];
                     transaction["Data"] = StringReplace[message, "%" -> "Global`$$out"];
                 ];
                 (*  FIXME TODO Normal OUT Support *)
@@ -79,20 +85,31 @@ evaluator  = StandardEvaluator["Name" -> "Wolfram Evaluator", "InitKernel" -> in
 
 init[k_] := Module[{},
     Print["Kernel init..."];
+    With[{channel = NotebookEditorChannel},
+        Kernel`Init[k,
+            Print["Init internal communication"];
+            Internal`Kernel`CommunicationChannel = Internal`Kernel`Stdout[channel];
+        ];
+    ];
     Kernel`Init[k, 
         Print["Init normal Kernel (Local)"];
         Notebook`Editor`WolframEvaluator = Function[t, 
+        With[{hash = CreateUUID[]},
+          Block[{
+            Global`$EvaluationContext = Join[t["EvaluationContext"], <|"EvaluationCellHash" -> hash|>]
+          },
             With[{result = ToExpression[ t["Data"], InputForm, Hold] // ReleaseHold },
                 If[KeyExistsQ[t, "Nohup"],
                     EventFire[Internal`Kernel`Stdout[ t["Hash"] ], "Result", <|"Data" -> Null |> ];
                 ,   
-                    EventFire[Internal`Kernel`Stdout[ t["Hash"] ], "Result", <|"Data" -> ToString[result, StandardForm] |> ];
+                    EventFire[Internal`Kernel`Stdout[ t["Hash"] ], "Result", <|"Data" -> ToString[result, StandardForm], "Meta"->Sequence["Hash"->hash] |> ];
                 ];
                 
                 (*  FIXME TODO Normal OUT Support *)
                 Global`$$out = result;
             ];
-        ];
+          ];
+        ] ];
     ]
 ]
 

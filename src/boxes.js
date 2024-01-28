@@ -29,6 +29,12 @@
       }
   }
 
+  boxes.IconizeBox = async (args, env) => {
+    env.context = boxes;
+    const count = await interpretate(args[0], env);
+    env.element.innerHTML = `${count} bytes`;
+  }
+
   boxes.StyleBox = async (args, env) => {
       env.context = boxes;
       console.log('style box');

@@ -11,20 +11,29 @@
     "js": [
       "dist/kernel.js",
       "src/boxes.js",
-      "src/objects.js"
+      "src/objects.js",
+      "src/autocomplete.js",
+      "src/frontsubmit.js"
     ],
     "frontend": [
       "src/Frontend.wl",
       "src/FrontendObject.wl",
-      "src/FrontendObjectSync.wl"
+      "src/FrontendObjectSync.wl",
+      "src/Autocomplete.wl",
+      "src/SetDirectory.wl",
+      "src/RemoteCells.wl",
+      "src/FrontSubmit.wl"      
     ],
     "kernel": [
       "src/StandardForm.wl",
       "src/FrontendObject.wl",
-      "src/Boxes.wl"
+      "src/Boxes.wl",
+      "src/AutocompleteKernel.wl",
+      "src/SetDirectoryKernel.wl",
+      "src/RemoteCellsKernel.wl",
+      "src/FrontSubmitKernel.wl"  
     ],
     "styles": "src/styles.css",
-    "autocomplete": "src/autocomplete.js",
     "priority": -10,
     "important": true
   },

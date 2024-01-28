@@ -53,6 +53,19 @@ TemplateBox[expr_List, "SummaryPanel"] := RowBox[expr]
 (*internal*)
 ViewBox[expr_, display_] := RowBox[{"(*VB[*)(", ToString[expr, InputForm], ")(*,*)(*", ToString[Compress[Hold[display]], InputForm], "*)(*]VB*)"}]
 
+Unprotect[Iconize]
+ClearAll[Iconize]
+
+Iconize[expr_] := With[{},
+  If[BytesCount[expr] > 30000,
+    $Failed
+  ,
+    Iconized[expr // Compress, BytesCount[expr] ]
+  ]
+]
+
+Iconized /: MakeBoxes[Iconized[c_, b_], StandardForm] := RowBox[{"(*VB[*)(Uncompress[", ToString[c, InputForm], "])(*,*)(*", ToString[Compress[Hold[IconizeBox[b] ] ], InputForm], "*)(*]VB*)"}]
+
 BoxBox[expr_, display_, OptionsPattern[]] := 
   If[OptionValue[Head] =!= Null,
     With[{dp = ProvidedOptions[Hold[display], "Head"->ToString[OptionValue[Head], InputForm]]},
