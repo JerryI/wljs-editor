@@ -1,7 +1,7 @@
-BeginPackage["Notebook`Editor`RemoteCells", {
+BeginPackage["Notebook`Editor`RemoteCells`", {
     "Notebook`Editor`",
     "JerryI`Notebook`", 
-    "JerryI`Notebook`Kernel", 
+    "JerryI`Notebook`Kernel`", 
     "JerryI`Notebook`Evaluator`", 
     "JerryI`Misc`Events`",
     "JerryI`Misc`Events`Promise`"

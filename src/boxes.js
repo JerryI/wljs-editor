@@ -31,8 +31,15 @@
 
   boxes.IconizeBox = async (args, env) => {
     env.context = boxes;
+    env.element.classList.add(...('sm-controls cursor-default rounded-md 0 py-1 px-2 bg-gray-100 text-left text-gray-500 ring-1 ring-inset ring-gray-400 text-xs'.split(' ')));
     const count = await interpretate(args[0], env);
-    env.element.innerHTML = `${count} bytes`;
+    env.element.innerHTML = `
+    <svg class="w-4 h-4 text-gray-500 inline-block mt-auto mb-auto" viewBox="0 0 24 24" fill="none">
+<path d="M18 2L6 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18 22L6 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M12 5V10M12 10L15 7M12 10L9 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M12 19V14M12 14L15 17M12 14L9 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg> <span class="leading-normal pl-1">${count} bytes</span>`;
   }
 
   boxes.StyleBox = async (args, env) => {
@@ -50,12 +57,7 @@
 
   boxes.DateObjectTemplate = async (args, env) => {
       const element = document.createElement('span');
-      element.class = "";
-      element.style.paddingLeft = "1em";
-      element.style.paddingRight = "1em";
-      element.style.border = "1px solid gray";
-      element.style.borderRadius = "4px";
-      element.style.fontSize = "x-small";
+      element.classList.add(...('sm-controls cursor-default rounded-md 0 py-1 pl-3 bg-gray-100 pr-2 text-left text-gray-500 ring-1 ring-inset ring-gray-400 text-xs'.split(' ')));
 
       //env.element.classList.add('frame-box');
       env.context = boxes;
@@ -68,11 +70,7 @@
   boxes.RGBColorSwatchTemplate = async (args, env) => {
       const element = document.createElement('span');
 
-      element.class = "";
-      element.style.width = "1em";
-      element.style.height = "1em";
-      element.style.border = "1px solid gray";
-      element.style.borderRadius = "4px";
+      element.classList.add(...('sm-controls cursor-default rounded-md 0 h-4 w-4 shadow-sm'.split(' ')));
 
       //env.element.classList.add('frame-box');
       env.context = boxes;

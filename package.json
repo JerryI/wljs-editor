@@ -13,7 +13,8 @@
       "src/boxes.js",
       "src/objects.js",
       "src/autocomplete.js",
-      "src/frontsubmit.js"
+      "src/frontsubmit.js",
+      "src/dir.js"
     ],
     "frontend": [
       "src/Frontend.wl",
@@ -22,7 +23,8 @@
       "src/Autocomplete.wl",
       "src/SetDirectory.wl",
       "src/RemoteCells.wl",
-      "src/FrontSubmit.wl"      
+      "src/FrontSubmit.wl",
+      "src/Store.wl"        
     ],
     "kernel": [
       "src/StandardForm.wl",
@@ -31,7 +33,9 @@
       "src/AutocompleteKernel.wl",
       "src/SetDirectoryKernel.wl",
       "src/RemoteCellsKernel.wl",
-      "src/FrontSubmitKernel.wl"  
+      "src/FrontSubmitKernel.wl",
+      "src/StoreKernel.wl",
+      "src/EditorKernel.wl"  
     ],
     "styles": "src/styles.css",
     "priority": -10,

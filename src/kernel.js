@@ -119,38 +119,11 @@ const defaultHighlightStyle = HighlightStyle.define([
 
 
 
-const EditorAutocomplete = defaultFunctions;
+window.EditorAutocomplete = defaultFunctions;
 EditorAutocomplete.extend = (list) => {
   window.EditorAutocomplete.push(...list);
   wolframLanguage.reBuild(window.EditorAutocomplete);
 }
-
-core.FrontAddDefinition = async (args, env) => {
-  const data = await interpretate(args[0], env);
-  console.log(data);
-  
-  data.forEach((element)=>{
-    const name = element[0];
-    const context = element[1];
-
-    if (!(name in core.FrontAddDefinition.symbols)) {
-      window.EditorAutocomplete.extend([  
-        {
-            "label": name,
-            "type": "keyword",
-            "info": "User's defined symbol in "+context  
-        }]);
-
-      core.FrontAddDefinition.symbols[name] = context;
-    }
-  });
-
-
-}
-
-core.FrontAddDefinition.symbols = {};
-
-console.log('loaded!');
 
 const unknownLanguage = StreamLanguage.define(spreadsheet);
 const regLang = new RegExp(/^[\w]*\.[\w]+/);
@@ -758,7 +731,7 @@ class CodeMirrorCell {
       //then it means this is like a slider
       updateFunction = (data) => {
         console.log('editor view emitt data: '+data);
-        server.emitt(options.Event, '"'+data.replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"')+'"');
+        server.kernel.emitt(options.Event, '"'+data.replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"')+'"');
       }
       
     }

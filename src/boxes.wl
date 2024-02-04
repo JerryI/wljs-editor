@@ -57,10 +57,10 @@ Unprotect[Iconize]
 ClearAll[Iconize]
 
 Iconize[expr_] := With[{},
-  If[BytesCount[expr] > 30000,
+  If[ByteCount[expr] > 30000,
     $Failed
   ,
-    Iconized[expr // Compress, BytesCount[expr] ]
+    Iconized[expr // Compress, ByteCount[expr] ]
   ]
 ]
 
@@ -91,7 +91,16 @@ InterpretationBox[placeholder_, expr_, opts___] := With[{data = expr, v = Editor
 
 TemplateBox[v_List, "SummaryPanel"] := v
 
-EventObjectHasView[assoc_Association] := KeyExistsQ[assoc, "view"]
-EventObject /: MakeBoxes[EventObject[a_?EventObjectHasView], StandardForm] := With[{o = CreateFrontEndObject[a["view"]]}, MakeBoxes[o, StandardForm]]
+EventObjectHasView[assoc_Association] := KeyExistsQ[assoc, "View"]
+EventObject /: MakeBoxes[EventObject[a_?EventObjectHasView], StandardForm] := If[StringQ[a["View"] ],
+  (* reuse an existing FE Object to save up resources, if someone copied it *)
+  With[{uid = a["View"]}, 
+    RowBox[{"(*VB[*)(", ToString[EventObject[Join[a, <|"View"->uid|>] ], InputForm], ")(*,*)(*", ToString[Compress[Hold[Global`FrontEndExecutable[uid]]], InputForm], "*)(*]VB*)"}]
+  ]
+,
+  With[{uid = CreateFrontEndObject[a["View"] ] // First}, 
+    RowBox[{"(*VB[*)(", ToString[EventObject[Join[a, <|"View"->uid|>] ], InputForm], ")(*,*)(*", ToString[Compress[Hold[Global`FrontEndExecutable[uid]]], InputForm], "*)(*]VB*)"}]
+  ]
+]
 
 FrontEndTruncated /: MakeBoxes[FrontEndTruncated[a__], StandardForm] := With[{o = CreateFrontEndObject[FrontEndTruncated[a]]}, MakeBoxes[o, StandardForm]]

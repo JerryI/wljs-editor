@@ -71826,12 +71826,10 @@ const defaultHighlightStyle = HighlightStyle.define([
 
 
 window.EditorAutocomplete = defaultFunctions;
-window.EditorAutocomplete.extend = (list) => {
+EditorAutocomplete.extend = (list) => {
   window.EditorAutocomplete.push(...list);
   wolframLanguage.reBuild(window.EditorAutocomplete);
 };
-
-console.log('loaded!');
 
 const unknownLanguage = StreamLanguage.define(spreadsheet);
 const regLang = new RegExp(/^[\w]*\.[\w]+/);
@@ -72074,7 +72072,7 @@ class ExecutableInlineWidget extends WidgetType {
 let compactWLEditor = null;
 let selectedCell = undefined;
 
-window.EditorSelected = {
+const EditorSelected = {
   get: () => {
     if (!selectedCell) return '';
     if (!selectedCell.editor.viewState) return '';
@@ -72435,7 +72433,7 @@ class CodeMirrorCell {
       //then it means this is like a slider
       updateFunction = (data) => {
         console.log('editor view emitt data: '+data);
-        server.emitt(options.Event, '"'+data.replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"')+'"');
+        server.kernel.emitt(options.Event, '"'+data.replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"')+'"');
       };
       
     }
@@ -72484,6 +72482,13 @@ class CodeMirrorCell {
     name: 'mathematica'
   });
 
+  window.SupportedLanguages.push({
+    check: (r) => {return(r[0].match(/\w+\.(wl|wls)$/) != null)},
+    plugins:  mathematicaPlugins,
+    legacy: true, 
+    name: 'mathematica'
+  });
+
   window.EditorMathematicaPlugins = mathematicaPlugins;
 
   window.SupportedCells['codemirror'] = {
@@ -72509,3 +72514,16 @@ class CodeMirrorCell {
 
   if (window.OfflineMode)
     extras.push(window.EditorState.readOnly.of(true));
+
+
+core.FrontEditorSelected = async (args, env) => {
+  const op = await interpretate(args[0], env);
+  if (op == "Get")
+    return EditorSelected.get();
+  
+  if (op == "Set") {
+    let data = await interpretate(args[1], env);
+    if (data.charAt(0) == '"') data = data.slice(1,-1);
+    EditorSelected.set(data);
+  }
+};

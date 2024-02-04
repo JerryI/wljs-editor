@@ -7,6 +7,8 @@ BeginPackage["Notebook`Editor`NotebookDirectory`", {
     "JerryI`Notebook`Kernel`"
 }]
 
+SetKernelDirectory::usage="";
+
 Begin["`Private`"]
 
 rootDir = $InputFileName // DirectoryName // ParentDirectory;
@@ -25,6 +27,18 @@ attachListeners[notebook_Notebook] := With[{},
                     Notebook`DirectorySetter`Private`NotebookDirectoryAppend[dir];
                 ] ];
             ];
+        ],
+        "OnBeforeLoad" -> Function[payload,
+            With[{dir = FileNameSplit[ notebook["Path"] // DirectoryName ]},
+                WebUISubmit[SetKernelDirectory[dir // FileNameJoin // URLEncode, "KernelDir"], payload["Client"] ]
+            ];        
+        ],
+        "OnClose" -> Function[payload,
+            With[{dir = FileNameSplit[ notebook["Path"] // DirectoryName ]},
+                Kernel`Init[notebook["Evaluator"]["Kernel"], Unevaluated[
+                    Notebook`DirectorySetter`Private`NotebookDirectoryRemove[dir];
+                ] ];
+            ];            
         ]
     }]; 
 ]

@@ -1,6 +1,0 @@
-<?wsp If[TrueQ[NotebookSettings["Editor_gutter"]], ?>
-    <script type="module">
-        window.EditorParameters["gutter"] = true;
-    </script>
-<?wsp , " "] ?>
-

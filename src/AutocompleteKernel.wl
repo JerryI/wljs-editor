@@ -24,6 +24,9 @@ EventHandler["autocomplete", {
         With[{client = Global`$Client},
             clients = Append[clients, client];
             Echo["Autocomplete  >> New connection!"];
+            If[Internal`Kernel`Type =!= "LocalKernel", Echo["Error. Autocomplete package can only for on LocalKernel. MasterKernel is not allowed!"]; EventRemove["autocomplete"]; Return[$Failed]; ];
+
+            BuildVocabular;
             If[Length[definitions] != 0,
                 shareDefinitions[client, definitions];
             ];
@@ -40,6 +43,8 @@ blacklist = {"Notebook`Autocomplete`", "KirillBelov`LTP`JerryI`Events`","KirillB
 
 BuildVocabular := With[{},
     BuildVocabular = Null;
+    If[Internal`Kernel`Type =!= "LocalKernel", Echo["Error. Autocomplete package can only for on LocalKernel. MasterKernel is not allowed!"]; Return[$Failed]; ];
+    
     With[{r = Flatten[( {#, Information[#, "Usage"]} &/@ Names[#<>"*"] ) &/@ Complement[$ContextPath, blacklist], 1]},
         definitions = Join[definitions, r] // DeleteDuplicates;
     ];
