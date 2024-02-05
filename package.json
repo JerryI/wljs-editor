@@ -39,7 +39,8 @@
     ],
     "styles": "src/styles.css",
     "priority": -10,
-    "important": true
+    "important": true,
+    "category": "Editor"
   },
   "repository": {
     "type": "git",
