@@ -1,5 +1,6 @@
 Begin["Notebook`Editor`FrontendObject`"]
 
+
 Notebook`Editor`FrontendObject`Objects = <||>
 
 Global`CreateFrontEndObject[expr_] := With[{uid = CreateUUID[]},
