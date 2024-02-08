@@ -36,14 +36,14 @@ FrontFetchAsync[expr_, OptionsPattern[] ] := With[{cli = OptionValue["Window"], 
         ]
     ] ];
 
-    WLJSTransportSend[Global`FSAsk[expr, event], cli]
+    WLJSTransportSend[Global`FSAsk[expr, event], cli];
 
     promise
 ]
 
 FrontFetch[expr_, opts___] := FrontFetchAsync[expr, opts] // WaitAll
 
-Options[FrontFetchAsync] = {"Format"->"ExpressionJSON", "Window" :> Global`$EvaluationContext["KernelWebSocket"]};
+Options[FrontFetchAsync] = {"Format"->"JSON", "Window" :> Global`$EvaluationContext["KernelWebSocket"]};
 
 CurrentWindow[] := Global`$EvaluationContext["KernelWebSocket"]
 
