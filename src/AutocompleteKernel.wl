@@ -23,7 +23,7 @@ EventHandler["autocomplete", {
     "Connect" -> Function[Null,
         With[{client = Global`$Client},
             clients = Append[clients, client];
-            Echo["Autocomplete  >> New connection!"];
+            
             If[Internal`Kernel`Type =!= "LocalKernel", Echo["Error. Autocomplete package can only for on LocalKernel. MasterKernel is not allowed!"]; EventRemove["autocomplete"]; Return[$Failed]; ];
 
             BuildVocabular;
@@ -37,7 +37,7 @@ EventHandler["autocomplete", {
 extend[set_] := shareDefinitions[#, set] &/@ clients;
 
 (* a bug with a first defined symbol $InterfaceEnvironment that causes shutdown (BUT THIS IS A STRING!!!). No idea why *)
-skip = 1;
+skip = 0;
 
 blacklist = {"Notebook`Autocomplete`", "KirillBelov`LTP`JerryI`Events`","KirillBelov`CSockets`EventsExtension`","JerryI`Misc`WLJS`Transport`","KirillBelov`WebSocketHandler`","KirillBelov`TCPServer`","KirillBelov`LTP`","KirillBelov`Internal`","KirillBelov`CSockets`","HighlightingCompatibility`","System`","Global`"};
 
@@ -55,7 +55,7 @@ StartTracking := (
     If[Internal`Kernel`Type =!= "LocalKernel",
         Echo["Error. Autocomplete package can only for on LocalKernel. MasterKernel is not allowed!"];
     ,
-        Echo["Tracking of symbols has been started!"];
+        
         SetTimeout[
         $NewSymbol = If[#2 === "Global`", (
             If[skip > 0,

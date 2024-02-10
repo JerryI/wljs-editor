@@ -17,25 +17,26 @@
       "src/dir.js"
     ],
     "frontend": [
+      "src/FrontendObject.wl",      
       "src/Frontend.wl",
-      "src/FrontendObject.wl",
       "src/FrontendObjectSync.wl",
       "src/Autocomplete.wl",
       "src/SetDirectory.wl",
       "src/RemoteCells.wl",
       "src/FrontSubmit.wl",
-      "src/Store.wl"        
+      "src/Store.wl" 
     ],
     "kernel": [
+      "src/EditorKernel.wl" ,
+      "src/FrontendObject.wl",      
       "src/StandardForm.wl",
-      "src/FrontendObject.wl",
       "src/Boxes.wl",
       "src/AutocompleteKernel.wl",
       "src/SetDirectoryKernel.wl",
       "src/RemoteCellsKernel.wl",
       "src/FrontSubmitKernel.wl",
       "src/StoreKernel.wl",
-      "src/EditorKernel.wl"  
+      "src/NotificationsKernel.wl"            
     ],
     "styles": "src/styles.css",
     "priority": -10,
