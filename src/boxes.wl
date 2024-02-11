@@ -103,4 +103,7 @@ EventObject /: MakeBoxes[EventObject[a_?EventObjectHasView], StandardForm] := If
   ]
 ]
 
+(**)
+System`WLXEmbed /: MakeBoxes[w_System`WLXEmbed, StandardForm] := With[{o = CreateFrontEndObject[w]}, MakeBoxes[o, StandardForm] ]
+
 FrontEndTruncated /: MakeBoxes[FrontEndTruncated[a__], StandardForm] := With[{o = CreateFrontEndObject[FrontEndTruncated[a]]}, MakeBoxes[o, StandardForm]]

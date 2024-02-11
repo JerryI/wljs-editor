@@ -27,8 +27,8 @@
       "src/Store.wl" 
     ],
     "kernel": [
+      "src/FrontendObject.wl", 
       "src/EditorKernel.wl" ,
-      "src/FrontendObject.wl",      
       "src/StandardForm.wl",
       "src/Boxes.wl",
       "src/AutocompleteKernel.wl",

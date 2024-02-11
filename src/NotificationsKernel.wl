@@ -23,7 +23,7 @@ Notify[template_, OptionsPattern[] ] := With[{
     EventFire[Internal`Kernel`Stdout[ Internal`Kernel`Hash ], Notifications`NotificationMessage[OptionValue["Topic"] ], message]; 
 ]
 
-Optinos[Notify] = {"Topic" -> "Kernel"}
+Options[Notify] = {"Topic" -> "Kernel"}
 
 NotificationSpinner[message_, OptionsPattern[] ] := With[{},
     (*EventFire[Internal`Kernel`Stdout[ Internal`Kernel`Hash ], Notifications`NotificationMessage[OptionValue["Topic"] ], message];*)
