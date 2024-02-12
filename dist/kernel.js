@@ -62796,14 +62796,14 @@ function snippet$3() {
 
 let EditorWidget$6 = class EditorWidget {
 
-  constructor(visibleValue, view, enumenator, denumenator) {
+  constructor(visibleValue, view, enumenator, denumenator, ref) {
     this.view = view;
     this.visibleValue = visibleValue;
 
     this.args = matchArguments(visibleValue.str, /\(\*,\*\)/gm);
 
     const self = this;
-
+    //ref.push(self);
     //console.log(visibleValue);
 
     console.log('creating InstanceWidget');
@@ -62935,6 +62935,7 @@ let Widget$6 = class Widget extends WidgetType {
     super();
     this.view = view;
     this.visibleValue = visibleValue;
+    this.reference = ref;
     //console.log('construct');
   }
 
@@ -62978,8 +62979,12 @@ let Widget$6 = class Widget extends WidgetType {
     const denumenator = document.createElement("td");
     trd.appendChild(denumenator);
 
-    span.EditorWidget = new EditorWidget$6(this.visibleValue, view, enumenator, denumenator);
-
+    span.EditorWidget = new EditorWidget$6(this.visibleValue, view, enumenator, denumenator, []);
+    const self = this;
+      
+    this.reference.push({destroy: () => {
+      self.destroy(span);
+    }});
 
     return span;
   }
@@ -63024,7 +63029,7 @@ const placeholder$6 = ViewPlugin.fromClass(
       console.log("disposable");
       console.log(this.disposable);
       this.disposable.forEach((el) => {
-        el.dispose();
+        el.destroy();
       });
     }
   },
@@ -63082,7 +63087,7 @@ var compactCMEditor$4;
 
   let EditorWidget$5 = class EditorWidget {
 
-    constructor(visibleValue, view, dom, sliceRanges) {
+    constructor(visibleValue, view, dom, sliceRanges, ref) {
       this.view = view;
       this.visibleValue = visibleValue;
       const self = this;
@@ -63090,6 +63095,8 @@ var compactCMEditor$4;
       this.length = visibleValue.str.length;
 
       console.log('creating InstanceWidget');
+
+      //(self);
 
       this.editor = compactCMEditor$4({
         //slice SqB[...]
@@ -63160,6 +63167,7 @@ var compactCMEditor$4;
       super();
       this.view = view;
       this.visibleValue = visibleValue;
+      this.reference = ref;
       //console.log('construct');
     }
 
@@ -63181,13 +63189,24 @@ var compactCMEditor$4;
 
       let span = document.createElement("span");
       span.classList.add("sqroot");
+
+      //console.log('Visible value:');
+      //console.log(this.visibleValue);
+
+      const self = this;
   
       const head = document.createElement("span");
       head.classList.add("radicand");
       
-      span.EditorWidget = new EditorWidget$5(this.visibleValue, view, head, [5,-1]);
+      span.EditorWidget = new EditorWidget$5(this.visibleValue, view, head, [5,-1], []);
 
       span.appendChild(head);
+
+
+      
+      this.reference.push({destroy: () => {
+        self.destroy(span);
+      }});      
 
       return span;
     }
@@ -63232,7 +63251,7 @@ var compactCMEditor$4;
         console.log("disposable");
         console.log(this.disposable);
         this.disposable.forEach((el) => {
-          el.dispose();
+          el.destroy();
         });
       }
     },
@@ -63290,7 +63309,7 @@ function snippet$1() {
 
 let EditorWidget$4 = class EditorWidget {
 
-  constructor(visibleValue, view, head, sub) {
+  constructor(visibleValue, view, head, sub, ref) {
     this.view = view;
     this.visibleValue = visibleValue;
     const self = this;
@@ -63359,6 +63378,7 @@ let EditorWidget$4 = class EditorWidget {
     delete self.args[1].body;
     delete self.args[0].body;
     
+    //ref.push(self);
   }
 
   applyChanges(update, pos) {
@@ -63415,6 +63435,8 @@ let Widget$4 = class Widget extends WidgetType {
     super();
     this.view = view;
     this.visibleValue = visibleValue;
+
+    this.reference = ref;
     //console.log('construct');
   }
 
@@ -63444,8 +63466,13 @@ let Widget$4 = class Widget extends WidgetType {
     span.appendChild(head);
     span.appendChild(sub);
 
-    span.EditorWidget = new EditorWidget$4(this.visibleValue, view, head, sub);
+    span.EditorWidget = new EditorWidget$4(this.visibleValue, view, head, sub, []);
 
+    const self = this;
+      
+    this.reference.push({destroy: () => {
+      self.destroy(span);
+    }});
 
     return span;
   }
@@ -63490,7 +63517,7 @@ const placeholder$4 = ViewPlugin.fromClass(
       console.log("disposable");
       console.log(this.disposable);
       this.disposable.forEach((el) => {
-        el.dispose();
+        el.destroy();
       });
     }
   },
@@ -63548,10 +63575,11 @@ var compactCMEditor$2;
   
   let EditorWidget$3 = class EditorWidget {
   
-    constructor(visibleValue, view, head, sub) {
+    constructor(visibleValue, view, head, sub, ref) {
       this.view = view;
       this.visibleValue = visibleValue;
       const self = this;
+
   
       //console.log(visibleValue);
       this.args = matchArguments(visibleValue.str, /\(\*\|\*\)/gm);
@@ -63615,6 +63643,8 @@ var compactCMEditor$2;
       delete self.args[2].body;
       delete self.args[1].body;
       delete self.args[0].body;  
+
+      //ref.push(self);
       
     }
   
@@ -63672,6 +63702,7 @@ var compactCMEditor$2;
       this.view = view;
       this.visibleValue = visibleValue;
       //console.log('construct');
+      this.reference = ref;
     }
   
     eq(other) {
@@ -63700,8 +63731,12 @@ var compactCMEditor$2;
       span.appendChild(head);
       span.appendChild(sub);
   
-      span.EditorWidget = new EditorWidget$3(this.visibleValue, view, head, sub);
-  
+      span.EditorWidget = new EditorWidget$3(this.visibleValue, view, head, sub, []);
+      const self = this;
+
+      this.reference.push({destroy: () => {
+        self.destroy(span);
+      }});
   
       return span;
     }
@@ -63746,7 +63781,7 @@ var compactCMEditor$2;
         console.log("disposable");
         console.log(this.disposable);
         this.disposable.forEach((el) => {
-          el.dispose();
+          el.destroy();
         });
       }
     },
@@ -63778,9 +63813,11 @@ var compactCMEditor$1;
   
   let EditorWidget$2 = class EditorWidget {
   
-    constructor(visibleValue, view, tbody) {
+    constructor(visibleValue, view, tbody, ref) {
       this.view = view;
       this.visibleValue = visibleValue;
+
+      //ref.push(self);
 
       this.tbody = tbody;
 
@@ -63937,6 +63974,7 @@ var compactCMEditor$1;
       super();
       this.view = view;
       this.visibleValue = visibleValue;
+      this.reference = ref;
       //console.log('construct');
     }
   
@@ -63966,8 +64004,12 @@ var compactCMEditor$1;
       const tbody      = document.createElement("tbody");
       table.appendChild(tbody);
   
-      span.EditorWidget = new EditorWidget$2(this.visibleValue, view, tbody);
-  
+      span.EditorWidget = new EditorWidget$2(this.visibleValue, view, tbody, []);
+      const self = this;
+      
+      this.reference.push({destroy: () => {
+        self.destroy(span);
+      }});  
   
       return span;
     }
@@ -64012,7 +64054,7 @@ var compactCMEditor$1;
         console.log("disposable");
         console.log(this.disposable);
         this.disposable.forEach((el) => {
-          el.dispose();
+          el.destroy();
         });
       }
     },
@@ -70843,28 +70885,28 @@ pako$1.constants = constants;
 
 const pako = pako$1;
 
-let Mma$1 = {};
-Mma$1.Util = {};
-Mma$1.Decode = {};
+let Mma = {};
+Mma.Util = {};
+Mma.Decode = {};
 
 // Utility functions to deal with error logging.
-Mma$1.Messages = [];
-Mma$1.Log = function (text) {
-    Mma$1.Messages.push(["I", text]);
+Mma.Messages = [];
+Mma.Log = function (text) {
+    Mma.Messages.push(["I", text]);
     console.log("Mma.js INFO: ", text);
 };
-Mma$1.Warn = function (text) {
-    Mma$1.Messages.push(["W", text]);
+Mma.Warn = function (text) {
+    Mma.Messages.push(["W", text]);
     console.log("Mma.js WARNING: ", text);
 };
-Mma$1.Fail = function (text) {
-    Mma$1.Messages.push(["E", text]);
+Mma.Fail = function (text) {
+    Mma.Messages.push(["E", text]);
     throw ("Mma.js ERROR: " + text);
 };
 
 // Decode a Base64-encoded string, storing it in a Uint8Array.
 // Taken from https://jsperf.com/base64-to-uint8array/19
-Mma$1.Util.Base64Decode = function (encoded) {
+Mma.Util.Base64Decode = function (encoded) {
     var binary = atob(encoded);
     var length = binary.length >>> 0;
     var array = new Uint8Array(length);
@@ -70875,7 +70917,7 @@ Mma$1.Util.Base64Decode = function (encoded) {
 
 // Convert a Uint8Array of character codes into a string.
 // Taken from http://stackoverflow.com/questions/12710001
-Mma$1.Util.U8ArrayToString = function (array) {
+Mma.Util.U8ArrayToString = function (array) {
     const chunkSize = 0x8000;
     var substrings = [];
     for (var i=0; i < array.length; i += chunkSize) {
@@ -70886,7 +70928,7 @@ Mma$1.Util.U8ArrayToString = function (array) {
 };
 
 // Delete a character at a specific position from a string.
-Mma$1.Util.DeleteCharAt = function (string, pos) {
+Mma.Util.DeleteCharAt = function (string, pos) {
     return string.substr(0, pos) + string.substr(pos + 1);
 };
 
@@ -70909,69 +70951,69 @@ Mma$1.Util.DeleteCharAt = function (string, pos) {
 // Mma.String      .str
 // Mma.Expression  .head .parts
 
-Mma$1.IntegerMP = function (input) {
+Mma.IntegerMP = function (input) {
     if (typeof input === "number" && Number.isInteger(input))
         this.n = input;
     else if (input === undefined)
         this.n = undefined;
     else
-        Mma$1.Fail("IntegerMP: invalid input");
+        Mma.Fail("IntegerMP: invalid input");
 };
-Mma$1.IntegerAP = function (input) {
+Mma.IntegerAP = function (input) {
     if (typeof input === "string") {
         for (var i=0; i < input.length; i++)
             if (Number(input[i]) === NaN)
-                Mma$1.Fail("IntegerAP: invalid input, contains non-digit: " +
+                Mma.Fail("IntegerAP: invalid input, contains non-digit: " +
                     String(input));
         if (input.length > 1 && input[0] === 0)
-            Mma$1.Fail("IntegerAP: input starts with 0: " + String(input));
+            Mma.Fail("IntegerAP: input starts with 0: " + String(input));
         this.nstring = input;
     } else if (input === undefined) {
         this.nstring = undefined;
     } else {
-        Mma$1.Fail("Integer: invalid input: " + String(input));
+        Mma.Fail("Integer: invalid input: " + String(input));
     }
 };
-Mma$1.RealMP = function (input) {
+Mma.RealMP = function (input) {
     if (typeof input === "number")
         this.n = input;
     else if (input === undefined)
         this.n = undefined;
     else
-        Mma$1.Fail("RealMP: invalid input");
+        Mma.Fail("RealMP: invalid input");
 };
-Mma$1.RealAP = function (input) {
+Mma.RealAP = function (input) {
     if (typeof input === "string") {
         if (input.length > 1 && input[0] === 0)
-            Mma$1.Fail("RealAP: input starts with 0: " + String(input));
+            Mma.Fail("RealAP: input starts with 0: " + String(input));
         this.nstring = input;
     } else if (input === undefined) {
         this.nstring = undefined;
     } else {
-        Mma$1.Fail("RealAP: invalid input: " + String(input));
+        Mma.Fail("RealAP: invalid input: " + String(input));
     }
 };
-Mma$1.Symbol = function (name) {
+Mma.Symbol = function (name) {
     if (typeof name === "string")
         this.name = name;
     else if (name === undefined)
         this.name = undefined;
     else
-        Mma$1.Fail("Symbol: invalid input: " + String(name));
+        Mma.Fail("Symbol: invalid input: " + String(name));
 };
-Mma$1.String = function (str) {
+Mma.String = function (str) {
     if (typeof str === "string")
         this.str = str;
     else if (str === undefined)
         this.str = undefined;
     else
-        Mma$1.Fail("String: invalid input: " + String(str));
+        Mma.Fail("String: invalid input: " + String(str));
 };
-Mma$1.Expression = function (head, parts) {
-    if (! (head instanceof Mma$1.Symbol))
-        Mma$1.Fail("Expression: head must be an Mma.Symbol");
+Mma.Expression = function (head, parts) {
+    if (! (head instanceof Mma.Symbol))
+        Mma.Fail("Expression: head must be an Mma.Symbol");
     if (! (parts instanceof Array))
-        Mma$1.Fail("Expression: parts must be an Array");
+        Mma.Fail("Expression: parts must be an Array");
     this.head = head;
     this.parts = parts;
 };
@@ -70980,7 +71022,7 @@ Mma$1.Expression = function (head, parts) {
 // encodings used by the !boR format for integers, reals and strings.
 
 // Get the little-endian 32-bit integer value at offset.
-Mma$1.Decode.Int32 = function (bits, offset) {
+Mma.Decode.Int32 = function (bits, offset) {
     try {
         var dataview = new DataView(bits.buffer);
         return dataview.getInt32(offset, true);
@@ -70990,7 +71032,7 @@ Mma$1.Decode.Int32 = function (bits, offset) {
 };
 
 // Get the little-endian IEEE 754 binary64 float at the offset.
-Mma$1.Decode.Float64 = function (bits, offset) {
+Mma.Decode.Float64 = function (bits, offset) {
     try {
         var dataview = new DataView(bits.buffer);
         return dataview.getFloat64(offset, true);
@@ -71000,20 +71042,20 @@ Mma$1.Decode.Float64 = function (bits, offset) {
 };
 
 // Get and decode the Mathematica-escaped (?) ASCII string at offset.
-Mma$1.Decode.String = function (bits, offset, length) {
+Mma.Decode.String = function (bits, offset, length) {
     if (offset === undefined)
         offset = 0;
     if (length === undefined)
         length = bits.length;
-    return Mma$1.Util.U8ArrayToString(bits.slice(offset, offset + length));
+    return Mma.Util.U8ArrayToString(bits.slice(offset, offset + length));
 };
 
 // Decode the string entry (length + data) at offset. Returns multiple fields.
-Mma$1.Decode.StringEntry = function (bits, offset) {
+Mma.Decode.StringEntry = function (bits, offset) {
     if (offset === undefined)
         offset = 0;
-    var length = Mma$1.Decode.Int32(bits, offset);
-    var string = Mma$1.Decode.String(bits, offset+4, length);
+    var length = Mma.Decode.Int32(bits, offset);
+    var string = Mma.Decode.String(bits, offset+4, length);
     return {
         length: length,
         string: string,
@@ -71024,7 +71066,7 @@ Mma$1.Decode.StringEntry = function (bits, offset) {
 // The main function that reads in serialized data and outputs so-called parts.
 // Can be set to read a specific number of parts (used for expressions).
 // Returns the read parts as an Array and the number of bytes read.
-Mma$1.Decode.Any = function (bits, offset, maxParts) {
+Mma.Decode.Any = function (bits, offset, maxParts) {
     if (offset === undefined)
         offset = 0;
     if (maxParts === undefined)
@@ -71077,7 +71119,7 @@ Mma$1.Decode.Any = function (bits, offset, maxParts) {
                 state = REAL_MATRIX;
                 break;
             default:
-                Mma$1.Warn("Decode.Any (READY): byte " + String(next_type) +
+                Mma.Warn("Decode.Any (READY): byte " + String(next_type) +
                     " (" + String.fromCharCode(next_type) + ") at offset " +
                     String(offset) + " is not a known type signature");
             }
@@ -71087,48 +71129,48 @@ Mma$1.Decode.Any = function (bits, offset, maxParts) {
         // Machine-precision integers: just consume the next 4 bytes and send
         // them on to Mma.Decode.Int32
         case INTEGER_MP:
-            var int = Mma$1.Decode.Int32(bits, offset);
-            parts.push(new Mma$1.IntegerMP(int));
+            var int = Mma.Decode.Int32(bits, offset);
+            parts.push(new Mma.IntegerMP(int));
             offset += 4;
             state = READY;
             break;
 
         // Arbitrary-precision integers are just strings.
         case INTEGER_AP:
-            var se = Mma$1.Decode.StringEntry(bits, offset);
-            parts.push(new Mma$1.IntegerAP(se.string));
+            var se = Mma.Decode.StringEntry(bits, offset);
+            parts.push(new Mma.IntegerAP(se.string));
             offset += se.bytesRead;
             state = READY;
             break;
 
         // Machine-precision reals: consume the next 8 bytes.
         case REAL_MP:
-            var float = Mma$1.Decode.Float64(bits, offset);
-            parts.push(new Mma$1.RealMP(float));
+            var float = Mma.Decode.Float64(bits, offset);
+            parts.push(new Mma.RealMP(float));
             offset += 8;
             state = READY;
             break;
 
         // Arbitrary-precision reals are just strings.
         case REAL_AP:
-            var se = Mma$1.Decode.StringEntry(bits, offset);
-            parts.push(new Mma$1.RealAP(se.string));
+            var se = Mma.Decode.StringEntry(bits, offset);
+            parts.push(new Mma.RealAP(se.string));
             offset += se.bytesRead;
             state = READY;
             break;
 
         // Symbols are also just strings.
         case SYMBOL:
-            var se = Mma$1.Decode.StringEntry(bits, offset);
-            parts.push(new Mma$1.Symbol(se.string));
+            var se = Mma.Decode.StringEntry(bits, offset);
+            parts.push(new Mma.Symbol(se.string));
             offset += se.bytesRead;
             state = READY;
             break;
 
         // Strings are, surprisingly, just strings.
         case STRING:
-            var se = Mma$1.Decode.StringEntry(bits, offset);
-            parts.push(new Mma$1.String(se.string));
+            var se = Mma.Decode.StringEntry(bits, offset);
+            parts.push(new Mma.String(se.string));
             offset += se.bytesRead;
             state = READY;
             break;
@@ -71142,14 +71184,14 @@ Mma$1.Decode.Any = function (bits, offset, maxParts) {
         // this function recursively, specifying a maxParts argument, to read
         // them.
         case EXPRESSION:
-            var exprPartCount = Mma$1.Decode.Int32(bits, offset);
+            var exprPartCount = Mma.Decode.Int32(bits, offset);
             offset += 4;
             // Use Decode.Any to get both the head and the parts in one go.
-            var exprDec = Mma$1.Decode.Any(bits, offset, exprPartCount + 1);
+            var exprDec = Mma.Decode.Any(bits, offset, exprPartCount + 1);
             offset += exprDec.bytesRead;
             var exprHead = exprDec.parts[0];
             var exprParts = exprDec.parts.slice(1);
-            parts.push(new Mma$1.Expression(exprHead, exprParts));
+            parts.push(new Mma.Expression(exprHead, exprParts));
             state = READY;
             break;
 
@@ -71157,11 +71199,11 @@ Mma$1.Decode.Any = function (bits, offset, maxParts) {
         // and size1*size2*... elements.
         // The highest-numbered size is for the innermost lists.
         case REAL_MATRIX:
-            var n = Mma$1.Decode.Int32(bits, offset);
+            var n = Mma.Decode.Int32(bits, offset);
             offset += 4;
             var sizes = [];
             for (var s = 0; s < n; s++) {
-                sizes[s] = Mma$1.Decode.Int32(bits, offset);
+                sizes[s] = Mma.Decode.Int32(bits, offset);
                 offset += 4;
             }
             // We'll use a recursive function for this one.
@@ -71172,8 +71214,8 @@ Mma$1.Decode.Any = function (bits, offset, maxParts) {
 
                 if (level === 0) {
                     for (var i = 0; i < sizes[sizes.length - 1]; i++) {
-                        var float = Mma$1.Decode.Float64(bits, offset);
-                        list.push(new Mma$1.RealMP(float));
+                        var float = Mma.Decode.Float64(bits, offset);
+                        list.push(new Mma.RealMP(float));
                         offset += 8;
                     }
                 } else {
@@ -71186,8 +71228,8 @@ Mma$1.Decode.Any = function (bits, offset, maxParts) {
                 }
 
                 return {
-                    expr: new Mma$1.Expression(
-                        new Mma$1.Symbol("List"),
+                    expr: new Mma.Expression(
+                        new Mma.Symbol("List"),
                         list),
                     bytesRead: offset - originalOffset,
                 };
@@ -71208,7 +71250,7 @@ Mma$1.Decode.Any = function (bits, offset, maxParts) {
 
 // The actual Uncompress[] implementation, unhelpfully called Decompress.
 // Might want to look into renaming it.
-Mma$1.Decompress = function (compressedString) {
+Mma.Decompress = function (compressedString) {
     // See http://mathematica.stackexchange.com/questions/104660
     // Copying from Mathematica may produce a string with quotes, newlines
     // and/or backslashes embedded in - we need to get rid of these.
@@ -71216,45 +71258,45 @@ Mma$1.Decompress = function (compressedString) {
         if (compressedString[i] == "\\" ||
             compressedString[i] == "\n" ||
             compressedString[i] == "\"") {
-            compressedString = Mma$1.Util.DeleteCharAt(compressedString, i);
+            compressedString = Mma.Util.DeleteCharAt(compressedString, i);
             i--;
         }
     }
     var b64EncodedData = compressedString.trim().slice(2);
-    var bitsCompressed = Mma$1.Util.Base64Decode(b64EncodedData);
+    var bitsCompressed = Mma.Util.Base64Decode(b64EncodedData);
     var bits = pako.inflate(bitsCompressed);
-    var headerString = Mma$1.Util.U8ArrayToString(bits.slice(0,4));
+    var headerString = Mma.Util.U8ArrayToString(bits.slice(0,4));
     if (headerString !== "!boR") {
-        Mma$1.Warn("Decompress: unknown header string " + headerString +
+        Mma.Warn("Decompress: unknown header string " + headerString +
             " (expected !boR)");
     }
     return bits.slice(4);
 };
 
 // A helper function to decompress and then decode.
-Mma$1.DecompressDecode = function (compressedString) {
-    return Mma$1.Decode.Any(Mma$1.Decompress(compressedString));
+Mma.DecompressDecode = function (compressedString) {
+    return Mma.Decode.Any(Mma.Decompress(compressedString));
 };
 
-Mma$1.toArray = function (obj) {
+Mma.toArray = function (obj) {
     
     var text = [];
     function print (str) {
         text.push(str);
     }
 
-    if (obj instanceof Mma$1.IntegerMP || obj instanceof Mma$1.RealMP) {
+    if (obj instanceof Mma.IntegerMP || obj instanceof Mma.RealMP) {
         return(obj.n);
-    } else if (obj instanceof Mma$1.IntegerAP || obj instanceof Mma$1.RealAP) {
+    } else if (obj instanceof Mma.IntegerAP || obj instanceof Mma.RealAP) {
         return(obj.nstring);
-    } else if (obj instanceof Mma$1.Symbol) {
+    } else if (obj instanceof Mma.Symbol) {
         return(obj.name);
-    } else if (obj instanceof Mma$1.String) {
+    } else if (obj instanceof Mma.String) {
         return("'" + obj.str + "'");
-    } else if (obj instanceof Mma$1.Expression) {
+    } else if (obj instanceof Mma.Expression) {
         print(obj.head.name);
         for (var i=0; i < obj.parts.length; i++) {
-            text.push(Mma$1.toArray(obj.parts[i]));
+            text.push(Mma.toArray(obj.parts[i]));
         }
    
     } else ;
@@ -71277,7 +71319,7 @@ const uuidv4$1 = () => {
   
   let EditorWidget$1 = class EditorWidget {
   
-    constructor(visibleValue, view, span) {
+    constructor(visibleValue, view, span, ref) {
       this.view = view;
       this.visibleValue = visibleValue;
   
@@ -71288,16 +71330,19 @@ const uuidv4$1 = () => {
 
       const string = this.args[1].body.slice(3,-3);
       //console.log(string);
-      const decoded = Mma$1.DecompressDecode(string);
-      const json = Mma$1.toArray(decoded.parts[0]);
+      const decoded = Mma.DecompressDecode(string);
+      const json = Mma.toArray(decoded.parts[0]);
 
       this.data = json;
   
       const cuid = uuidv4$1();
       let global = {call: cuid, EditorWidget: self};
       let env = {global: global, element: span}; //Created in CM6
-      interpretate(json, env);
-   
+      this.expression = json;
+      this.env = env;
+      this.interpretated = interpretate(json, env);
+
+      //ref.push(self);  
     }
 
     getDoc() {
@@ -71325,8 +71370,14 @@ const uuidv4$1 = () => {
       this.visibleValue.argsPos = visibleValue.argsPos;
     }
   
-    destroy() {
-      console.warn('destroy Instance of Widget is not implemented');
+    destroy(any) {
+      console.warn('destroy Instance of Widget');
+      console.log(this);
+      for (const obj of Object.values(this.env.global.stack))  {
+        obj.dispose();
+      }
+      //interpretate(this.expression, {...this.env, method: 'destroy'});
+      //this.view.destroy();
       delete this.data;
     }
   };
@@ -71336,6 +71387,7 @@ const uuidv4$1 = () => {
       super();
       this.view = view;
       this.visibleValue = visibleValue;
+      this.reference = ref;
       //console.log('construct');
     }
   
@@ -71354,13 +71406,18 @@ const uuidv4$1 = () => {
   
     toDOM(view) {
       console.log('Create a new one!');
-  
+      const self = this;
+      
+
       let span = document.createElement("span");
       span.classList.add("frontend-view");
   
       span.EditorWidget = new EditorWidget$1(this.visibleValue, view, span);
   
-  
+      this.reference.push({destroy: () => {
+        self.destroy(span);
+      }});
+
       return span;
     }
   
@@ -71369,6 +71426,7 @@ const uuidv4$1 = () => {
     }
   
     destroy(dom) {
+      console.log('destroy in general*');
       dom.EditorWidget.destroy();
     }
   };
@@ -71404,7 +71462,7 @@ const uuidv4$1 = () => {
         console.log("disposable");
         console.log(this.disposable);
         this.disposable.forEach((el) => {
-          el.dispose();
+          el.destroy();
         });
       }
     },
@@ -71442,13 +71500,14 @@ var compactCMEditor;
   
   class EditorWidget {
   
-    constructor(visibleValue, view, span) {
+    constructor(visibleValue, view, span, ref) {
       this.view = view;
       this.visibleValue = visibleValue;
   
       this.args = matchArguments(visibleValue.str, /\(\*,\*\)/gm);
   
       const self = this;
+      //ref.push(self);
       //console.log(visibleValue);
 
       
@@ -71465,14 +71524,15 @@ var compactCMEditor;
 
       const string = this.args[1].body.slice(3,-3);
       //console.log(string);
-      const decoded = Mma$1.DecompressDecode(string);
-      const json = Mma$1.toArray(decoded.parts[0]);
+      const decoded = Mma.DecompressDecode(string);
+      const json = Mma.toArray(decoded.parts[0]);
 
       this.data = json;
   
       const cuid = uuidv4();
       let global = {call: cuid, element: span, origin: self};
       let env = {global: global, element: span}; //Created in CM6
+      this.env = env;
 
       interpretate(json, env).then(() => {
         if (env.options?.Head) {
@@ -71529,7 +71589,11 @@ var compactCMEditor;
     }
   
     destroy() {
-      console.warn('destroy Instance of Widget is not implemented');
+      console.warn('destroy Instance of Widget');
+      console.log(this);
+      for (const obj of Object.values(this.env.global.stack))  {
+        obj.dispose();
+      }      
       this.editor.destroy();
       delete this.data;
     }
@@ -71540,6 +71604,7 @@ var compactCMEditor;
       super();
       this.view = view;
       this.visibleValue = visibleValue;
+      this.reference = ref;
       //console.log('construct');
     }
   
@@ -71562,7 +71627,13 @@ var compactCMEditor;
       let span = document.createElement("span");
       span.classList.add("subscript-tail");
   
-      span.EditorWidget = new EditorWidget(this.visibleValue, view, span);
+      span.EditorWidget = new EditorWidget(this.visibleValue, view, span, []);
+
+      const self = this;
+      
+      this.reference.push({destroy: () => {
+        self.destroy(span);
+      }});      
   
   
       return span;
@@ -71608,7 +71679,7 @@ var compactCMEditor;
         console.log("disposable");
         console.log(this.disposable);
         this.disposable.forEach((el) => {
-          el.dispose();
+          el.destroy();
         });
       }
     },
@@ -71887,188 +71958,6 @@ const autoLanguage = EditorState.transactionExtender.of(tr => {
   }
 });
 
-const ExecutableMatcher = (ref) => { return new MatchDecorator({
-  regexp: /FrontEndExecutable\["([^"]+)"\]/g,
-  decoration: match => Decoration.replace({
-    widget: new ExecutableWidget(match[1], ref),
-  })
-}) };
-
-const ExecutableHolder = ViewPlugin.fromClass(class {
-  constructor(view) {
-    this.disposable = [];
-    this.ExecutableHolder = ExecutableMatcher(this.disposable).createDeco(view);
-    
-  }
-  update(update) {
-    this.ExecutableHolder = ExecutableMatcher(this.disposable).updateDeco(update, this.ExecutableHolder);
-  }
-  destroy() {
-    console.log('removed holder');
-    console.log('disposable');
-    console.log(this.disposable);
-    this.disposable.forEach((el)=>{
-        el.dispose();
-    });
-  }
-}, {
-  decorations: instance => instance.ExecutableHolder,
-  provide: plugin => EditorView.atomicRanges.of(view => {
-    var _a;
-    return ((_a = view.plugin(plugin)) === null || _a === void 0 ? void 0 : _a.ExecutableHolder) || Decoration.none;
-  })
-});   
-
-class ExecutableWidget extends WidgetType {
-  constructor(name, ref) {
-    super();
-    this.ref = ref;
-    this.name = name;
-  }
-  eq(other) {
-    return this.name === other.name;
-  }
-  toDOM() {
-    let elt = document.createElement("div");
-    elt.classList.add("frontend-object");
-    elt.setAttribute('data-object', this.name);
-    
-    //callid
-    const cuid = Date.now() + Math.floor(Math.random() * 100);
-    var global = {call: cuid};
-    this.global = global; //pass a ref to the global memeory
-
-    let env = {global: global, element: elt}; //Created in CM6
-    console.log("CM6: creating an object with key "+this.name);
-    this.fobj = new ExecutableObject(this.name, env);
-    this.fobj.execute();     
-
-    this.ref.push(this.fobj);
-
-    return elt;
-  }
-  ignoreEvent() {
-    return true; 
-  }
-  destroy() {
-    console.log('widget got destroyed! removing objects');
-    Object.values(this.global.stack).forEach((o)=>{
-      console.log('removing instance: '+o.uid+' ...');
-      o.dispose();
-    });
-    console.log('finished. now get rid of the editor itself. Bye!');
-  }
-}
-
-//----
-
-
-
-
-
-//----
-
-const ExecutableInlineMatcher = (ref) => { return new MatchDecorator({
-  regexp: /FrontEndInlineExecutable\["([^"]+)"\]/g,
-  decoration: match => Decoration.replace({
-    widget: new ExecutableInlineWidget(match[1], ref),
-  })
-}) };
-
-const ExecutableInlineHolder = ViewPlugin.fromClass(class {
-  constructor(view) {
-    this.disposable = [];
-    this.ExecutableInlineHolder = ExecutableInlineMatcher(this.disposable).createDeco(view);
-    
-  }
-  update(update) {
-    this.ExecutableInlineHolder = ExecutableInlineMatcher(this.disposable).updateDeco(update, this.ExecutableInlineHolder);
-  }
-  destroy() {
-    console.log('removed holder');
-    console.log('disposable');
-    console.log(this.disposable);
-    this.disposable.forEach((el)=>{
-        el.dispose();
-    });
-  }
-}, {
-  decorations: instance => instance.ExecutableInlineHolder,
-  provide: plugin => EditorView.atomicRanges.of(view => {
-    var _a;
-    return ((_a = view.plugin(plugin)) === null || _a === void 0 ? void 0 : _a.ExecutableInlineHolder) || Decoration.none;
-  })
-});   
-
-function stringToHash(string) {
-             
-  let hash = 0;
-   
-  if (string.length == 0) return hash;
-   
-  for (let i = 0; i < string.length; i++) {
-      let char = string.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash;
-  }
-   
-  return hash;
-}
-
-class ExecutableInlineWidget extends WidgetType {
-  constructor(name, ref) {
-    super();
-    this.ref = ref;
-    this.name = name;
-  }
-  eq(other) {
-    return this.name === other.name;
-  }
-  toDOM() {
-    let elt = document.createElement("div");
-    elt.classList.add("frontend-object");
-    elt.setAttribute('data-object', 'inline');
-    
-    //callid
-    const cuid = Date.now() + Math.floor(Math.random() * 100);
-    var global = {call: cuid};
-    this.global = global; //pass a ref to the global memeory
-
-    let env = {global: global, element: elt}; //Created in CM6
-    console.log("CM6: creating an inline object");
-
-    const decoded = Mma.DecompressDecode(this.name);
-    const json = Mma.toArray(decoded.parts[0]);
-    //TODO
-
-    const hash = stringToHash(this.name);
-    if (!(hash in ObjectHashMap)) {
-      const o = new ObjectStorage(hash);
-      o.cached = true;
-      o.cache = json;
-    }
-
-    this.fobj = new ExecutableObject(hash, env);
-    this.fobj.execute();     
-
-    this.ref.push(this.fobj);
-
-    return elt;
-  }
-
-  ignoreEvent() {
-    return true; 
-  }
-  destroy() {
-    console.log('widget got destroyed! removing objects');
-    Object.values(this.global.stack).forEach((o)=>{
-      console.log('removing instance: '+o.uid+' ...');
-      o.dispose();
-    });
-    console.log('finished. now get rid of the editor itself. Bye!');
-  }
-}
-
 let compactWLEditor = null;
 let selectedCell = undefined;
 
@@ -72148,8 +72037,6 @@ compactWLEditor = (args) => {
     minimalSetup,
     editorCustomThemeCompact,      
     wolframLanguage.of(window.EditorAutocomplete),
-    ExecutableHolder,
-    ExecutableInlineHolder,
     FractionBoxWidget(compactWLEditor),
     SqrtBoxWidget(compactWLEditor),
     SubscriptBoxWidget(compactWLEditor),
@@ -72179,8 +72066,6 @@ compactWLEditor = (args) => {
 
 const mathematicaPlugins = [
   wolframLanguage.of(window.EditorAutocomplete), 
-  ExecutableHolder, 
-  ExecutableInlineHolder,
   FractionBoxWidget(compactWLEditor),
   SqrtBoxWidget(compactWLEditor),
   SubscriptBoxWidget(compactWLEditor),

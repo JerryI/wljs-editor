@@ -42,7 +42,7 @@ EventHandler[NotebookEditorChannel // EventClone,
 
         "FindParent" -> Function[data,
             With[{promise = data["Promise"], o = CellObj`HashMap[ data["CellHash"] ], kernel = Kernel`HashMap[ data["Kernel"] ]},
-            
+
                 If[MissingQ[o],
                     Echo["RemoveCells >> cell does not exist. Using reference cell instead"];
                     With[{ref = data["Ref"]},
@@ -54,10 +54,13 @@ EventHandler[NotebookEditorChannel // EventClone,
                         ];
                     ]
                 ,
-                    With[{parent = (SequenceCases[o["Notebook"]["Cells"], Sequence[_?InputCellQ, ___?OutputCellQ, o] ] // First // First)["Hash"]},
+                    With[{parent = (SequenceCases[o["Notebook"]["Cells"], {_?InputCellQ, ___?OutputCellQ, o} ] // First // First)["Hash"]},
+                        Echo["RemoteCells >> found parent"];
+                        Echo[parent];
+                        
                         Kernel`Async[kernel, EventFire[promise, Resolve, parent] ];
                     ]                 
-                ]
+                ];
  
             ];
         ],

@@ -54,10 +54,11 @@ import {
   
   class EditorWidget {
   
-    constructor(visibleValue, view, head, sub) {
+    constructor(visibleValue, view, head, sub, ref) {
       this.view = view;
       this.visibleValue = visibleValue;
       const self = this;
+
   
       //console.log(visibleValue);
       this.args = matchArguments(visibleValue.str, /\(\*\|\*\)/gm);
@@ -121,6 +122,8 @@ import {
       delete self.args[2].body;
       delete self.args[1].body;
       delete self.args[0].body;  
+
+      //ref.push(self);
       
     }
   
@@ -178,6 +181,7 @@ import {
       this.view = view;
       this.visibleValue = visibleValue;
       //console.log('construct');
+      this.reference = ref;
     }
   
     eq(other) {
@@ -207,8 +211,12 @@ import {
       span.appendChild(head);
       span.appendChild(sub);
   
-      span.EditorWidget = new EditorWidget(this.visibleValue, view, head, sub);
-  
+      span.EditorWidget = new EditorWidget(this.visibleValue, view, head, sub, []);
+      const self = this;
+
+      this.reference.push({destroy: () => {
+        self.destroy(span);
+      }});
   
       return span;
     }
@@ -253,7 +261,7 @@ import {
         console.log("disposable");
         console.log(this.disposable);
         this.disposable.forEach((el) => {
-          el.dispose();
+          el.destroy();
         });
       }
     },

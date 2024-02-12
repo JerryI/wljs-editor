@@ -54,7 +54,7 @@ import {
 
   class EditorWidget {
 
-    constructor(visibleValue, view, dom, sliceRanges) {
+    constructor(visibleValue, view, dom, sliceRanges, ref) {
       this.view = view;
       this.visibleValue = visibleValue;
       const self = this;
@@ -62,6 +62,8 @@ import {
       this.length = visibleValue.str.length;
 
       console.log('creating InstanceWidget');
+
+      //(self);
 
       this.editor = compactCMEditor({
         //slice SqB[...]
@@ -132,6 +134,7 @@ import {
       super();
       this.view = view;
       this.visibleValue = visibleValue;
+      this.reference = ref;
       //console.log('construct');
     }
 
@@ -163,9 +166,15 @@ import {
       const head = document.createElement("span");
       head.classList.add("radicand");
       
-      span.EditorWidget = new EditorWidget(this.visibleValue, view, head, [5,-1]);
+      span.EditorWidget = new EditorWidget(this.visibleValue, view, head, [5,-1], []);
 
       span.appendChild(head);
+
+
+      
+      this.reference.push({destroy: () => {
+        self.destroy(span);
+      }});      
 
       return span;
     }
@@ -210,7 +219,7 @@ import {
         console.log("disposable");
         console.log(this.disposable);
         this.disposable.forEach((el) => {
-          el.dispose();
+          el.destroy();
         });
       }
     },

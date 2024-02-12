@@ -181,78 +181,6 @@ const autoLanguage = EditorState.transactionExtender.of(tr => {
   }
 })
 
-const ExecutableMatcher = (ref) => { return new MatchDecorator({
-  regexp: /FrontEndExecutable\["([^"]+)"\]/g,
-  decoration: match => Decoration.replace({
-    widget: new ExecutableWidget(match[1], ref),
-  })
-}) };
-
-const ExecutableHolder = ViewPlugin.fromClass(class {
-  constructor(view) {
-    this.disposable = [];
-    this.ExecutableHolder = ExecutableMatcher(this.disposable).createDeco(view);
-    
-  }
-  update(update) {
-    this.ExecutableHolder = ExecutableMatcher(this.disposable).updateDeco(update, this.ExecutableHolder);
-  }
-  destroy() {
-    console.log('removed holder');
-    console.log('disposable');
-    console.log(this.disposable);
-    this.disposable.forEach((el)=>{
-        el.dispose();
-    });
-  }
-}, {
-  decorations: instance => instance.ExecutableHolder,
-  provide: plugin => EditorView.atomicRanges.of(view => {
-    var _a;
-    return ((_a = view.plugin(plugin)) === null || _a === void 0 ? void 0 : _a.ExecutableHolder) || Decoration.none;
-  })
-});   
-
-class ExecutableWidget extends WidgetType {
-  constructor(name, ref) {
-    super();
-    this.ref = ref;
-    this.name = name;
-  }
-  eq(other) {
-    return this.name === other.name;
-  }
-  toDOM() {
-    let elt = document.createElement("div");
-    elt.classList.add("frontend-object");
-    elt.setAttribute('data-object', this.name);
-    
-    //callid
-    const cuid = Date.now() + Math.floor(Math.random() * 100);
-    var global = {call: cuid};
-    this.global = global; //pass a ref to the global memeory
-
-    let env = {global: global, element: elt}; //Created in CM6
-    console.log("CM6: creating an object with key "+this.name);
-    this.fobj = new ExecutableObject(this.name, env);
-    this.fobj.execute()     
-
-    this.ref.push(this.fobj);
-
-    return elt;
-  }
-  ignoreEvent() {
-    return true; 
-  }
-  destroy() {
-    console.log('widget got destroyed! removing objects');
-    Object.values(this.global.stack).forEach((o)=>{
-      console.log('removing instance: '+o.uid+' ...');
-      o.dispose();
-    });
-    console.log('finished. now get rid of the editor itself. Bye!');
-  }
-}
 
 //----
 
@@ -261,38 +189,7 @@ class ExecutableWidget extends WidgetType {
 
 
 //----
-
-const ExecutableInlineMatcher = (ref) => { return new MatchDecorator({
-  regexp: /FrontEndInlineExecutable\["([^"]+)"\]/g,
-  decoration: match => Decoration.replace({
-    widget: new ExecutableInlineWidget(match[1], ref),
-  })
-}) };
-
-const ExecutableInlineHolder = ViewPlugin.fromClass(class {
-  constructor(view) {
-    this.disposable = [];
-    this.ExecutableInlineHolder = ExecutableInlineMatcher(this.disposable).createDeco(view);
-    
-  }
-  update(update) {
-    this.ExecutableInlineHolder = ExecutableInlineMatcher(this.disposable).updateDeco(update, this.ExecutableInlineHolder);
-  }
-  destroy() {
-    console.log('removed holder');
-    console.log('disposable');
-    console.log(this.disposable);
-    this.disposable.forEach((el)=>{
-        el.dispose();
-    });
-  }
-}, {
-  decorations: instance => instance.ExecutableInlineHolder,
-  provide: plugin => EditorView.atomicRanges.of(view => {
-    var _a;
-    return ((_a = view.plugin(plugin)) === null || _a === void 0 ? void 0 : _a.ExecutableInlineHolder) || Decoration.none;
-  })
-});   
+ 
 
 function stringToHash(string) {
              
@@ -307,60 +204,6 @@ function stringToHash(string) {
   }
    
   return hash;
-}
-
-class ExecutableInlineWidget extends WidgetType {
-  constructor(name, ref) {
-    super();
-    this.ref = ref;
-    this.name = name;
-  }
-  eq(other) {
-    return this.name === other.name;
-  }
-  toDOM() {
-    let elt = document.createElement("div");
-    elt.classList.add("frontend-object");
-    elt.setAttribute('data-object', 'inline');
-    
-    //callid
-    const cuid = Date.now() + Math.floor(Math.random() * 100);
-    var global = {call: cuid};
-    this.global = global; //pass a ref to the global memeory
-
-    let env = {global: global, element: elt}; //Created in CM6
-    console.log("CM6: creating an inline object");
-
-    const decoded = Mma.DecompressDecode(this.name);
-    const json = Mma.toArray(decoded.parts[0]);
-    //TODO
-
-    const hash = stringToHash(this.name);
-    if (!(hash in ObjectHashMap)) {
-      const o = new ObjectStorage(hash);
-      o.cached = true;
-      o.cache = json;
-    }
-
-    this.fobj = new ExecutableObject(hash, env);
-    this.fobj.execute();     
-
-    this.ref.push(this.fobj);
-
-    return elt;
-  }
-
-  ignoreEvent() {
-    return true; 
-  }
-  destroy() {
-    console.log('widget got destroyed! removing objects');
-    Object.values(this.global.stack).forEach((o)=>{
-      console.log('removing instance: '+o.uid+' ...');
-      o.dispose();
-    });
-    console.log('finished. now get rid of the editor itself. Bye!');
-  }
 }
 
 let compactWLEditor = null;
@@ -442,8 +285,6 @@ compactWLEditor = (args) => {
     minimalSetup,
     editorCustomThemeCompact,      
     wolframLanguage.of(window.EditorAutocomplete),
-    ExecutableHolder,
-    ExecutableInlineHolder,
     FractionBoxWidget(compactWLEditor),
     SqrtBoxWidget(compactWLEditor),
     SubscriptBoxWidget(compactWLEditor),
@@ -473,8 +314,6 @@ compactWLEditor = (args) => {
 
 const mathematicaPlugins = [
   wolframLanguage.of(window.EditorAutocomplete), 
-  ExecutableHolder, 
-  ExecutableInlineHolder,
   FractionBoxWidget(compactWLEditor),
   SqrtBoxWidget(compactWLEditor),
   SubscriptBoxWidget(compactWLEditor),

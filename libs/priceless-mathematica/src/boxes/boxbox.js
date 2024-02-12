@@ -36,13 +36,14 @@ import {
   
   class EditorWidget {
   
-    constructor(visibleValue, view, span) {
+    constructor(visibleValue, view, span, ref) {
       this.view = view;
       this.visibleValue = visibleValue;
   
       this.args = matchArguments(visibleValue.str, /\(\*,\*\)/gm);
   
       const self = this;
+      //ref.push(self);
       //console.log(visibleValue);
 
       
@@ -67,6 +68,7 @@ import {
       const cuid = uuidv4();
       let global = {call: cuid, element: span, origin: self};
       let env = {global: global, element: span}; //Created in CM6
+      this.env = env;
 
       interpretate(json, env).then(() => {
         if (env.options?.Head) {
@@ -123,7 +125,11 @@ import {
     }
   
     destroy() {
-      console.warn('destroy Instance of Widget is not implemented');
+      console.warn('destroy Instance of Widget');
+      console.log(this);
+      for (const obj of Object.values(this.env.global.stack))  {
+        obj.dispose();
+      }      
       this.editor.destroy();
       delete this.data;
     }
@@ -134,6 +140,7 @@ import {
       super();
       this.view = view;
       this.visibleValue = visibleValue;
+      this.reference = ref;
       //console.log('construct');
     }
   
@@ -157,7 +164,13 @@ import {
       let span = document.createElement("span");
       span.classList.add("subscript-tail");
   
-      span.EditorWidget = new EditorWidget(this.visibleValue, view, span);
+      span.EditorWidget = new EditorWidget(this.visibleValue, view, span, []);
+
+      const self = this;
+      
+      this.reference.push({destroy: () => {
+        self.destroy(span);
+      }});      
   
   
       return span;
@@ -203,7 +216,7 @@ import {
         console.log("disposable");
         console.log(this.disposable);
         this.disposable.forEach((el) => {
-          el.dispose();
+          el.destroy();
         });
       }
     },

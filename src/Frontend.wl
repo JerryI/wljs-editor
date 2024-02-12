@@ -96,7 +96,7 @@ init[k_] := Module[{},
         Notebook`Editor`WolframEvaluator = Function[t, 
         With[{hash = CreateUUID[]},
           Block[{
-            Global`$EvaluationContext = Join[t["EvaluationContext"], <|"EvaluationCellHash" -> hash|>]
+            Global`$EvaluationContext = Join[t["EvaluationContext"], <|"ResultCellHash" -> hash|>]
           },
             With[{result = ToExpression[ t["Data"], InputForm, Hold] // ReleaseHold },
                 If[KeyExistsQ[t, "Nohup"],

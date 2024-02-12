@@ -54,7 +54,7 @@ function snippet() {
 
 class EditorWidget {
 
-  constructor(visibleValue, view, head, sub) {
+  constructor(visibleValue, view, head, sub, ref) {
     this.view = view;
     this.visibleValue = visibleValue;
     const self = this;
@@ -123,6 +123,7 @@ class EditorWidget {
     delete self.args[1].body;
     delete self.args[0].body;
     
+    //ref.push(self);
   }
 
   applyChanges(update, pos) {
@@ -179,6 +180,8 @@ class Widget extends WidgetType {
     super();
     this.view = view;
     this.visibleValue = visibleValue;
+
+    this.reference = ref;
     //console.log('construct');
   }
 
@@ -209,8 +212,13 @@ class Widget extends WidgetType {
     span.appendChild(head);
     span.appendChild(sub);
 
-    span.EditorWidget = new EditorWidget(this.visibleValue, view, head, sub);
+    span.EditorWidget = new EditorWidget(this.visibleValue, view, head, sub, []);
 
+    const self = this;
+      
+    this.reference.push({destroy: () => {
+      self.destroy(span);
+    }});
 
     return span;
   }
@@ -255,7 +263,7 @@ const placeholder = ViewPlugin.fromClass(
       console.log("disposable");
       console.log(this.disposable);
       this.disposable.forEach((el) => {
-        el.dispose();
+        el.destroy();
       });
     }
   },

@@ -54,10 +54,12 @@ import {
   
   class EditorWidget {
   
-    constructor(visibleValue, view, tbody) {
+    constructor(visibleValue, view, tbody, ref) {
       this.view = view;
       this.visibleValue = visibleValue;
       const self = this;
+
+      //ref.push(self);
 
       this.tbody = tbody;
 
@@ -214,6 +216,7 @@ import {
       super();
       this.view = view;
       this.visibleValue = visibleValue;
+      this.reference = ref;
       //console.log('construct');
     }
   
@@ -244,8 +247,12 @@ import {
       const tbody      = document.createElement("tbody");
       table.appendChild(tbody);
   
-      span.EditorWidget = new EditorWidget(this.visibleValue, view, tbody);
-  
+      span.EditorWidget = new EditorWidget(this.visibleValue, view, tbody, []);
+      const self = this;
+      
+      this.reference.push({destroy: () => {
+        self.destroy(span);
+      }});  
   
       return span;
     }
@@ -290,7 +297,7 @@ import {
         console.log("disposable");
         console.log(this.disposable);
         this.disposable.forEach((el) => {
-          el.dispose();
+          el.destroy();
         });
       }
     },

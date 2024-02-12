@@ -6,6 +6,8 @@ BeginPackage["Notebook`CellOperations`", {
 RemoteCellObj::usage = "Internal representation of remote cell object on Kernel"
 RemoteNotebook::usage = "Internal representation of remote notebook object on Kernel"
 
+ResultCell::usage = "An access to an output cell generated during the evaluation"
+
 Begin["`Private`"]
 
 Unprotect[EvaluationCell];
@@ -20,22 +22,26 @@ ClearAll[EvaluationCell]
 ClearAll[ParentCell]
 ClearAll[NotebookDirectory]
 
-ParentCell[cell_RemoteCellObj:RemoteCellObj[ Global`$EvaluationContext["EvaluationCellHash"] ] ] := Module[{},
+ParentCell[cell_RemoteCellObj: RemoteCellObj[ Global`$EvaluationContext["ResultCellHash"] ] ] := Module[{},
     With[{promise = Promise[]},
-        EventFire[Internal`Kernel`CommunicationChannel, "FindParent", <|"Ref"->Global`$EvaluationContext["Ref"], "CellHash" -> uid, "Promise" -> promise, "Kernel"->Internal`Kernel`Hash|>];
+        EventFire[Internal`Kernel`CommunicationChannel, "FindParent", <|"Ref"->Global`$EvaluationContext["Ref"], "CellHash" -> (cell // First), "Promise" -> (promise), "Kernel"->Internal`Kernel`Hash|>];
         promise // WaitAll
     ] // RemoteCellObj
 ]
 
 NotebookDirectory[] := With[{},
     With[{promise = Promise[]},
-        EventFire[Internal`Kernel`CommunicationChannel, "AskNotebookDirectory", <|"Ref"->Global`$EvaluationContext["Ref"], "Promise" -> promise, "Kernel"->Internal`Kernel`Hash|>];
+        EventFire[Internal`Kernel`CommunicationChannel, "AskNotebookDirectory", <|"Ref"->Global`$EvaluationContext["Ref"], "Promise" -> (promise), "Kernel"->Internal`Kernel`Hash|>];
         promise // WaitAll
     ] 
 ]
 
 EvaluationCell[] := With[{},
-    RemoteCellObj[ Global`$EvaluationContext["EvaluationCellHash"] ]
+    RemoteCellObj[ Global`$EvaluationContext["Ref"] ]
+]
+
+ResultCell[] := With[{},
+    RemoteCellObj[ Global`$EvaluationContext["ResultCellHash"] ]
 ]
 
 EvaluationNotebook[] := With[{},

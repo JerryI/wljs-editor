@@ -36,7 +36,7 @@ import {
   
   class EditorWidget {
   
-    constructor(visibleValue, view, span) {
+    constructor(visibleValue, view, span, ref) {
       this.view = view;
       this.visibleValue = visibleValue;
   
@@ -55,8 +55,11 @@ import {
       const cuid = uuidv4();
       let global = {call: cuid, EditorWidget: self};
       let env = {global: global, element: span}; //Created in CM6
-      interpretate(json, env);
-   
+      this.expression = json;
+      this.env = env;
+      this.interpretated = interpretate(json, env);
+
+      //ref.push(self);  
     }
 
     getDoc() {
@@ -84,8 +87,14 @@ import {
       this.visibleValue.argsPos = visibleValue.argsPos;
     }
   
-    destroy() {
-      console.warn('destroy Instance of Widget is not implemented');
+    destroy(any) {
+      console.warn('destroy Instance of Widget');
+      console.log(this);
+      for (const obj of Object.values(this.env.global.stack))  {
+        obj.dispose();
+      }
+      //interpretate(this.expression, {...this.env, method: 'destroy'});
+      //this.view.destroy();
       delete this.data;
     }
   }
@@ -95,6 +104,7 @@ import {
       super();
       this.view = view;
       this.visibleValue = visibleValue;
+      this.reference = ref;
       //console.log('construct');
     }
   
@@ -114,13 +124,18 @@ import {
   
     toDOM(view) {
       console.log('Create a new one!');
-  
+      const self = this;
+      
+
       let span = document.createElement("span");
       span.classList.add("frontend-view");
   
       span.EditorWidget = new EditorWidget(this.visibleValue, view, span);
   
-  
+      this.reference.push({destroy: () => {
+        self.destroy(span);
+      }});
+
       return span;
     }
   
@@ -129,6 +144,7 @@ import {
     }
   
     destroy(dom) {
+      console.log('destroy in general*');
       dom.EditorWidget.destroy();
     }
   }
@@ -164,7 +180,7 @@ import {
         console.log("disposable");
         console.log(this.disposable);
         this.disposable.forEach((el) => {
-          el.dispose();
+          el.destroy();
         });
       }
     },

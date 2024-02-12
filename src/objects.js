@@ -7,9 +7,23 @@ window.ObjectStorage = class {
     cache = []
   
     garbageCollect() {
-      console.warn('garbage collector is not defined for');
-      console.warn(this);
-  
+      console.warn('garbage collector started...');
+      let toBeRemoved = true;
+      const refs = this.refs;
+      Object.keys(refs).forEach((key) => {
+        if (refs[key].dead) {
+          delete refs[key];
+        } else {
+          toBeRemoved = false;
+        }
+      });
+
+      if (toBeRemoved) {
+        console.warn('No active refs. Removing...');
+        delete ObjectHashMap[this.uid];
+        delete this.cache;
+        delete this.refs;
+      }
     }         
   
     constructor(uid) {
@@ -90,6 +104,7 @@ function getObject(server, id) {
     return server.ask('Notebook`Editor`FrontendObject`GetObject["'+id+'"]'); 
 }
 
+
 //element will be provided in 
 core.FrontEndExecutable = async (args, env) => {
     console.log('forntend executable');
@@ -113,12 +128,27 @@ core.FrontEndExecutable = async (args, env) => {
     return await instance.execute();
 }
 
+core.FrontEndExecutable.destroy = async (args, env) => {
+  console.warn("Nothing to do. Will be purged automatically...");
+}
+
+//bug fix when importing an old format notebook, context gets lost
+core["Global`FrontEndExecutable"] = core.FrontEndExecutable;
+
+const garbageCollect = () => {
+  const list = Object.values(ObjectHashMap);
+  for (let i=0; i<list.length; i++) {
+    list[i].garbageCollect();
+  }  
+}
+
 core.UIObjects = async (args, env) => {
   const type = await interpretate(args[0], env);
   return core.UIObjects[type](args.slice(1), env);
 }
 
 core.UIObjects.GetAll = async (args, env) => {
+  garbageCollect();
   const list = Object.values(ObjectHashMap);
   const message = [];
   for (let i=0; i<list.length; i++) {
