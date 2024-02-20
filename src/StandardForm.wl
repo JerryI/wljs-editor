@@ -5,7 +5,7 @@ ExpressionReplacements = {
     Graphics[opts__] :> CreateFrontEndObject[Graphics[opts]], 
     Graphics3D[opts__] :> CreateFrontEndObject[Graphics3D[opts]], 
     Image[opts__] :> CreateFrontEndObject[Image[opts]]
-}
+} // Quiet
 
 RowBoxFlatten[x_List, y___] := StringJoin @@ (ToString[#] & /@ x)
 
