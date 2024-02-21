@@ -8,28 +8,28 @@ NotebookStore::usage = "Use is as an association NotebookStore[\"Key\", opts] to
 
 Begin["`Private`"]
 
-NotebookStore /: Keys[ NotebookStore[ OptionsPattern[] ] ] := With[{notebook = OptionValue["Notebook"] // First},
+NotebookStore /: Keys[ NotebookStore[ OptionsPattern[] ] ] := With[{notebook = OptionValue[NotebookStore, "Notebook"] // First},
     With[{promise = Promise[]},
         EventFire[Internal`Kernel`CommunicationChannel, "NotebookStoreGetKeys", <|"Ref"->notebook, "Promise" -> promise, "Kernel"->Internal`Kernel`Hash|>];
         promise // WaitAll
     ] 
 ]
 
-NotebookStore[key_String, OptionsPattern[] ] := With[{notebook = OptionValue["Notebook"] // First},
+NotebookStore[key_String, OptionsPattern[] ] := With[{notebook = OptionValue[NotebookStore, "Notebook"] // First},
     With[{promise = Promise[]},
         EventFire[Internal`Kernel`CommunicationChannel, "NotebookStoreGet", <|"Ref"->notebook, "Key"->key, "Promise" -> promise, "Kernel"->Internal`Kernel`Hash|>];
         promise // WaitAll 
     ] // Uncompress
 ]
 
-NotebookStore /: Set[NotebookStore[key_String, OptionsPattern[] ], data_] := With[{notebook = OptionValue["Notebook"] // First},
+NotebookStore /: Set[NotebookStore[key_String, OptionsPattern[] ], data_] := With[{notebook = OptionValue[NotebookStore, "Notebook"] // First},
     With[{promise = Promise[]},
         EventFire[Internal`Kernel`CommunicationChannel, "NotebookStoreSet", <|"Ref"->notebook, "Key"->key, "Data"->Compress[data], "Promise" -> promise, "Kernel"->Internal`Kernel`Hash|>];
         promise // WaitAll
     ] 
 ]
 
-NotebookStore /: Unset[NotebookStore[key_String, OptionsPattern[] ] ] := With[{notebook = OptionValue["Notebook"] // First},
+NotebookStore /: Unset[NotebookStore[key_String, OptionsPattern[] ] ] := With[{notebook = OptionValue[NotebookStore, "Notebook"] // First},
     With[{promise = Promise[]},
         EventFire[Internal`Kernel`CommunicationChannel, "NotebookStoreUnset", <|"Ref"->notebook, "Key"->key, "Promise" -> promise, "Kernel"->Internal`Kernel`Hash|>];
         promise // WaitAll

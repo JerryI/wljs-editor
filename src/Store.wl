@@ -13,6 +13,8 @@ Begin["`Internal`"]
 EventHandler[NotebookEditorChannel // EventClone,
     {
         "NotebookStoreGetKeys" -> Function[data,
+           Echo["NotebookStore :: Get keys"];
+           Echo[data];
            With[{promise = data["Promise"], notebook = Notebook`HashMap[ data["Ref"] ], kernel = Kernel`HashMap[ data["Kernel"] ]},
                 If[!MemberQ[notebook["Properties"], "Storage"],
                     notebook["Storage"] = <||>;

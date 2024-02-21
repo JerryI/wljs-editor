@@ -1,4 +1,4 @@
-BeginPackage["Notebook`DirectorySetter`", {"JerryI`Misc`Events`"}];
+BeginPackage["Notebook`DirectorySetter`", {"JerryI`Misc`Events`"}]
 
 Begin["`Private`"]
 
@@ -11,16 +11,16 @@ EventHandler["KernelDir", Function[path,
     ];    
 ] ];
 
-NotebookDirectoryAppend[dir_List] := (
-    (* skip this ...*)
-    (*
+  (*NotebookDirectoryAppend[dir_List] := (
+   skip this ...
+
     If[Internal`Kernel`Type =!= "LocalKernel",
         Echo["Error. AppendNotebookDirectory can only work for on LocalKernel. MasterKernel is not allowed!"];
     ,
         AppendTo[$Path, FileNameJoin[dir] ];
         SetDirectory[ FileNameJoin[dir] ];
     ];*)
-)
+(*
 
 NotebookDirectoryRemove[dir_List] := (
     (*Echo["Remove directory from $Path"];*)
@@ -29,7 +29,7 @@ NotebookDirectoryRemove[dir_List] := (
     ,
         $Path = $Path /. {FileNameJoin[dir] -> Nothing};
     ];
-)
+) *)
 
 End[]
 
