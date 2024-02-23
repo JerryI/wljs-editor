@@ -10,7 +10,11 @@ ExpressionReplacements = {
 RowBoxFlatten[x_List, y___] := StringJoin @@ (ToString[#] & /@ x)
 
 Unprotect[ToString]
-ToString[expr_, StandardForm] := StringReplace[(expr /. ExpressionReplacements // ToBoxes) /. {RowBox->RowBoxFlatten} // ToString, {"\[NoBreak]"->""}]
+ToString[expr_, StandardForm] := ExportString[
+    StringReplace[
+        (expr /. ExpressionReplacements // ToBoxes) /. {RowBox->RowBoxFlatten} // ToString
+    , {"\[NoBreak]"->""}]
+, "String"]
 
 
 
