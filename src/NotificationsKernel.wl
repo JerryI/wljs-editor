@@ -1,11 +1,14 @@
-BeginPackage["Notebook`Utils`Notifications`"]
+BeginPackage["Notebook`Utils`Notifications`", {"JerryI`Misc`Events`"}]
 
 Notify::usage = "Notify[message_, args__, opts] prints a message in a notification box"
 NotificationSpinner::usage = "NotificationSpinner[message_, \"Topic\"->] _Promise"
 
 Begin["`Private`"]
 
-Notify[template_String, args__, OptionsPattern[] ] := With[{
+notRule[_Rule] = False
+notRule[_] = True
+
+Notify[template_String, args__?notRule, OptionsPattern[] ] := With[{
     message = StringTemplate[template][args]
 },
     EventFire[Internal`Kernel`Stdout[ Internal`Kernel`Hash ], Notifications`NotificationMessage[OptionValue["Topic"] ], message]; 
