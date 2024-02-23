@@ -11,6 +11,10 @@ EventHandler["KernelDir", Function[path,
     ];    
 ] ];
 
+NotebookDirectorySet[dir_List] := (
+    SetDirectory[ dir // FileNameJoin ];
+)
+
   (*NotebookDirectoryAppend[dir_List] := (
    skip this ...
 

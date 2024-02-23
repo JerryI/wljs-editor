@@ -24,6 +24,7 @@ attachListeners[notebook_Notebook] := With[{},
                 Notebook`Autocomplete`Private`BuildVocabular;
                 Notebook`Autocomplete`Private`StartTracking;
             ], "Once"->True];
+         
 
             WebUISubmit[ Global`UIAutocompleteConnect[], payload["Client"] ];
         ]

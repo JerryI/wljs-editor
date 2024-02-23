@@ -2,6 +2,7 @@ BeginPackage["Notebook`Editor`FrontSubmitService`", {
     "JerryI`Misc`Events`",
     "JerryI`Misc`Events`Promise`", 
     "JerryI`Notebook`", 
+    "JerryI`Notebook`Windows`",
     "JerryI`WLX`WebUI`", 
     "JerryI`Notebook`AppExtensions`",
     "JerryI`Notebook`Kernel`"
@@ -24,6 +25,25 @@ attachListeners[notebook_Notebook] := With[{},
             Then[WebUIFetch[Global`FSAskKernelSocket[], payload["Client"] ], Function[data,
                 notebook["EvaluationContext", "KernelWebSocket"] = data;
             ] ];
+        ],
+
+        "OnWindowCreate" -> Function[payload,
+            Echo["Subscribe for an window events"];
+            With[{win = payload["Window"]},
+                EventHandler[win, {
+                    "OnWebSocketConnected" -> Function[data,
+                        Echo["Requesting socket object for client window object..."];
+                        With[{p = Promise[]},
+                            Then[WebUIFetch[Global`FSAskKernelSocket[], data["Client"] ], Function[dp,
+                                win["EvaluationContext", "KernelWebSocket"] = dp;
+                                Echo["Obtained!"];
+                                EventFire[p, Resolve, True];
+                            ] ];
+                            p
+                        ]
+                    ]
+                }];
+            ];
         ]
     }]; 
 ]

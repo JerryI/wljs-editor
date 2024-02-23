@@ -43,9 +43,11 @@ blacklist = {"Notebook`Autocomplete`", "KirillBelov`LTP`JerryI`Events`","KirillB
 
 BuildVocabular := With[{},
     BuildVocabular = Null;
+ 
     If[Internal`Kernel`Type =!= "LocalKernel", Echo["Error. Autocomplete package can only for on LocalKernel. MasterKernel is not allowed!"]; Return[$Failed]; ];
     
-    With[{r = Flatten[( {#, Information[#, "Usage"]} &/@ Names[#<>"*"] ) &/@ Complement[$ContextPath, blacklist], 1]},
+    Echo["Buildind vocabular..."];
+    With[{r = Flatten[( (Echo[#]; {#, Information[#, "Usage"]}) &/@ Names[#<>"*"] ) &/@ Complement[$ContextPath, blacklist], 1]},
         definitions = Join[definitions, r] // DeleteDuplicates;
     ];
 ]

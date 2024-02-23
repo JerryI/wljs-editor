@@ -27,6 +27,4 @@ core.SetKernelDirectory = async (args, env) => {
         caller = () => {};
     }, 300);
 
-    caller();
-
 }
