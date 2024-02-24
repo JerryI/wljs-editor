@@ -71992,32 +71992,6 @@ const EditorSelected = {
   }
 };
 
-if (window.electronAPI) {
-  window.electronAPI.contextMenu((event, id) => {
-    if (!selectedCell) return;
-    if (!selectedCell.editor.viewState) return;
-    const ranges = selectedCell.editor.viewState.state.selection.ranges;
-    if (!ranges.length) return;
-
-    const selection = ranges[0];
-    console.log('yoko');
-    console.log(selection);
-    console.log(selectedCell.editor.state.doc.toString().slice(selection.from, selection.to));
-    console.log('processing');
-    const substr = selectedCell.editor.state.doc.toString().slice(selection.from, selection.to).replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"');
-
-
-
-    selectedCell.origin.evalString(id + '[' + substr + ']').then((res) => {
-      console.log('result');
-      console.log(res);
-      selectedCell.editor.dispatch({
-        changes: {...selection, insert: res.slice(1,-1)}
-      });
-    });
-  });
-}
-
 compactWLEditor = (args) => {
   let editor = new EditorView({
   doc: args.doc,

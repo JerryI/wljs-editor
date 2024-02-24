@@ -18,14 +18,16 @@
       "src/metamarkers.js"
     ],
     "frontend": [
-      "src/FrontendObject.wl",      
+      "src/FrontendObject.wl", 
+      "src/Editor.wl",     
       "src/Frontend.wl",
       "src/FrontendObjectSync.wl",
       "src/SetDirectory.wl",
       "src/RemoteCells.wl",
       "src/FrontSubmit.wl",
       "src/Store.wl",
-      "src/Autocomplete.wl"
+      "src/Autocomplete.wl",
+      "src/ContextMenu.wl"
     ],
     "kernel": [
       "src/FrontendObject.wl", 
@@ -43,7 +45,29 @@
     "styles": "src/styles.css",
     "priority": -10,
     "important": true,
-    "category": "Editor"
+    "category": "Editor",
+    "contextMenu": [
+      {
+        "label": "Evaluate in place",
+        "event": "evaluate_in_place",
+        "visible": "selection"
+      },
+      {
+        "label": "Iconize",
+        "event": "iconize_selected",
+        "visible": "selection"
+      },
+      {
+        "label": "Simplify",
+        "event": "simplify_selected",
+        "visible": "selection"
+      },
+      {
+        "label": "Highlight",
+        "event": "highlight_selected",
+        "visible": "selection"
+      }     
+    ]    
   },
   "repository": {
     "type": "git",
