@@ -4,12 +4,19 @@ BeginPackage["Notebook`Editor`", {
     "JerryI`Notebook`Evaluator`", 
     "JerryI`Notebook`Kernel`", 
     "JerryI`Notebook`Transactions`",
-    "JerryI`Misc`Events`"
+    "JerryI`Misc`Events`",
+    "JerryI`WLX`",
+    "JerryI`WLX`Importer`",
+    "JerryI`Misc`WLJS`Transport`",
+    "Notebook`Editor`FrontendObject`"
 }]
 
 NotebookEditorChannel::usage = "used to transfer extra events"
 
 Begin["`Internal`"]
+
+truncatedTemplate = ImportComponent[ FileNameJoin[{$InputFileName // DirectoryName // ParentDirectory, "templates", "truncated.wlx"}] ];
+truncatedTemplate = truncatedTemplate["Data"->"``", "Size"->"``"];
 
 NotebookEditorChannel = CreateUUID[];
 
@@ -85,9 +92,10 @@ evaluator  = StandardEvaluator["Name" -> "Wolfram Evaluator", "InitKernel" -> in
 
 init[k_] := Module[{},
     Print["Kernel init..."];
-    With[{channel = NotebookEditorChannel},
+    With[{channel = NotebookEditorChannel, tt = truncatedTemplate},
         Kernel`Init[k,
             Print["Init internal communication"];
+            Internal`Kernel`TruncatedOutputTemplate = tt;
             Internal`Kernel`CommunicationChannel = Internal`Kernel`Stdout[channel];
         ];
     ];
@@ -102,7 +110,17 @@ init[k_] := Module[{},
                 If[KeyExistsQ[t, "Nohup"],
                     EventFire[Internal`Kernel`Stdout[ t["Hash"] ], "Result", <|"Data" -> Null |> ];
                 ,   
-                    EventFire[Internal`Kernel`Stdout[ t["Hash"] ], "Result", <|"Data" -> ToString[result, StandardForm], "Meta"->Sequence["Hash"->hash] |> ];
+                    (* check length *)
+                    With[{string = ToString[result, StandardForm]},
+                        If[StringLength[string] < 10000,
+                            EventFire[Internal`Kernel`Stdout[ t["Hash"] ], "Result", <|"Data" -> string, "Meta"->Sequence["Hash"->hash] |> ];
+                        ,
+                            With[{truncated = ToString[result, InputForm]},
+                                EventFire[Internal`Kernel`Stdout[ t["Hash"] ], "Result", <|"Data" -> StringTemplate[Internal`Kernel`TruncatedOutputTemplate][StringLength[string], StringTake[truncated, Min[StringLength[truncated], 5000] ] ], "Meta"->Sequence["Hash"->hash, "Display"->"html"] |> ];
+                            ]
+                        ]
+                    ]
+                    
                 ];
                 
                 (*  FIXME TODO Normal OUT Support *)
