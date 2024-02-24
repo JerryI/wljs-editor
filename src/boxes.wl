@@ -93,6 +93,18 @@ InterpretationBox[placeholder_, expr_, opts___] := With[{data = expr, v = Editor
   RowBox[{"(*VB[*)(", ToString[expr, InputForm], ")(*,*)(*", ToString[Compress[Hold[v]], InputForm], "*)(*]VB*)"}]
 ]
 
+(* an optimization for FrontEnd object to avoid creating an editor *)
+Unprotect[Interpretation]
+Interpretation[view_FrontEndExecutable, expr_] := With[{},
+  InterpretationOptimized[view, expr]
+]
+
+Interpretation[view_CreateFrontEndObject, expr_] := With[{},
+  InterpretationOptimized[view, expr]
+]
+
+InterpretationOptimized /: MakeBoxes[InterpretationOptimized[view_, expr_], StandardForm] := RowBox[{"(*VB[*)(", ToString[expr, InputForm], ")(*,*)(*", ToString[Compress[Hold[view]], InputForm], "*)(*]VB*)"}]
+
 TemplateBox[v_List, "SummaryPanel"] := v
 
 EventObjectHasView[assoc_Association] := KeyExistsQ[assoc, "View"]
