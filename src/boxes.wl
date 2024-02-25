@@ -93,17 +93,17 @@ InterpretationBox[placeholder_, expr_, opts___] := With[{data = expr, v = Editor
   RowBox[{"(*VB[*)(", ToString[expr, InputForm], ")(*,*)(*", ToString[Compress[Hold[v]], InputForm], "*)(*]VB*)"}]
 ]
 
-(* an optimization for FrontEnd object to avoid creating an editor *)
 Unprotect[Interpretation]
-Interpretation[view_FrontEndExecutable, expr_] := With[{},
-  InterpretationOptimized[view, expr]
-]
 
-Interpretation[view_CreateFrontEndObject, expr_] := With[{},
+Interpretation[view_FrontEndExecutable, expr_] := With[{},
+  Echo["Optimized expression!"];
   InterpretationOptimized[view, expr]
 ]
 
 InterpretationOptimized /: MakeBoxes[InterpretationOptimized[view_, expr_], StandardForm] := RowBox[{"(*VB[*)(", ToString[expr, InputForm], ")(*,*)(*", ToString[Compress[Hold[view]], InputForm], "*)(*]VB*)"}]
+
+
+
 
 TemplateBox[v_List, "SummaryPanel"] := v
 
@@ -121,5 +121,3 @@ EventObject /: MakeBoxes[EventObject[a_?EventObjectHasView], StandardForm] := If
 
 (**)
 System`WLXEmbed /: MakeBoxes[w_System`WLXEmbed, StandardForm] := With[{o = CreateFrontEndObject[w]}, MakeBoxes[o, StandardForm] ]
-
-FrontEndTruncated /: MakeBoxes[FrontEndTruncated[a__], StandardForm] := With[{o = CreateFrontEndObject[FrontEndTruncated[a]]}, MakeBoxes[o, StandardForm]]

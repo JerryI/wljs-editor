@@ -127,9 +127,11 @@ import {
     destroy() {
       console.warn('destroy Instance of Widget');
       console.log(this);
-      for (const obj of Object.values(this.env.global.stack))  {
-        obj.dispose();
-      }      
+      if (this.env.global.stack) {
+        for (const obj of Object.values(this.env.global.stack))  {
+          obj.dispose();
+        }
+      }  
       this.editor.destroy();
       delete this.data;
     }

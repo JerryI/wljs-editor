@@ -20,6 +20,8 @@ truncatedTemplate = truncatedTemplate["Data"->"``", "Size"->"``"];
 
 NotebookEditorChannel = CreateUUID[];
 
+rootFolder = $InputFileName // DirectoryName;
+
 evaluator  = StandardEvaluator["Name" -> "Wolfram Evaluator", "InitKernel" -> init, "Priority"->(999)];
 
     StandardEvaluator`ReadyQ[evaluator, k_] := (
@@ -28,6 +30,11 @@ evaluator  = StandardEvaluator["Name" -> "Wolfram Evaluator", "InitKernel" -> in
             StandardEvaluator`Print[evaluator, "Kernel is not ready"];
             False
         ,
+            (* !!!! Unknown bug with Boxes... have to do it separately *)
+            With[{p = Import[FileNameJoin[{rootFolder, "Boxes.wl"}], "String"]},
+                Kernel`Init[k,   ToExpression[p, InputForm]; , "Once"->True];
+            ];
+
             True
         ]
     );
