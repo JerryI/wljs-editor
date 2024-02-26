@@ -33,7 +33,6 @@
       "src/FrontendObject.wl", 
       "src/EditorKernel.wl" ,
       "src/StandardForm.wl",
-      "src/Boxes.wl",
       "src/SetDirectoryKernel.wl",
       "src/RemoteCellsKernel.wl",
       "src/FrontSubmitKernel.wl",
