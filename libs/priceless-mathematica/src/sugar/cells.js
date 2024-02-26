@@ -76,6 +76,8 @@ export const cellTypesHighlight = ViewPlugin.fromClass(
               deco.range(pos + m.index, pos + m.index + m[0].length)
             );
           }
+        } else {
+          break;
         }
         pos += cursor.value.length;
       }
