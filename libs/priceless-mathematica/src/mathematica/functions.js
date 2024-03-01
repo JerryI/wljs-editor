@@ -9935,31 +9935,6 @@ export let defaultFunctions = [
     "info":"EvenQ[expr] gives True if expr is an even integer, and False otherwise. "
   },
   {
-    "label":"EventData",
-    "type":"keyword",
-    "info":"EventData[{e , e , â¦}] represents event data with explicitly specified censoring e .EventData[{e , e"
-  },
-  {
-    "label":"EventEvaluator",
-    "type":"keyword",
-    "info":"System`EventEvaluator"
-  },
-  {
-    "label":"EventHandler",
-    "type":"keyword",
-    "info":"EventHandler[expr, {event  :> action , event  :> action , â¦}] displays as expr, evaluating action  w"
-  },
-  {
-    "label":"EventHandlerTag",
-    "type":"keyword",
-    "info":"System`EventHandlerTag"
-  },
-  {
-    "label":"EventLabels",
-    "type":"keyword",
-    "info":"EventLabels is an option to CandlestickChart, KagiChart, and similar functions that specifies events"
-  },
-  {
     "label":"EventSeries",
     "type":"keyword",
     "info":"EventSeries[{{t , v }, {t , v } â¦}] represents a series of events given as time-value pairs {t , v }"
@@ -10098,6 +10073,11 @@ export let defaultFunctions = [
     "label":"ExpIntegralE",
     "type":"keyword",
     "info":"ExpIntegralE[n, z] gives the exponential integral function E (z).\n                                  "
+  },
+  {
+    "label":"Offload",
+    "type":"keyword",
+    "info":"Use Offload[expr_] to keep expr from evaluation on Kernel"
   },
   {
     "label":"ExpIntegralEi",

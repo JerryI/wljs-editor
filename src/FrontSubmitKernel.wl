@@ -6,7 +6,7 @@ BeginPackage["Notebook`Editor`Kernel`FrontSubmitService`", {
     "JerryI`Misc`WLJS`Transport`"
 }]
 
-Offload::usage = "Offload[exp] to keep it from evaluation on Kernel"
+(*Offload::usage = "Offload[exp] to keep it from evaluation on Kernel"*)
 
 FrontSubmit::usage = "FrontSubmit[expr] _FrontEndInstance (taken from global stack) to evaluation on frontend"
 CurrentWindow::usage = "Gets current window representation"
