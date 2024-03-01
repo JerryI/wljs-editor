@@ -18,6 +18,9 @@ TagBox[x_, opts___] := x
 
 TagBox["ByteArray", "SummaryHead"] = ""
 
+(* FIX for WL14 *)
+TagBox[any_, f_Function] := any
+
 Unprotect[FrameBox]
 FrameBox[x_, opts__]  := RowBox[{"(*BB[*)(", x, ")(*,*)(*", ToString[Compress[Hold[FrameBox[opts]]], InputForm], "*)(*]BB*)"}]
 
