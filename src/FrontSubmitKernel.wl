@@ -8,7 +8,7 @@ BeginPackage["Notebook`Editor`Kernel`FrontSubmitService`", {
 
 Offload::usage = "Offload[exp] to keep it from evaluation on Kernel"
 
-FrontSubmit::usage = "FrontSubmit[expr] to evaluation on frontend"
+FrontSubmit::usage = "FrontSubmit[expr] _FrontEndInstance (taken from global stack) to evaluation on frontend"
 CurrentWindow::usage = "Gets current window representation"
 
 FrontFetch::usage = "FrontFetch[expr] fetches an expression from frontend"
