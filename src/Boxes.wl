@@ -116,7 +116,7 @@ EventObject /: MakeBoxes[EventObject[a_?EventObjectHasView], StandardForm] := If
 ,
   With[{uid = CreateFrontEndObject[a["View"] ] // First}, 
     RowBox[{"(*VB[*)(", ToString[EventObject[Join[a, <|"View"->uid|>] ], InputForm], ")(*,*)(*", ToString[Compress[Hold[FrontEndExecutable[uid]]], InputForm], "*)(*]VB*)"}]
-  ]
+  ] 
 ]
 
 (**)
