@@ -36,6 +36,8 @@ Unprotect[TemplateBox]
 
 TemplateBox[list_List, "RowDefault"] := GridBox[{list}]
 
+TemplateBox[{"meow.wl"}, FileArgument]
+
 TemplateBox[expr_, "Bra"] := With[{dp = ProvidedOptions[BraDecorator, "Head"->"Bra"]}, RowBox[{"(*BB[*)(Bra[", RowBox[Riffle[expr, ","]], "])(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]]
 TemplateBox[expr_, "Ket"] := With[{dp = ProvidedOptions[KetDecorator, "Head"->"Ket"]}, RowBox[{"(*BB[*)(Ket[", RowBox[Riffle[expr, ","]], "])(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]]
 
@@ -69,6 +71,18 @@ Iconize[expr_] := With[{},
     Iconized[expr // Compress, ByteCount[expr] ]
   ]
 ]
+
+Iconize[expr_, title_String] := With[{},
+  If[ByteCount[expr] > 30000,
+    With[{name = title<>"-"<>StringTake[CreateUUID[], 4]<>".wl"},
+      Put[expr, name];
+      IconizedFile[FileNameJoin[{Directory[], name}], ByteCount[expr] ]
+    ]
+  ,
+    Iconized[expr // Compress, ByteCount[expr] ]
+  ]
+]
+
 
 IconizedFile /: MakeBoxes[IconizedFile[c_, b_], StandardForm] := RowBox[{"(*VB[*)(Get[\"", c, "\"])(*,*)(*", ToString[Compress[Hold[IconizeFileBox[b] ] ], InputForm], "*)(*]VB*)"}]
 Iconized /: MakeBoxes[Iconized[c_, b_], StandardForm] := RowBox[{"(*VB[*)(Uncompress[", ToString[c, InputForm], "])(*,*)(*", ToString[Compress[Hold[IconizeBox[b] ] ], InputForm], "*)(*]VB*)"}]
