@@ -533,7 +533,10 @@ class CodeMirrorCell {
     const textData = await interpretate(args[0], env);
     const options = await core._getRules(args, env);
 
+    let evalFunction = () => {};
+
     let updateFunction = () => {};
+    let state = textData;
 
     const ext = [];
     if (options.ReadOnly) {
@@ -543,17 +546,22 @@ class CodeMirrorCell {
     if (options.Event) {
       //then it means this is like a slider
       updateFunction = (data) => {
+        state = data;
         console.log('editor view emitt data: '+data);
-        server.kernel.emitt(options.Event, '"'+data.replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"')+'"');
+        server.kernel.emitt(options.Event, '"'+data.replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"')+'"', 'Input');
+      }
+
+      evalFunction = () => {
+        server.kernel.emitt(options.Event, '"'+state.replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"')+'"', 'Evaluate');
       }
       
     }
 
     if (env.local) {
       //if it is running in a container
-      env.local.editor = compactWLEditor({doc: textData, parent: env.element, eval: ()=>{}, update: updateFunction, extensions: ext});
+      env.local.editor = compactWLEditor({doc: textData, parent: env.element, eval: evalFunction, update: updateFunction, extensions: ext});
     } else {
-      compactWLEditor({doc: textData, parent: env.element, eval: ()=>{}, update: updateFunction, extensions: ext});
+      compactWLEditor({doc: textData, parent: env.element, eval: evalFunction, update: updateFunction, extensions: ext});
     }
 
     env.element.style.verticalAlign = "inherit";
