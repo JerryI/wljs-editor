@@ -49976,6 +49976,11 @@ let defaultFunctions = [
     "info":"PascalDistribution[n, p] represents a Pascal distribution with parameters n and p."
   },
   {
+    "label":"EventHandler",
+    "type":"keyword",
+    "info":"EventHandler[ev_String | _EventObject, {handlers___Rule | handlers___RuleDelayed}] ev_ binds an event object represented as a string or EventObject or anything compatible with this type to a single or multiple handling functions (multiple - only if patterns do not intersect). Returns an original event-object ev"
+  },
+  {
     "label":"PassEventsDown",
     "type":"keyword",
     "info":"PassEventsDown is an option to EventHandler which specifies whether events handled by a particular e"
