@@ -259,9 +259,9 @@ const placeholder = ViewPlugin.fromClass(
       );
     }
     destroy() {
-      console.log("removed holder");
-      console.log("disposable");
-      console.log(this.disposable);
+      //console.log("removed holder");
+      //console.log("disposable");
+      //console.log(this.disposable);
       this.disposable.forEach((el) => {
         el.destroy();
       });

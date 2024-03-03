@@ -207,34 +207,34 @@ function stringToHash(string) {
 }
 
 let compactWLEditor = null;
-let selectedCell = undefined;
+let selectedEditor = undefined;
 
 const EditorSelected = {
   get: () => {
-    if (!selectedCell) return '';
-    if (!selectedCell.editor.viewState) return '';
-    const ranges = selectedCell.editor.viewState.state.selection.ranges;
+    if (!selectedEditor) return '';
+    if (!selectedEditor.viewState) return '';
+    const ranges = selectedEditor.viewState.state.selection.ranges;
     if (!ranges.length) return '';
 
     const selection = ranges[0];
     console.log('yoko');
     console.log(selection);
-    console.log(selectedCell.editor.state.doc.toString().slice(selection.from, selection.to));
+    console.log(selectedEditor.state.doc.toString().slice(selection.from, selection.to));
     console.log('processing');
-    return selectedCell.editor.state.doc.toString().slice(selection.from, selection.to);
+    return selectedEditor.state.doc.toString().slice(selection.from, selection.to);
   },
 
   set: (data) => {
-    if (!selectedCell) return;
-    if (!selectedCell.editor.viewState) return;
-    const ranges = selectedCell.editor.viewState.state.selection.ranges;
+    if (!selectedEditor) return;
+    if (!selectedEditor.viewState) return;
+    const ranges = selectedEditor.viewState.state.selection.ranges;
     if (!ranges.length) return;
 
     const selection = ranges[0];
 
     console.log('result');
       console.log(data);
-      selectedCell.editor.dispatch({
+      selectedEditor.dispatch({
         changes: {...selection, insert: data}
       });
   }
@@ -275,6 +275,11 @@ compactWLEditor = (args) => {
     EditorView.updateListener.of((v) => {
       if (v.docChanged) {
         args.update(v.state.doc.toString());
+      }
+      if (v.selectionSet) {
+        //console.log('selected editor:');
+        //console.log(v.view);
+        selectedEditor = v.view;
       }
     })
   ],
@@ -464,7 +469,9 @@ window.EditorExtensions = [
       self.origin.save(v.state.doc.toString().replaceAll('\\\\', '\\\\\\\\').replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"'));
     }
     if (v.selectionSet) {
-      selectedCell = self;
+      //console.log('selected editor:');
+      //console.log(v.view);
+      selectedEditor = v.view;
     }
     
   }),
