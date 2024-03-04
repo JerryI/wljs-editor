@@ -8,6 +8,12 @@
   },
   "defaultPackage": true,
   "wljs-meta": {
+    "minjs": [
+      "dist/kernel.min.js",
+      "src/boxes.js",
+      "src/objects.js",
+      "src/metamarkers.js"
+    ],
     "js": [
       "dist/kernel.js",
       "src/boxes.js",
@@ -18,8 +24,8 @@
       "src/metamarkers.js"
     ],
     "frontend": [
-      "src/FrontendObject.wl", 
-      "src/Editor.wl",     
+      "src/FrontendObject.wl",
+      "src/Editor.wl",
       "src/Frontend.wl",
       "src/FrontendObjectSync.wl",
       "src/SetDirectory.wl",
@@ -30,8 +36,8 @@
       "src/ContextMenu.wl"
     ],
     "kernel": [
-      "src/FrontendObject.wl", 
-      "src/EditorKernel.wl" ,
+      "src/FrontendObject.wl",
+      "src/EditorKernel.wl",
       "src/StandardForm.wl",
       "src/SetDirectoryKernel.wl",
       "src/RemoteCellsKernel.wl",
@@ -39,7 +45,7 @@
       "src/StoreKernel.wl",
       "src/NotificationsKernel.wl",
       "src/MetaMarkersKernel.wl",
-      "src/AutocompleteKernel.wl"       
+      "src/AutocompleteKernel.wl"
     ],
     "styles": "src/styles.css",
     "priority": -10,
@@ -65,8 +71,8 @@
         "label": "Highlight",
         "event": "highlight_selected",
         "visible": "selection"
-      }     
-    ]    
+      }
+    ]
   },
   "repository": {
     "type": "git",
@@ -84,6 +90,7 @@
     "@rollup/plugin-commonjs": "^25.0.0",
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.1.0",
+    "@rollup/plugin-terser": "^0.4.4",
     "codemirror": "6.0.1",
     "crypto-js": "^4.1.1",
     "mma-uncompress": "^1.0.1",
