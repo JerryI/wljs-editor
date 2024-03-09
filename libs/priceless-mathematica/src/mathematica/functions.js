@@ -80,6 +80,11 @@ export let defaultFunctions = [
     "info":"AbortScheduledTask[task] interrupts any currently evaluating instances of the cloud task task."
   },
   {
+    "label": "WLXEmbed",
+    "type":"keyword",
+    "info":"Renders an inline WLX or HTML strings into DOM"
+  },
+  {
     "label":"Above",
     "type":"keyword",
     "info":"Above is a symbol that represents the region above an object for purposes of placement."

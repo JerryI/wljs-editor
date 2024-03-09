@@ -38,6 +38,8 @@ TemplateBox[list_List, "RowDefault"] := GridBox[{list}]
 
 TemplateBox[{"meow.wl"}, FileArgument]
 
+TemplateBox[{number_}, "C"] := RowBox[{ SubscriptBox[C, number]}]
+
 TemplateBox[expr_, "Bra"] := With[{dp = ProvidedOptions[BraDecorator, "Head"->"Bra"]}, RowBox[{"(*BB[*)(Bra[", RowBox[Riffle[expr, ","]], "])(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]]
 TemplateBox[expr_, "Ket"] := With[{dp = ProvidedOptions[KetDecorator, "Head"->"Ket"]}, RowBox[{"(*BB[*)(Ket[", RowBox[Riffle[expr, ","]], "])(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]]
 
