@@ -62048,7 +62048,7 @@ function readFile(file, cbk) {
 
 
 //drag and drop and past events
-const DropPasteHandlers = (hd) => EditorView.domEventHandlers({
+const DropPasteHandlers = (hd, hp) => EditorView.domEventHandlers({
 	drop(ev, view) {
         //console.log("codeMirror :: paste ::", ev); // Prevent default behavior (Prevent file from being opened)
         ev.preventDefault();
@@ -62077,8 +62077,26 @@ const DropPasteHandlers = (hd) => EditorView.domEventHandlers({
 
     },
 
-    paste() {
-
+    paste(ev, view) {
+      
+        let paste = (ev.clipboardData || window.clipboardData);
+        for (const obj of paste.items) {
+          //console.log(obj);
+          if (obj.kind === "string") {
+           switch(obj.type) {
+             case 'text/plain':
+               
+               break;
+             case "image/png":
+               ev.preventDefault();
+               transferFiles([obj.getAsFile()], ev, view, hp);
+               break;
+             }
+           } else {
+            ev.preventDefault();
+            transferFiles([obj.getAsFile()], ev, view, hp);
+           }
+        }
     }
 });
 
@@ -72123,6 +72141,23 @@ const wlDrop = {
     }
 };
 
+const wlPaste = {
+  transaction: (ev, view, id, length) => {
+    console.log(view.dom.ocellref);
+    if (view.dom.ocellref) {
+      const channel = view.dom.ocellref.origin.channel;
+      server._emitt(channel, `<|"Channel"->"${id}", "Length"->${length}, "CellType"->"wl"|>`, 'Forwarded["CM:PasteEvent"]');
+    }
+  },
+
+  file: (ev, view, id, name, result) => {
+    console.log(view.dom.ocellref);
+    if (view.dom.ocellref) {
+      server.emitt(id, `<|"Data"->"${result}", "Name"->"${name}"|>`, 'File');
+    }
+  }
+};
+
 window.DropPasteHandlers = DropPasteHandlers;
 
 
@@ -72140,7 +72175,7 @@ const mathematicaPlugins = [
   Greekholder,
   Arrowholder,
   extras,
-  DropPasteHandlers(wlDrop)
+  DropPasteHandlers(wlDrop, wlPaste)
 ];
 
 let editorCustomTheme = EditorView.theme({

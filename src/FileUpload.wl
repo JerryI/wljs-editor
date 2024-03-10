@@ -58,7 +58,8 @@ pasteFileNames["md", cli_, files_] := With[{},
 (* drop and paste events *)
 controlsListener[OptionsPattern[]] := With[{messager = OptionValue["Messanger"], secret = OptionValue["Event"], controls = OptionValue["Controls"], appEvents = OptionValue["AppEvent"], modals = OptionValue["Modals"]},
     EventHandler[EventClone[controls], {
-        "CM:DropEvent" -> Function[data, processRequest[Global`$Client, controls, data, modals, messager] ]
+        "CM:DropEvent" -> Function[data, processRequest[Global`$Client, controls, data, modals, messager] ],
+        "CM:PasteEvent" -> Function[data, processRequest[Global`$Client, controls, data, modals, messager] ]
     }];
 
     ""

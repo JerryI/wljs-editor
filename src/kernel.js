@@ -313,6 +313,23 @@ const wlDrop = {
     }
 }
 
+const wlPaste = {
+  transaction: (ev, view, id, length) => {
+    console.log(view.dom.ocellref);
+    if (view.dom.ocellref) {
+      const channel = view.dom.ocellref.origin.channel;
+      server._emitt(channel, `<|"Channel"->"${id}", "Length"->${length}, "CellType"->"wl"|>`, 'Forwarded["CM:PasteEvent"]');
+    }
+  },
+
+  file: (ev, view, id, name, result) => {
+    console.log(view.dom.ocellref);
+    if (view.dom.ocellref) {
+      server.emitt(id, `<|"Data"->"${result}", "Name"->"${name}"|>`, 'File');
+    }
+  }
+}
+
 window.DropPasteHandlers = DropPasteHandlers
 
 
@@ -330,7 +347,7 @@ const mathematicaPlugins = [
   Greekholder,
   Arrowholder,
   extras,
-  DropPasteHandlers(wlDrop)
+  DropPasteHandlers(wlDrop, wlPaste)
 ]
 
 

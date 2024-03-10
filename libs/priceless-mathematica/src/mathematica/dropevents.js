@@ -49,7 +49,7 @@ function readFile(file, cbk) {
 
 
 //drag and drop and past events
-export const DropPasteHandlers = (hd) => EditorView.domEventHandlers({
+export const DropPasteHandlers = (hd, hp) => EditorView.domEventHandlers({
 	drop(ev, view) {
         //console.log("codeMirror :: paste ::", ev); // Prevent default behavior (Prevent file from being opened)
         ev.preventDefault();
@@ -78,8 +78,26 @@ export const DropPasteHandlers = (hd) => EditorView.domEventHandlers({
 
     },
 
-    paste() {
-
+    paste(ev, view) {
+      
+        let paste = (ev.clipboardData || window.clipboardData);
+        for (const obj of paste.items) {
+          //console.log(obj);
+          if (obj.kind === "string") {
+           switch(obj.type) {
+             case 'text/plain':
+               
+               break;
+             case "image/png":
+               ev.preventDefault();
+               transferFiles([obj.getAsFile()], ev, view, hp);
+               break;
+             }
+           } else {
+            ev.preventDefault();
+            transferFiles([obj.getAsFile()], ev, view, hp);
+           }
+        }
     }
 })
 
