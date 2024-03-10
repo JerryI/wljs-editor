@@ -27321,6 +27321,11 @@ let defaultFunctions = [
     "info":"AbortScheduledTask[task] interrupts any currently evaluating instances of the cloud task task."
   },
   {
+    "label": "WLXEmbed",
+    "type":"keyword",
+    "info":"Renders an inline WLX or HTML strings into DOM"
+  },
+  {
     "label":"Above",
     "type":"keyword",
     "info":"Above is a symbol that represents the region above an object for purposes of placement."
@@ -62009,6 +62014,74 @@ wolframLanguage.reBuild = (vocabulary) => {
   builtins = vocabulary.map((e) => e.label);
 };
 
+const transferFiles = (list, ev, view, handler) => {
+    if (list.length == 0) return;
+    const id = new Date().valueOf();
+    handler.transaction(ev, view, id, list.length);
+   // server.kernel.emitt('<Event/>', `<|"Id" -> "${id}", "Length" -> ${list.length}|>`, 'Transaction');
+    
+    for (const file of list) {
+        readFile(file, (name, result) => {
+            handler.file(ev, view, id, name, result);
+        });
+    }
+    
+};
+
+function readFile(file, cbk) {
+    const reader = new FileReader();
+    reader.addEventListener('load', (event) => {
+      let compressedData = base64ArrayBuffer(event.target.result);
+      //console.log(compressedData);
+      cbk(file.name, compressedData);  
+    });
+  
+    reader.addEventListener('progress', (event) => {
+      if (event.loaded && event.total) {
+        const percent = (event.loaded / event.total) * 100;
+        console.log(percent);
+      }
+    });
+
+    reader.readAsArrayBuffer(file);
+}
+
+
+//drag and drop and past events
+const DropPasteHandlers = (hd) => EditorView.domEventHandlers({
+	drop(ev, view) {
+        //console.log("codeMirror :: paste ::", ev); // Prevent default behavior (Prevent file from being opened)
+        ev.preventDefault();
+
+        const filesArray = [];
+
+        if (ev.dataTransfer.items) {
+            // Use DataTransferItemList interface to access the file(s)
+            [...ev.dataTransfer.items].forEach((item, i) => {
+                // If dropped items aren't files, reject them
+                if (item.kind === "file") {
+                    const file = item.getAsFile();
+                    console.log(`… file[${i}].name = ${file.name}`);
+                    filesArray.push(file);
+                }
+            });
+        } else {
+            // Use DataTransfer interface to access the file(s)
+            [...ev.dataTransfer.files].forEach((file, i) => {
+                console.log(`… file[${i}].name = ${file.name}`);
+                filesArray.push(file);
+            });
+        }
+
+        transferFiles(filesArray, ev, view, hd);
+
+    },
+
+    paste() {
+
+    }
+});
+
 const GreekMatcher = new MatchDecorator({
   regexp: /\\\[(\w+)\]/g,
   decoration: (match) => {
@@ -72033,6 +72106,25 @@ compactWLEditor = (args) => {
   return editor;
 };
 
+const wlDrop = {
+    transaction: (ev, view, id, length) => {
+      console.log(view.dom.ocellref);
+      if (view.dom.ocellref) {
+        const channel = view.dom.ocellref.origin.channel;
+        server._emitt(channel, `<|"Channel"->"${id}", "Length"->${length}, "CellType"->"wl"|>`, 'Forwarded["CM:DropEvent"]');
+      }
+    },
+
+    file: (ev, view, id, name, result) => {
+      console.log(view.dom.ocellref);
+      if (view.dom.ocellref) {
+        server.emitt(id, `<|"Data"->"${result}", "Name"->"${name}"|>`, 'File');
+      }
+    }
+};
+
+window.DropPasteHandlers = DropPasteHandlers;
+
 
 const mathematicaPlugins = [
   wolframLanguage.of(window.EditorAutocomplete), 
@@ -72047,7 +72139,8 @@ const mathematicaPlugins = [
   rainbowBrackets(),
   Greekholder,
   Arrowholder,
-  extras
+  extras,
+  DropPasteHandlers(wlDrop)
 ];
 
 let editorCustomTheme = EditorView.theme({
@@ -72256,6 +72349,8 @@ class CodeMirrorCell {
       });
       
       this.editor = editor;
+      this.editor.dom.ocellref = self;
+
       this.editor.viewState.state.config.eval = () => {
         origin.eval(this.editor.state.doc.toString());
       };

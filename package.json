@@ -33,7 +33,8 @@
       "src/FrontSubmit.wl",
       "src/Store.wl",
       "src/Autocomplete.wl",
-      "src/ContextMenu.wl"
+      "src/ContextMenu.wl",
+      "src/FileUpload.wl"
     ],
     "kernel": [
       "src/FrontendObject.wl",

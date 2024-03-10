@@ -163,6 +163,7 @@ CheckSyntax[str_String] :=
         Return[True, Module];
     ];
 
+
 End[]
 
 EndPackage[]

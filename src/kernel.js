@@ -54,6 +54,8 @@ import {spreadsheet} from "@codemirror/legacy-modes/mode/spreadsheet"
 import { wolframLanguage } from "../libs/priceless-mathematica/src/mathematica/mathematica"
 import { defaultFunctions } from "../libs/priceless-mathematica/src/mathematica/functions"
 
+import { DropPasteHandlers } from "../libs/priceless-mathematica/src/mathematica/dropevents";
+
 import { Arrowholder, Greekholder } from "../libs/priceless-mathematica/src/sugar/misc"
 
 import {FractionBoxWidget} from "../libs/priceless-mathematica/src/boxes/fractionbox"
@@ -66,6 +68,10 @@ import {ViewBoxWidget} from "../libs/priceless-mathematica/src/boxes/viewbox"
 import {BoxBoxWidget} from "../libs/priceless-mathematica/src/boxes/boxbox"
 
 import { cellTypesHighlight } from "../libs/priceless-mathematica/src/sugar/cells"
+
+
+
+
 
 
 const languageConf = new Compartment
@@ -290,6 +296,25 @@ compactWLEditor = (args) => {
   return editor;
 }
 
+const wlDrop = {
+    transaction: (ev, view, id, length) => {
+      console.log(view.dom.ocellref);
+      if (view.dom.ocellref) {
+        const channel = view.dom.ocellref.origin.channel;
+        server._emitt(channel, `<|"Channel"->"${id}", "Length"->${length}, "CellType"->"wl"|>`, 'Forwarded["CM:DropEvent"]');
+      }
+    },
+
+    file: (ev, view, id, name, result) => {
+      console.log(view.dom.ocellref);
+      if (view.dom.ocellref) {
+        server.emitt(id, `<|"Data"->"${result}", "Name"->"${name}"|>`, 'File');
+      }
+    }
+}
+
+window.DropPasteHandlers = DropPasteHandlers
+
 
 const mathematicaPlugins = [
   wolframLanguage.of(window.EditorAutocomplete), 
@@ -304,7 +329,8 @@ const mathematicaPlugins = [
   rainbowBrackets(),
   Greekholder,
   Arrowholder,
-  extras
+  extras,
+  DropPasteHandlers(wlDrop)
 ]
 
 
@@ -517,6 +543,8 @@ class CodeMirrorCell {
       });
       
       this.editor = editor;
+      this.editor.dom.ocellref = self;
+
       this.editor.viewState.state.config.eval = () => {
         origin.eval(this.editor.state.doc.toString());
       };
