@@ -60,6 +60,7 @@ import {
       this.interpretated = interpretate(json, env);
 
       //ref.push(self);  
+      //console.error(this.visibleValue)
     }
 
     getDoc() {
@@ -78,11 +79,22 @@ import {
 
 
       this.view.dispatch({changes: changes});
-  }      
+  }  
+  
+  applyOuterChanges(update) {
+    const vis = this.visibleValue;
+
+    const data = update;
+    const changes = {from: vis.pos, to: vis.pos + vis.length, insert: data};
+    //suicide basically
+
+    this.view.dispatch({changes: changes});
+}  
   
   
     update(visibleValue) {
       //console.log('Update instance: new ranges & arguments');
+      
       this.visibleValue.pos = visibleValue.pos;
       this.visibleValue.argsPos = visibleValue.argsPos;
     }

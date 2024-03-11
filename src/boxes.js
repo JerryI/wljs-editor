@@ -13,6 +13,16 @@
     console.log(args);
   }
 
+  boxes["ViewBox`InnerExpression"] = async (args, env) => {
+    const changes = await interpretate(args[0], env);
+    env.global.EditorWidget.applyChanges(changes);
+  }
+
+  boxes["ViewBox`OuterExpression"] = async (args, env) => {
+    const changes = await interpretate(args[0], env);
+    env.global.EditorWidget.applyOuterChanges(changes);
+  }  
+
   boxes.ProvidedOptions = async (args, env) => {
     env.options = await core._getRules(args.slice(1), env);
     return await interpretate(args[0], env);
