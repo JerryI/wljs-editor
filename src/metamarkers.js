@@ -69,8 +69,15 @@ core.MarkerContainer = async (args, env) => {
       const arr =  Object.values(MetaMarkers[uid]);
       
       for (const instance of arr) {
+
         //execute inside the container
         console.log('try!');
+
+        if (instance.root.dead) {
+          console.log('instance is dead!');
+          delete MetaMarkers[uid][instance.root.instance];
+          continue;
+        }
         //console.log(instanceEnv);
         const copy = {...instance};
   
