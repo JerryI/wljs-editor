@@ -117,7 +117,7 @@ InterpretationBox[placeholder_, expr_, opts___] := With[{data = expr, v = Editor
 Unprotect[Interpretation]
 
 Interpretation[view_FrontEndExecutable, expr_] := With[{},
-  Echo["Optimized expression!"];
+  (*Echo["Optimized expression!"];*)
   InterpretationOptimized[view, expr]
 ]
 
