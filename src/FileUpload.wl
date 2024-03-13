@@ -43,9 +43,9 @@ processRequest[cli_, controls_, data_, __] := With[{channel = data["Channel"]},
 
 pasteFileNames["wl", cli_, files_] := With[{},
     WLJSTransportSend[If[Length[Keys[files] ] === 1,
-        FrontEditorSelected["Set", StringTemplate[" Import[\"``\"] "][ FileNameJoin[{"attachments", #}] &@ (Keys[files] // First) ] ]
+        FrontEditorSelected["Set", "Import[FileNameJoin["<>ToString[{"attachments", #} &@ (Keys[files] // First), InputForm]<>"]]" ]
     ,
-        FrontEditorSelected["Set", StringTemplate[" Import /@ `` "][ ToString[ FileNameJoin[{"attachments", #}] &/@ Keys[files], InputForm] ] ]
+        FrontEditorSelected["Set", "Import /@ FileNameJoin /@ "<>ToString[ FileNameJoin[{"attachments", #}] &/@ Keys[files], InputForm] ]
     ], cli]
 ]
 

@@ -68,9 +68,9 @@ ClearAll[Iconize]
 Iconize[expr_] := With[{},
   If[ByteCount[expr] > 30000,
     With[{name = "iconized-"<>StringTake[CreateUUID[], 4]<>".wl"},
-      If[!DirectoryQ[FileNameJoin[{Directory[], ".iconized"}] ],  CreateDirectory[FileNameJoin[{Directory[], ".iconized"}] ]  ];
-      Put[expr, FileNameJoin[{Directory[], ".iconized", name}] ];
-      IconizedFile[FileNameJoin[{Directory[], ".iconized", name}], ByteCount[expr] ]
+      If[!DirectoryQ[".iconized"],  CreateDirectory[FileNameJoin[{Directory[], ".iconized"}] ]  ];
+      Put[expr, FileNameJoin[{".iconized", name}] ];
+      IconizedFile[{".iconized", name}, ByteCount[expr] ]
     ]
   ,
     Iconized[expr // Compress, ByteCount[expr] ]
@@ -80,9 +80,9 @@ Iconize[expr_] := With[{},
 Iconize[expr_, title_String] := With[{},
   If[ByteCount[expr] > 30000,
     With[{name = title<>"-"<>StringTake[CreateUUID[], 4]<>".wl"},
-      If[!DirectoryQ[FileNameJoin[{Directory[], ".iconized"}] ],  CreateDirectory[FileNameJoin[{Directory[], ".iconized"}] ]  ];
-      Put[expr, FileNameJoin[{Directory[], ".iconized", name}] ];
-      IconizedFile[FileNameJoin[{Directory[], ".iconized", name}], ByteCount[expr] ]
+      If[!DirectoryQ[".iconized"],  CreateDirectory[FileNameJoin[{Directory[], ".iconized"}] ]  ];
+      Put[expr, FileNameJoin[{".iconized", name}] ];
+      IconizedFile[{".iconized", name}, ByteCount[expr] ]
     ]
   ,
     Iconized[expr // Compress, ByteCount[expr] ]
@@ -90,7 +90,7 @@ Iconize[expr_, title_String] := With[{},
 ]
 
 
-IconizedFile /: MakeBoxes[IconizedFile[c_, b_], StandardForm] := RowBox[{"(*VB[*)(Get[\"", c, "\"])(*,*)(*", ToString[Compress[Hold[IconizeFileBox[b] ] ], InputForm], "*)(*]VB*)"}]
+IconizedFile /: MakeBoxes[IconizedFile[c_, b_], StandardForm] := RowBox[{"(*VB[*)(Get[FileNameJoin[", ToString[c, InputForm], "]])(*,*)(*", ToString[Compress[Hold[IconizeFileBox[b] ] ], InputForm], "*)(*]VB*)"}]
 Iconized /: MakeBoxes[Iconized[c_, b_], StandardForm] := RowBox[{"(*VB[*)(Uncompress[", ToString[c, InputForm], "])(*,*)(*", ToString[Compress[Hold[IconizeBox[b] ] ], InputForm], "*)(*]VB*)"}]
 
 BoxBox[expr_, display_, OptionsPattern[]] := 
