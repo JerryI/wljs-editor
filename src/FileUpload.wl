@@ -26,9 +26,10 @@ processRequest[cli_, controls_, data_, __] := With[{channel = data["Channel"]},
         }];
 
         finished := With[{path = DirectoryName[ data["Notebook"]["Path"] ]},
+            If[!DirectoryQ[FileNameJoin[{path, "attachments"}] ], CreateDirectory[FileNameJoin[{path, "attachments"}] ] ];
             Echo["Uploading files..."];
             (
-                With[{filename = FileNameJoin[{path, #}]},
+                With[{filename = FileNameJoin[{path, "attachments", #}]},
                     BinaryWrite[filename, files[#] ] // Close;
                 ]
             ) &/@ Keys[files];
@@ -42,15 +43,15 @@ processRequest[cli_, controls_, data_, __] := With[{channel = data["Channel"]},
 
 pasteFileNames["wl", cli_, files_] := With[{},
     WLJSTransportSend[If[Length[Keys[files] ] === 1,
-        FrontEditorSelected["Set", StringTemplate[" Get[\"``\"] "][ Keys[files] // First ] ]
+        FrontEditorSelected["Set", StringTemplate[" Import[\"``\"] "][ FileNameJoin[{"attachments", #}] &@ (Keys[files] // First) ] ]
     ,
-        FrontEditorSelected["Set", StringTemplate[" Get /@ `` "][ ToString[Keys[files], InputForm] ] ]
+        FrontEditorSelected["Set", StringTemplate[" Import /@ `` "][ ToString[ FileNameJoin[{"attachments", #}] &/@ Keys[files], InputForm] ] ]
     ], cli]
 ]
 
 pasteFileNames["md", cli_, files_] := With[{},
     WLJSTransportSend[
-        FrontEditorSelected["Set", "\n"<>StringRiffle[StringJoin["![](", URLEncode[#], ")"] &/@ Keys[files], "\n"]<>"\n" ]
+        FrontEditorSelected["Set", "\n"<>StringRiffle[StringJoin["![](attachments/", URLEncode[#], ")"] &/@ Keys[files], "\n"]<>"\n" ]
     , cli]
 ]
 

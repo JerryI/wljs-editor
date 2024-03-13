@@ -19,7 +19,19 @@ MetaMarker[s_?notString] := MetaMarker[s // ToString]
 End[]
 
 FrontSubmit[expr_, m_MetaMarker, OptionsPattern[] ] := With[{cli = OptionValue["Window"]},
-    WLJSTransportSend[MarkerContainer[expr, m], cli]
+    If[OptionValue["Tracking"],     
+        With[{uid = CreateUUID[]}, 
+            If[WLJSTransportSend[MarkerContainer[FrontEndInstance[expr, uid], m], cli] < 0, $Failed,
+                FrontEndInstance[uid]
+            ] 
+        ]
+    ,
+        If[WLJSTransportSend[MarkerContainer[expr, m], cli] < 0, $Failed,
+            Null
+        ]          
+    ]
+    
 ]
+
 
 EndPackage[]

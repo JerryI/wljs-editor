@@ -14,6 +14,8 @@ CurrentWindow::usage = "Gets current window representation"
 FrontFetch::usage = "FrontFetch[expr] fetches an expression from frontend"
 FrontFetchAsync::usage = "FrontFetchAsync[expr] fetches an expression from frontend and returns Promise"
 
+FrontEndInstance::usage = "FrontEndInstance[uid_String] an identifier object of an executed expression on the frontend"
+
 Begin["`Private`"]
 
 FrontFetchAsync[expr_, OptionsPattern[] ] := With[{cli = OptionValue["Window"], format = OptionValue["Format"], event = CreateUUID[], promise = Promise[]},
@@ -48,10 +50,26 @@ Options[FrontFetchAsync] = {"Format"->"JSON", "Window" :> Global`$EvaluationCont
 CurrentWindow[] := Global`$EvaluationContext["KernelWebSocket"]
 
 FrontSubmit[expr_, OptionsPattern[] ] := With[{cli = OptionValue["Window"]},
-    WLJSTransportSend[expr, cli]
+    If[OptionValue["Tracking"],     
+        With[{uid = CreateUUID[]}, 
+            If[WLJSTransportSend[FrontEndInstance[expr, uid], cli] < 0, $Failed,
+                FrontEndInstance[uid]
+            ] 
+        ]
+    ,
+        If[WLJSTransportSend[expr, cli] < 0, $Failed,
+            Null
+        ]          
+    ]
 ]
 
-Options[FrontSubmit] = {"Window" :> Global`$EvaluationContext["KernelWebSocket"]}
+FrontEndInstance /: Delete[FrontEndInstance[uid_String], OptionsPattern[{"Window" :> Global`$EvaluationContext["KernelWebSocket"]}] ] := With[{win = OptionValue["WIndow"]},
+    If[WLJSTransportSend[FrontEndInstanceDelete[uid], win] < 0, $Failed,
+        Null
+    ]
+]
+
+Options[FrontSubmit] = {"Window" :> Global`$EvaluationContext["KernelWebSocket"], "Tracking" -> False}
 
 End[]
 EndPackage[]
