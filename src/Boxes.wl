@@ -65,15 +65,15 @@ ViewBox[expr_, display_] := RowBox[{"(*VB[*)(", ToString[expr, InputForm], ")(*,
 Unprotect[Iconize]
 ClearAll[Iconize]
 
-Iconize[expr_] := With[{},
+Iconize[expr_, opts: OptionsPattern[] ] := With[{},
   If[ByteCount[expr] > 30000,
     With[{name = "iconized-"<>StringTake[CreateUUID[], 4]<>".wl"},
       If[!DirectoryQ[".iconized"],  CreateDirectory[FileNameJoin[{Directory[], ".iconized"}] ]  ];
       Put[expr, FileNameJoin[{".iconized", name}] ];
-      IconizedFile[{".iconized", name}, ByteCount[expr] ]
+      IconizedFile[{".iconized", name}, ByteCount[expr], opts]
     ]
   ,
-    Iconized[expr // Compress, ByteCount[expr] ]
+    Iconized[expr // Compress, ByteCount[expr], opts]
   ]
 ]
 
@@ -89,9 +89,11 @@ Iconize[expr_, title_String] := With[{},
   ]
 ]
 
+Options[Iconize] = {"Label"->None}
 
-IconizedFile /: MakeBoxes[IconizedFile[c_, b_], StandardForm] := RowBox[{"(*VB[*)(Get[FileNameJoin[", ToString[c, InputForm], "]])(*,*)(*", ToString[Compress[Hold[IconizeFileBox[b] ] ], InputForm], "*)(*]VB*)"}]
-Iconized /: MakeBoxes[Iconized[c_, b_], StandardForm] := RowBox[{"(*VB[*)(Uncompress[", ToString[c, InputForm], "])(*,*)(*", ToString[Compress[Hold[IconizeBox[b] ] ], InputForm], "*)(*]VB*)"}]
+
+IconizedFile /: MakeBoxes[IconizedFile[c_, b_, opts___], StandardForm] := RowBox[{"(*VB[*)(Get[FileNameJoin[", ToString[c, InputForm], "]])(*,*)(*", ToString[Compress[Hold[IconizeFileBox[b, opts] ] ], InputForm], "*)(*]VB*)"}]
+Iconized /: MakeBoxes[Iconized[c_, b_, opts___], StandardForm] := RowBox[{"(*VB[*)(Uncompress[", ToString[c, InputForm], "])(*,*)(*", ToString[Compress[Hold[IconizeBox[b, opts] ] ], InputForm], "*)(*]VB*)"}]
 
 BoxBox[expr_, display_, OptionsPattern[]] := 
   If[OptionValue[Head] =!= Null,
