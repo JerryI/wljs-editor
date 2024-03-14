@@ -21,10 +21,14 @@ attachListeners[notebook_Notebook] := With[{},
     Echo["Attach event listeners to notebook from EXTENSION FrontSubmit"];
     EventHandler[notebook // EventClone, {
         "OnWebSocketConnected" -> Function[payload,
-            Echo["Requesting socket object for client..."];
-            Then[WebUIFetch[Global`FSAskKernelSocket[], payload["Client"] ], Function[data,
-                notebook["EvaluationContext", "KernelWebSocket"] = data;
-            ] ];
+            With[{p = Promise[]},
+                Echo["Requesting socket object for client..."];
+                Then[WebUIFetch[Global`FSAskKernelSocket[], payload["Client"] ], Function[data,
+                    notebook["EvaluationContext", "KernelWebSocket"] = data;
+                    EventFire[p, Resolve, True];
+                ] ];
+                p
+            ]
         ],
 
         "OnWindowCreate" -> Function[payload,

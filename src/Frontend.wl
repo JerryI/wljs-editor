@@ -30,10 +30,7 @@ evaluator  = StandardEvaluator["Name" -> "Wolfram Evaluator", "InitKernel" -> in
             StandardEvaluator`Print[evaluator, "Kernel is not ready"];
             False
         ,
-            (* !!!! Unknown bug with Boxes... have to do it separately *)
-            With[{p = Import[FileNameJoin[{rootFolder, "Boxes.wl"}], "String"]},
-                Kernel`Init[k,   ToExpression[p, InputForm]; , "Once"->True];
-            ];
+
 
             True
         ]
@@ -135,7 +132,12 @@ init[k_] := Module[{},
             ];
           ];
         ] ];
-    ]
+    ];
+
+    (* !!!! Unknown bug with Boxes... have to do it separately *)
+    With[{p = Import[FileNameJoin[{rootFolder, "Boxes.wl"}], "String"]},
+        Kernel`Init[k,   ToExpression[p, InputForm]; , "Once"->True];
+    ];
 ]
 
 SplitExpression[astr_] := With[{str = StringReplace[astr, {"$Pi$"->"\[Pi]"}]},
