@@ -164,6 +164,9 @@ Internal`RawText /: MakeBoxes[Internal`RawText[text_], StandardForm] := MakeBoxe
 Unprotect[FrameBox]
 FrameBox[x_] := FrameBox[x, "Background"->White] 
 
+(* TODO: just leave as EditorView, no ToStringMethod *)
+(* Assume that EditorView will automatically apply ToString *)
+
 Legended[expr_, SwatchLegend[l_List, names_List] ] := ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject
 
 Legended[expr_, {Placed[SwatchLegend[l_, names_List, opts__], _, Identity]}] := ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject
