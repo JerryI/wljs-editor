@@ -1,4 +1,4 @@
-{
+
   let boxes = {};
   boxes.name = "WebObjects/Boxes";
 
@@ -256,5 +256,9 @@
       env.element.appendChild(editor); 
     }
 
-}
+    boxes["Internal`RawText"] = async (args, env) => {
+      const text = await interpretate(args[0], {...env, context: boxes});
+      env.element.innerHTML = text;
+      env.element.style = "font-family: system-ui"
+    }
 
