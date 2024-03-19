@@ -4,9 +4,10 @@ Begin["Notebook`Editor`StandardForm`"]
 
 (* Being unable to change Boxes of Graphics, Graphics3D and Image, we have to use this *)
 ExpressionReplacements = {
-    Graphics[opts__] :> CreateFrontEndObject[Graphics[opts]], 
-    Graphics3D[opts__] :> CreateFrontEndObject[Graphics3D[opts]], 
-    Image[opts__] :> CreateFrontEndObject[Image[opts]]
+    Graphics[opts__] :> CreateFrontEndObject[Graphics[opts] ], 
+    Graphics3D[opts__] :> CreateFrontEndObject[Graphics3D[opts] ], 
+    Image[opts__] :> CreateFrontEndObject[Image[opts] ],
+    Sound[opts__] :> CreateFrontEndObject[Sound[opts] ]
 } // Quiet
 
 Unprotect[ToString]

@@ -262,3 +262,81 @@
       env.element.style = "font-family: system-ui"
     }
 
+    //temporaly here
+
+ core.Sound = async (args, env) => {
+  var ctx = new AudioContext();
+
+  const object = await interpretate(args[0], {
+      ...env,
+      ctx: ctx
+  });
+
+
+  env.element.classList.add(...('sm-controls cursor-default rounded-md 0 py-1 px-2 bg-gray-100 text-left text-gray-500 ring-1 ring-inset ring-gray-400 text-xs'.split(' ')));
+
+  env.element.innerHTML = `
+       <svg class="w-4 h-4 text-gray-500 inline-block mt-auto mb-auto" viewBox="0 0 24 24" fill="none">
+   <path class="group-hover:opacity-0" d="M3 11V13M6 10V14M9 11V13M12 9
+V15M15 6V18M18 10V14M21 11V13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+   <path d="M3 11V13M6 8V16M9 10V14M12 7V17M15 4V20M18 9V15M21 11V13" class="opacity-0 group-hover:opacity-100" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+   </svg> <span class="leading-normal pl-1">${object.length} sec</span>`;
+
+  const targetRate = ctx.sampleRate;
+
+  env.element.addEventListener('click', () => {
+
+
+      const ratio = Math.floor(targetRate / object.rate);
+
+      const myArrayBuffer = ctx.createBuffer(
+
+          2,
+          ratio * object.data.length,
+          ctx.sampleRate,
+      );
+
+      // Fill the buffer with white noise;
+      //just random values between -1.0 and 1.0
+      for (let channel = 0; channel < myArrayBuffer.numberOfChannels; channel++) {
+          // This gives us the actual ArrayBuffer that contains the data
+          const nowBuffering = myArrayBuffer.getChannelData(channel);
+          for (let i = 0; i < object.data.length; i++) {
+              // Math.random() is in [0; 1.0]
+              // audio needs to be in [-1.0; 1.0]
+              for (let k = 0; k < ratio; ++k)
+                  nowBuffering[i * ratio + k] = object.data[i];
+          }
+      }
+
+      // Get an AudioBufferSourceNode.
+      // This is the AudioNode to use when we want to play an AudioBuffer
+      const source = ctx.createBufferSource();
+      // set the buffer in the AudioBufferSourceNode
+      source.buffer = myArrayBuffer;
+
+      source.connect(ctx.destination);
+      source.start();
+  })
+  // start the source playing
+  //
+}
+
+
+
+core.SampledSoundList = async (args, env) => {
+  const data = await interpretate(args[0], env);
+  const rate = await interpretate(args[1], env);
+
+  const targetRate = env.ctx.sampleRate;
+
+  // connect the AudioBufferSourceNode to the
+  // destination so we can hear the sound
+  const length = data.length / rate;
+
+  return {
+      data: data,
+      rate: rate,
+      length: length
+  };
+}
