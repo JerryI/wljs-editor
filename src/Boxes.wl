@@ -66,7 +66,7 @@ TemplateBox[expr_List, "DateObject", __] := With[{date = expr[[1]][[1]][[1]]},
 
 TemplateBox[expr_List, "SummaryPanel"] := RowBox[expr]
 
-TemplateBox[expr_, ]
+
 
 (*internal*)
 ViewBox[expr_, display_] := RowBox[{"(*VB[*)(", ToString[expr, InputForm], ")(*,*)(*", ToString[Compress[Hold[display]], InputForm], "*)(*]VB*)"}]
