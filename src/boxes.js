@@ -319,6 +319,7 @@ V15M15 6V18M18 10V14M21 11V13" stroke="currentColor" stroke-width="1.5" stroke-l
       source.start();
   })
   // start the source playing
+  env.element.click();
   //
 }
 
