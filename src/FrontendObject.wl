@@ -7,6 +7,9 @@ FrontEndExecutable::usage = "A representation of a stored expression on the fron
 
 Begin["`Internal`"]
 
+(* predefine for the future *)
+System`WLXForm;
+
 Notebook`Editor`FrontendObject`Objects = <||>
 
 CreateFrontEndObject[expr_, uid_String, OptionsPattern[] ] := With[{},
