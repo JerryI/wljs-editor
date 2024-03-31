@@ -216,6 +216,25 @@ let compactWLEditor = null;
 let selectedEditor = undefined;
 
 const EditorSelected = {
+  type: () => {
+    if (!selectedEditor) return '';
+    if (!selectedEditor.viewState) return '';
+    console.log();
+    return checkDocType(selectedEditor.state.doc.line(1).text).name;
+  },
+  cursor: () => {
+    if (!selectedEditor) return '';
+    if (!selectedEditor.viewState) return '';
+    const ranges = selectedEditor.viewState.state.selection.ranges;
+    if (!ranges.length) return false;  
+    const selection = ranges[0];
+    return [selection.from, selection.to];  
+  },
+  getContent: () => {
+    if (!selectedEditor) return '';
+    if (!selectedEditor.viewState) return '';
+    return selectedEditor.state.doc.toString();
+  },  
   get: () => {
     if (!selectedEditor) return '';
     if (!selectedEditor.viewState) return '';
@@ -688,13 +707,29 @@ class CodeMirrorCell {
 
 
 core.FrontEditorSelected = async (args, env) => {
+  console.log('check');
   const op = await interpretate(args[0], env);
-  if (op == "Get")
-    return EditorSelected.get();
-  
-  if (op == "Set") {
-    let data = await interpretate(args[1], env);
-    if (data.charAt(0) == '"') data = data.slice(1,-1);
-    EditorSelected.set(data);
+  switch(op) {
+    case 'Get':
+      return EditorSelected.get();
+    break;
+
+    case 'Set':
+      let data = await interpretate(args[1], env);
+      if (data.charAt(0) == '"') data = data.slice(1,-1);
+      EditorSelected.set(data);
+    break;
+
+    case 'Content':
+      return EditorSelected.getContent();
+    break;
+
+    case 'Cursor':
+      return EditorSelected.cursor();
+    break;
+
+    case 'Type':
+      return EditorSelected.type();
+    break;    
   }
 }
