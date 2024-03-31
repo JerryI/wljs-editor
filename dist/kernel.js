@@ -72064,8 +72064,8 @@ const EditorSelected = {
   type: () => {
     if (!selectedEditor) return '';
     if (!selectedEditor.viewState) return '';
-    console.log(checkDocType(selectedEditor.state.doc.line(1).text));
-    return '';
+    console.log();
+    return checkDocType(selectedEditor.state.doc.line(1).text).name;
   },
   cursor: () => {
     if (!selectedEditor) return '';
@@ -72106,6 +72106,20 @@ const EditorSelected = {
       console.log(data);
       selectedEditor.dispatch({
         changes: {...selection, insert: data}
+      });
+  },
+  setContent: (data) => {
+    if (!selectedEditor) return;
+    if (!selectedEditor.viewState) return;
+
+
+    console.log('result');
+      console.log(data);
+      selectedEditor.dispatch({
+        changes: {
+          from: 0,
+          to: selectedEditor.viewState.state.doc.length
+        , insert: data}
       });
   }
 };
@@ -72560,8 +72574,14 @@ core.FrontEditorSelected = async (args, env) => {
       EditorSelected.set(data);
     break;
 
-    case 'Content':
+    case 'GetDoc':
       return EditorSelected.getContent();
+
+    case 'SetDoc':
+      let data2 = await interpretate(args[1], env);
+      if (data2.charAt(0) == '"') data2 = data2.slice(1,-1);
+      EditorSelected.setContent(data2);
+    break;
 
     case 'Cursor':
       return EditorSelected.cursor();

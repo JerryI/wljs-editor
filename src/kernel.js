@@ -262,6 +262,20 @@ const EditorSelected = {
       selectedEditor.dispatch({
         changes: {...selection, insert: data}
       });
+  },
+  setContent: (data) => {
+    if (!selectedEditor) return;
+    if (!selectedEditor.viewState) return;
+
+
+    console.log('result');
+      console.log(data);
+      selectedEditor.dispatch({
+        changes: {
+          from: 0,
+          to: selectedEditor.viewState.state.doc.length
+        , insert: data}
+      });
   }
 }
 
@@ -720,8 +734,14 @@ core.FrontEditorSelected = async (args, env) => {
       EditorSelected.set(data);
     break;
 
-    case 'Content':
+    case 'GetDoc':
       return EditorSelected.getContent();
+    break;
+
+    case 'SetDoc':
+      let data2 = await interpretate(args[1], env);
+      if (data2.charAt(0) == '"') data2 = data2.slice(1,-1);
+      EditorSelected.setContent(data2);
     break;
 
     case 'Cursor':
