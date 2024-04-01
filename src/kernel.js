@@ -216,64 +216,82 @@ let compactWLEditor = null;
 let selectedEditor = undefined;
 
 const EditorSelected = {
-  type: () => {
-    if (!selectedEditor) return '';
-    if (!selectedEditor.viewState) return '';
+  type: (e) => {
+    const editor = e || selectedEditor;
+
+    if (!editor) return '';
+    if (!editor.viewState) return '';
     console.log();
-    return checkDocType(selectedEditor.state.doc.line(1).text).name;
+    return checkDocType(editor.state.doc.line(1).text).name;
   },
-  cursor: () => {
-    if (!selectedEditor) return '';
-    if (!selectedEditor.viewState) return '';
-    const ranges = selectedEditor.viewState.state.selection.ranges;
+  cursor: (e) => {
+    const editor = e || selectedEditor;
+
+    if (!editor) return '';
+    if (!editor.viewState) return '';
+    const ranges = editor.viewState.state.selection.ranges;
     if (!ranges.length) return false;  
     const selection = ranges[0];
     return [selection.from, selection.to];  
   },
-  getContent: () => {
-    if (!selectedEditor) return '';
-    if (!selectedEditor.viewState) return '';
-    return selectedEditor.state.doc.toString();
+  getContent: (e) => {
+    const editor = e || selectedEditor;
+
+    if (!editor) return '';
+    if (!editor.viewState) return '';
+    return editor.state.doc.toString();
   },  
-  get: () => {
-    if (!selectedEditor) return '';
-    if (!selectedEditor.viewState) return '';
-    const ranges = selectedEditor.viewState.state.selection.ranges;
+  get: (e) => {
+    const editor = e || selectedEditor;
+
+
+    if (!editor) return '';
+    if (!editor.viewState) return '';
+    const ranges = editor.viewState.state.selection.ranges;
     if (!ranges.length) return '';
 
     const selection = ranges[0];
     console.log('yoko');
     console.log(selection);
-    console.log(selectedEditor.state.doc.toString().slice(selection.from, selection.to));
+    console.log(editor.state.doc.toString().slice(selection.from, selection.to));
     console.log('processing');
-    return selectedEditor.state.doc.toString().slice(selection.from, selection.to);
+    return editor.state.doc.toString().slice(selection.from, selection.to);
   },
 
-  set: (data) => {
-    if (!selectedEditor) return;
-    if (!selectedEditor.viewState) return;
-    const ranges = selectedEditor.viewState.state.selection.ranges;
+  set: (data, e) => {
+    const editor = e || selectedEditor;
+
+    if (!editor) return;
+    if (!editor.viewState) return;
+    const ranges = editor.viewState.state.selection.ranges;
     if (!ranges.length) return;
 
     const selection = ranges[0];
 
     console.log('result');
       console.log(data);
-      selectedEditor.dispatch({
+      editor.dispatch({
         changes: {...selection, insert: data}
       });
   },
-  setContent: (data) => {
-    if (!selectedEditor) return;
-    if (!selectedEditor.viewState) return;
+
+  currentEditor: () => {
+    return selectedEditor;
+  },
+
+  setContent: (data, e) => {
+    const editor = e || selectedEditor;
+
+    if (!editor) return;
+    if (!editor.viewState) return;
 
 
     console.log('result');
       console.log(data);
-      selectedEditor.dispatch({
+      editor.dispatch({
         changes: {
           from: 0,
-          to: selectedEditor.viewState.state.doc.length
+          to: editor.viewState.state.doc.length
         , insert: data}
       });
   }
@@ -719,37 +737,62 @@ class CodeMirrorCell {
   if (window.OfflineMode)
     extras.push(window.EditorState.readOnly.of(true))
 
+function uuidv4() {
+      return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
+        (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
+      );
+}    
+
+const editorHashMap = {};
 
 core.FrontEditorSelected = async (args, env) => {
   console.log('check');
   const op = await interpretate(args[0], env);
+  const options = await core._getRules(args, env);
+  let editor = undefined;
+
+  if (options.Editor) {
+    editor = editorHashMap[options.Editor];
+    console.log('Editor');
+    console.log(options.Editor);
+    console.log(editor);
+  }
+
+  
+
   switch(op) {
     case 'Get':
-      return EditorSelected.get();
+      return EditorSelected.get(editor);
     break;
 
     case 'Set':
       let data = await interpretate(args[1], env);
-      if (data.charAt(0) == '"') data = data.slice(1,-1);
-      EditorSelected.set(data);
+      //if (data.charAt(0) == '"') data = data.slice(1,-1);
+      EditorSelected.set(data, editor);
     break;
 
     case 'GetDoc':
-      return EditorSelected.getContent();
+      return EditorSelected.getContent(editor);
     break;
 
     case 'SetDoc':
       let data2 = await interpretate(args[1], env);
-      if (data2.charAt(0) == '"') data2 = data2.slice(1,-1);
-      EditorSelected.setContent(data2);
+      //if (data2.charAt(0) == '"') data2 = data2.slice(1,-1);
+      EditorSelected.setContent(data2, editor);
     break;
 
     case 'Cursor':
-      return EditorSelected.cursor();
+      return EditorSelected.cursor(editor);
     break;
 
     case 'Type':
-      return EditorSelected.type();
+      return EditorSelected.type(editor);
     break;    
+
+    case 'Editor':
+      const key = uuidv4();
+      editorHashMap[key] = EditorSelected.currentEditor();
+      return key;
+    break;
   }
 }

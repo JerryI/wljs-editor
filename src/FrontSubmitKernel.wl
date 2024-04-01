@@ -18,6 +18,8 @@ FrontEndInstance::usage = "FrontEndInstance[uid_String] an identifier object of 
 
 Begin["`Private`"]
 
+CurrentWindow[] := Global`$EvaluationContext["KernelWebSocket"]
+
 FrontFetchAsync[expr_, OptionsPattern[] ] := With[{cli = OptionValue["Window"], format = OptionValue["Format"], event = CreateUUID[], promise = Promise[]},
     EventHandler[event, Function[payload,
         EventRemove[event];
@@ -45,9 +47,8 @@ FrontFetchAsync[expr_, OptionsPattern[] ] := With[{cli = OptionValue["Window"], 
 
 FrontFetch[expr_, opts___] := FrontFetchAsync[expr, opts] // WaitAll
 
-Options[FrontFetchAsync] = {"Format"->"JSON", "Window" :> Global`$EvaluationContext["KernelWebSocket"]};
-
-CurrentWindow[] := Global`$EvaluationContext["KernelWebSocket"]
+Options[FrontFetch] = {"Format"->"JSON", "Window" :> CurrentWindow[]};
+Options[FrontFetchAsync] = {"Format"->"JSON", "Window" :> CurrentWindow[]};
 
 FrontSubmit[expr_, OptionsPattern[] ] := With[{cli = OptionValue["Window"]},
     If[OptionValue["Tracking"],     
@@ -63,13 +64,13 @@ FrontSubmit[expr_, OptionsPattern[] ] := With[{cli = OptionValue["Window"]},
     ]
 ]
 
-FrontEndInstance /: Delete[FrontEndInstance[uid_String], OptionsPattern[{"Window" :> Global`$EvaluationContext["KernelWebSocket"]}] ] := With[{win = OptionValue["WIndow"]},
+FrontEndInstance /: Delete[FrontEndInstance[uid_String], OptionsPattern[{"Window" :> CurrentWindow[]}] ] := With[{win = OptionValue["WIndow"]},
     If[WLJSTransportSend[FrontEndInstanceDelete[uid], win] < 0, $Failed,
         Null
     ]
 ]
 
-Options[FrontSubmit] = {"Window" :> Global`$EvaluationContext["KernelWebSocket"], "Tracking" -> False}
+Options[FrontSubmit] = {"Window" :> CurrentWindow[], "Tracking" -> False}
 
 End[]
 EndPackage[]
