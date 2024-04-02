@@ -158,3 +158,15 @@ core.UIObjects.GetAll = async (args, env) => {
   console.log(message);
   return message;
 }
+
+core.UIObjects.Get = async (args, env) => {
+  //garbageCollect();
+  //const list = Object.values(ObjectHashMap);
+  const uid = await interpretate(args[0], env);
+  if (ObjectHashMap[uid]) { 
+    return ObjectHashMap[uid].cache;
+  } else {
+    console.error('UIObjects get could not find an object');
+    return ['$Failed'];
+  }
+}

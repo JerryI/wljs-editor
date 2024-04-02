@@ -7,6 +7,8 @@ FrontEndExecutable::usage = "A representation of a stored expression on the fron
 
 Begin["`Internal`"]
 
+$MissingHandler[_, _] := $Failed
+
 (* predefine for the future *)
 System`WLXForm;
 
@@ -39,7 +41,11 @@ CreateFrontEndObject[expr_, opts: OptionsPattern[] ] := CreateFrontEndObject[exp
 
 Options[CreateFrontEndObject] = {"Store" -> All}
 
-FrontEndRef[uid_String] := Notebook`Editor`FrontendObject`Objects[uid, "Private"] // ReleaseHold
+FrontEndRef[uid_String] := If[KeyExistsQ[Notebook`Editor`FrontendObject`Objects, uid], 
+    Notebook`Editor`FrontendObject`Objects[uid, "Private"] // ReleaseHold
+,
+    $MissingHandler[uid, "Private"] // ReleaseHold
+]
 
 FrontEndExecutable /: MakeBoxes[FrontEndExecutable[uid_String], StandardForm] := RowBox[{"(*VB[*)(FrontEndRef[\"", uid, "\"])(*,*)(*", ToString[Compress[Hold[FrontEndExecutable[uid]]], InputForm], "*)(*]VB*)"}]
 
