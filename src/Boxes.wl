@@ -29,6 +29,12 @@ FrameBox[x_, opts__]  := RowBox[{"(*BB[*)(", x, ")(*,*)(*", ToString[Compress[Ho
 Unprotect[StyleBox]
 StyleBox[x_, opts__]  := RowBox[{"(*BB[*)(", x, ")(*,*)(*", ToString[Compress[Hold[StyleBox[opts]]], InputForm], "*)(*]BB*)"}]
 
+(*if a string, then remove quotes*)
+Unprotect[Style]
+Style /: MakeBoxes[Style[s_String, opts__], StandardForm] := StringBox[s, opts]
+StringBox[x_String, opts__]  := RowBox[{"(*BB[*)(", ToString[x, InputForm], ")(*,*)(*", ToString[Compress[ProvidedOptions[Hold[StringBox[opts] ], "String"->True ] ], InputForm], "*)(*]BB*)"}, "String"->True]
+
+
 Unprotect[PanelBox]
 PanelBox[x_, opts__]  := RowBox[{"(*BB[*)(Panel[", x, "])(*,*)(*", ToString[Compress[Hold[ProvidedOptions[PanelBox[opts], "Head"->"Panel"]]], InputForm], "*)(*]BB*)"}]
 
@@ -104,16 +110,23 @@ Options[Iconize] = {"Label"->None}
 IconizedFile /: MakeBoxes[IconizedFile[c_, b_, opts___], StandardForm] := RowBox[{"(*VB[*)(Get[FileNameJoin[", ToString[c, InputForm], "]])(*,*)(*", ToString[Compress[Hold[IconizeFileBox[b, opts] ] ], InputForm], "*)(*]VB*)"}]
 Iconized /: MakeBoxes[Iconized[c_, b_, opts___], StandardForm] := RowBox[{"(*VB[*)(Uncompress[", ToString[c, InputForm], "])(*,*)(*", ToString[Compress[Hold[IconizeBox[b, opts] ] ], InputForm], "*)(*]VB*)"}]
 
+(*TODO: MAKE IT JUST OPTIONS REMOVE IFs !!! *)
 BoxBox[expr_, display_, OptionsPattern[]] := 
   If[OptionValue[Head] =!= Null,
     With[{dp = ProvidedOptions[Hold[display], "Head"->ToString[OptionValue[Head], InputForm]]},
       RowBox[{"(*BB[*)(", ToString[OptionValue[Head], InputForm], "[", expr, "]", ")(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]
     ]
   ,
-    RowBox[{"(*BB[*)(", expr, ")(*,*)(*", ToString[Compress[Hold[display]], InputForm], "*)(*]BB*)"}]
+    If[OptionValue["String"] === True,
+      With[{dp = ProvidedOptions[Hold[display], "String"->True]},
+        RowBox[{"(*BB[*)(", expr, ")(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]
+      ]
+    ,
+      RowBox[{"(*BB[*)(", expr, ")(*,*)(*", ToString[Compress[Hold[display]], InputForm], "*)(*]BB*)"}]
+    ]
   ]
 
-Options[BoxBox] = {Head -> Null}
+Options[BoxBox] = {Head -> Null, "String"->False}
 
 Unprotect[PaneSelectorBox]
 
