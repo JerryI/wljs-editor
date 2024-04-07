@@ -22,7 +22,7 @@ EventHandler[NotebookEditorChannel // EventClone,
             
                 With[{ref = data["Ref"]},
                         If[ !MissingQ[CellObj`HashMap[ref] ] ,
-                            With[{dir = CellObj`HashMap[ref]["Notebook"]["Path"]},
+                            With[{dir = If[DirectoryQ[#], #, DirectoryName[#] ] &@ (CellObj`HashMap[ref]["Notebook"]["Path"])},
                                 If[StringQ[dir],
                                     Kernel`Async[kernel, EventFire[promise, Resolve, dir] ];
                                 ,
