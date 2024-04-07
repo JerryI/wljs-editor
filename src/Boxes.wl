@@ -197,14 +197,14 @@ Unprotect[BoxForm`ArrangeSummaryBox]
 ClearAll[BoxForm`ArrangeSummaryBox]
 
 Unprotect[BoxForm`SummaryItem]
-ClearAll[BoxForm`SummaryItem]
 
 BoxForm`SummaryItem[{label_String, view_}] := BoxForm`SummaryItemView[label, EditorView[ToString[view, StandardForm], "ReadyOnly"->True]]
 
 BoxForm`IconsStore = <||>;
 
+BoxForm`temporal = {};
+
 BoxForm`ArrangeSummaryBox[head_, interpretation_, icon_, above_, hidden_, ___] := With[{
-  interpretationString = ToString[interpretation, InputForm],
   headString = ToString[head, InputForm],
 
   iconHash = Hash[icon]
@@ -223,8 +223,23 @@ BoxForm`ArrangeSummaryBox[head_, interpretation_, icon_, above_, hidden_, ___] :
                       
                     ]},
   
-  
-    RowBox[{headString, "[", "(*VB[*) ", StringDrop[StringDrop[interpretationString, -1], StringLength[headString] + 1], " (*,*)(*", ToString[Compress[BoxForm`ArrangedSummaryBox[iconSymbol // FrontEndVirtual, above, hidden] ], InputForm ], "*)(*]VB*)", "]"}]
+    If[False (* not supported for NOW *),
+      Module[{temporalStorage},
+        With[{
+          result = RowBox[{headString, "[", "(*VB[*) ", ToString[temporalStorage, InputForm], " (*,*)(*", ToString[Compress[BoxForm`ArrangedSummaryBox[iconSymbol // FrontEndVirtual, above, hidden] ], InputForm ], "*)(*]VB*)", "]"}]
+        },
+          AppendTo[BoxForm`temporal, Hold[temporalStorage] ];
+
+          temporalStorage = Sequence @@ interpretation;
+          result
+        ]
+      ]
+    ,
+      With[{interpretationString = ToString[interpretation, InputForm]},
+        RowBox[{headString, "[", "(*VB[*) ", StringDrop[StringDrop[interpretationString, -1], StringLength[headString] + 1], " (*,*)(*", ToString[Compress[BoxForm`ArrangedSummaryBox[iconSymbol // FrontEndVirtual, above, hidden] ], InputForm ], "*)(*]VB*)", "]"}]
+      ]
+    ]
+    
 
   ]
 ]

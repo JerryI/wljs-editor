@@ -116,7 +116,7 @@ init[k_] := Module[{},
                 ,   
                     (* check length *)
                     With[{string = ToString[result, StandardForm]},
-                        If[StringLength[string] < 10000,
+                        If[StringLength[string] < 30000,
                             EventFire[Internal`Kernel`Stdout[ t["Hash"] ], "Result", <|"Data" -> string, "Meta"->Sequence["Hash"->hash] |> ];
                         ,
                             With[{truncated = ToString[result, InputForm]},

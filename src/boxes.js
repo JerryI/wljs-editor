@@ -111,7 +111,7 @@
     } 
 
     if ('FontSize' in options) {
-      env.element.style.fontSize = options.FontSize;
+      env.element.style.fontSize = String(options.FontSize) + 'pt';
     } 
 
     if ('FontFamily' in options) {
@@ -121,6 +121,7 @@
     const data = [];
     for (let i=0; i<(args.length - Object.keys(options).length); ++i) {
       let result = await interpretate(args[i], env);
+
       if (typeof result == 'string') {
         result = result.toLocaleLowerCase();
         
@@ -140,8 +141,10 @@
         continue;
       }
 
+      
       if (typeof result === 'number') {
-        env.element.style.fontSize = result;
+
+        env.element.style.fontSize = String(result) + 'pt';
         continue;
       }
     }
@@ -153,13 +156,60 @@
       env.context = boxes;
       console.log('style box');
       
-      console.log(args);
+      //sort all rules to the end
+      args.sort((el) => {
+        if(Array.isArray(el)) {
+          if (el[0] == 'Rule') return 1;
+        }
+        return -1;
+      });
 
       const options = await core._getRules(args, env) || {};
-      
+
+      //env.element.style.fontFamily = 'system-ui';
+
       if ('Background' in options) {
-          env.element.style.backgroundColor = options.Background;
-      }        
+        env.element.style.backgroundColor = options.Background;
+      } 
+
+      if ('FontSize' in options) {
+        env.element.style.fontSize = String(options.FontSize) + 'pt';
+      } 
+
+      if ('FontFamily' in options) {
+        env.element.style.fontFamily = options.FontFamily.toLowerCase();
+      }
+
+      const data = [];
+      for (let i=0; i<(args.length - Object.keys(options).length); ++i) {
+        let result = await interpretate(args[i], env);
+      
+        if (typeof result == 'string') {
+          result = result.toLocaleLowerCase();
+
+          if (result.slice(0,3) == 'rgb') {
+            //this is a color
+            env.element.style.color = result;
+          } else {
+            //this is a font-face
+            if (result == 'italic') {
+              env.element.style.fontStyle = result;
+            } else if (result == 'bold') {
+              env.element.style.fontWeight = result;
+            } else {
+              env.element.style.textDecoration = result;
+            }
+          }
+          continue;
+        }
+      
+
+        if (typeof result === 'number') {
+        
+          env.element.style.fontSize = String(result) + 'pt';
+          continue;
+        }
+      }      
   }
 
   boxes.DateObjectTemplate = async (args, env) => {
