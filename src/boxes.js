@@ -329,6 +329,61 @@
       env.element.style = "font-family: system-ui"
     }
 
+
+    boxes.SpanFromLeft = () => "SpanFromLeft"
+
+    boxes.None = () => "None"
+    
+    boxes["BoxForm`SummaryItemView"] = async (args, env) => {
+      const tr = document.createElement('tr');
+      const label = document.createElement('td');
+      const content = document.createElement('td');
+    
+      label.innerText = await interpretate(args[0], env);
+    
+      await interpretate(args[1], {...env, context:boxes, element: content});
+    
+      tr.appendChild(label);
+      tr.appendChild(content);
+    
+      env.element.appendChild(tr);
+    
+      
+    }
+    
+    
+    
+    boxes["BoxForm`ArrangedSummaryBox"] = async (args, env) => {
+      env.element.style.verticalAlign = 'middle';
+      env.element.classList.add(...('sm-controls cursor-default rounded-md 0 py-1 px-2 bg-gray-100 text-left text-gray-500 ring-1 ring-inset ring-gray-400 text-xs flex flex-row'.split(' ')));
+    
+      let iconElement = document.createElement('span');
+      iconElement.classList.add(...('text-gray-500 inline-block mt-auto mb-auto pr-1'.split(' ')));
+    
+      env.element.appendChild(iconElement);
+    
+      const table = document.createElement('table');
+      table.classList.add(...('pl-1 table-auto'.split(' ')));
+      
+      let tbodyElement = document.createElement('tbody');
+      
+      table.appendChild(tbodyElement);
+    
+      env.element.appendChild(table);
+    
+      console.log(iconElement.getBoundingClientRect());
+    
+      const iconWidth = 35;
+    
+      
+    
+      interpretate(args[0], {...env, element: iconElement,  global: env.global, imageSize:[iconWidth, iconWidth]});
+      interpretate(args[1], {...env, element: tbodyElement, static:true, local: false});
+    }
+
+
+
+
     //temporaly here
 
  core.Sound = async (args, env) => {

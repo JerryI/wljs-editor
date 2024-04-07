@@ -104,6 +104,16 @@ function getObject(server, id) {
     return server.ask('Notebook`Editor`FrontendObject`GetObject["'+id+'"]'); 
 }
 
+core.FrontEndVirtual = async (args, env) => {
+  const copy = {...env};
+  const store = args[0];
+  const instance = new ExecutableObject('fevirtual-'+uuidv4(), copy, store);
+  instance.assignScope(copy);
+
+
+  return await instance.execute();
+}
+
 
 //element will be provided in 
 core.FrontEndExecutable = async (args, env) => {

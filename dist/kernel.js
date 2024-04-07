@@ -72506,10 +72506,17 @@ class CodeMirrorCell {
 
   core.ReadOnly = () => "ReadOnly";
 
+  function unicodeToChar2(text) {
+    return text.replace(/\\\\:[\da-f]{4}/gi, 
+           function (match) {
+                return String.fromCharCode(parseInt(match.replace(/\\\\:/g, ''), 16));
+           });
+  }
+
   //for dynamics
   core.EditorView = async (args, env) => {
     //cm6 inline editor (editable or read-only)
-    const textData = await interpretate(args[0], env);
+    const textData = unicodeToChar2(await interpretate(args[0], env));
     const options = await core._getRules(args, env);
 
     let evalFunction = () => {};
@@ -72553,7 +72560,7 @@ class CodeMirrorCell {
 
   core.EditorView.update = async (args, env) => {
     if (!env.local.editor) return;
-    const textData = await interpretate(args[0], env);
+    const textData = unicodeToChar2(await interpretate(args[0], env));
     console.log('editor view: dispatch');
     env.local.editor.dispatch({
       changes: {from: 0, to: env.local.editor.state.doc.length, insert: textData}

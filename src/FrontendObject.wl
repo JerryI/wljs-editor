@@ -4,6 +4,7 @@ CreateFrontEndObject::usage = "CreateFrontEndObject[expr_, uid_, opts] to force 
 FrontEndRef::usage = "A readable representation of a stored expression on the kernel"
 FrontEndExecutable::usage = "A representation of a stored expression on the frontend"
 
+FrontEndVirtual::usage = ""
 
 Begin["`Internal`"]
 

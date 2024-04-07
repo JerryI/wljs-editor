@@ -191,5 +191,49 @@ Legended[expr_, {Placed[LineLegend[l_, names_List, opts__], _, Identity]}] := To
 Legended[expr_, Placed[LineLegend[l_, names_List, opts__], _, Identity] ] := ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject
 
 
+
+
+Unprotect[BoxForm`ArrangeSummaryBox]
+ClearAll[BoxForm`ArrangeSummaryBox]
+
+Unprotect[BoxForm`SummaryItem]
+ClearAll[BoxForm`SummaryItem]
+
+BoxForm`SummaryItem[{label_String, view_}] := BoxForm`SummaryItemView[label, EditorView[ToString[view, StandardForm], "ReadyOnly"->True]]
+
+BoxForm`IconsStore = <||>;
+
+BoxForm`ArrangeSummaryBox[head_, interpretation_, icon_, above_, hidden_, ___] := With[{
+  interpretationString = ToString[interpretation, InputForm],
+  headString = ToString[head, InputForm],
+
+  iconHash = Hash[icon]
+},
+
+  (* Wolfram cleans up icon symbols for some reason. Frontend cannot get them back. Also to fix this and improve caching we will store the copies of them separately *)
+  With[{iconSymbol = If[KeyExistsQ[BoxForm`IconsStore, iconHash], 
+                      BoxForm`IconsStore[iconHash]
+                    ,
+                      Module[{iconTempSymbol},
+                        If[icon === None, Return[Hold[None], Module ] ];
+                        BoxForm`IconsStore[iconHash] = Hold[iconTempSymbol];
+                        iconTempSymbol = icon;
+                        Hold[iconTempSymbol]
+                      ]
+                      
+                    ]},
+  
+  
+    RowBox[{headString, "[", "(*VB[*) ", StringDrop[StringDrop[interpretationString, -1], StringLength[headString] + 1], " (*,*)(*", ToString[Compress[BoxForm`ArrangedSummaryBox[iconSymbol // FrontEndVirtual, above, hidden] ], InputForm ], "*)(*]VB*)", "]"}]
+
+  ]
+]
+
+
+SetAttributes[BoxForm`ArrangeSummaryBox, HoldAll]
+
+
+
+
 (**)
 System`WLXEmbed /: MakeBoxes[w_System`WLXEmbed, StandardForm] := With[{o = CreateFrontEndObject[w]}, MakeBoxes[o, StandardForm] ]
