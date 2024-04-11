@@ -388,6 +388,8 @@
       const tr = document.createElement('tr');
       const label = document.createElement('td');
       const content = document.createElement('td');
+
+      content.style.maxWidth = "200px";
     
       label.innerText = await interpretate(args[0], env);
     
