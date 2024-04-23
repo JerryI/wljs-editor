@@ -134,10 +134,10 @@ init[k_] := Module[{},
         ] ];
     ];
 
-    (* !!!! Unknown bug with Boxes... have to do it separately *)
+    (* !!!! Unknown bug with Boxes... have to do it separately
     With[{p = Import[FileNameJoin[{rootFolder, "Boxes.wl"}], "String"]},
         Kernel`Init[k,   ToExpression[p, InputForm]; , "Once"->True];
-    ];
+    ];*)
 ]
 
 SplitExpression[astr_] := With[{str = StringReplace[astr, {"$Pi$"->"\[Pi]"}]},

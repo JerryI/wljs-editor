@@ -1,6 +1,6 @@
 {
   "name": "wljs-editor",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "WLJS Code editor",
   "scripts": {
     "build": "node --max-old-space-size=8192 ./node_modules/.bin/rollup --config rollup.config.mjs",
@@ -40,6 +40,7 @@
       "src/FrontendObject.wl",
       "src/EditorKernel.wl",
       "src/StandardForm.wl",
+      "src/Boxes.wl",
       "src/SetDirectoryKernel.wl",
       "src/RemoteCellsKernel.wl",
       "src/FrontSubmitKernel.wl",
