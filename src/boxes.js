@@ -403,7 +403,12 @@
       
     }
     
-    
+    boxes.Row = async (args, env) => {
+      console.warn('RowBox is not implemented properly for BoxForm`ArrangedSummaryBox!!!');
+      args.forEach((el) => {
+        interpretate(el, env);
+      });
+    }
     
     boxes["BoxForm`ArrangedSummaryBox"] = async (args, env) => {
       env.element.style.verticalAlign = 'middle';
@@ -430,7 +435,7 @@
       
     
       interpretate(args[0], {...env, element: iconElement,  global: env.global, imageSize:[iconWidth, iconWidth]});
-      interpretate(args[1], {...env, element: tbodyElement, static:true, local: false});
+      interpretate(args[1], {...env, context: boxes, element: tbodyElement, static:true, local: false});
     }
 
 
