@@ -8,6 +8,11 @@ Begin["`Private`"]
 notRule[_Rule] = False
 notRule[_] = True
 
+Unprotect[Beep]
+ClearAll[Beep]
+Beep[]  := EventFire[Internal`Kernel`Stdout[ Internal`Kernel`Hash ], Notifications`Beeper[], True]; 
+Beep[_] := Beep[]
+
 Notify[template_String, args__?notRule, OptionsPattern[] ] := With[{
     message = StringTemplate[template][args]
 },
