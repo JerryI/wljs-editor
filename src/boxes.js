@@ -402,6 +402,22 @@
     
       
     }
+
+    boxes.QuantityBox = async (args, env) => {
+      const n = await interpretate(args[0], env);
+      const units = await interpretate(args[1], env);
+
+      
+      env.element.classList.add(...('text-gray-500 ring-gray-300 ring-1 rounded-lg px-2 text-sm'.split(' ')));
+      env.element.style.verticalAlign = 'baseline';
+      const text = document.createTextNode(n);
+      const u = document.createElement('span');
+      u.classList.add('ml-1');
+      u.innerText = units;
+
+      env.element.appendChild(text);
+      env.element.appendChild(u);
+    }
     
     boxes.Row = async (args, env) => {
       console.warn('RowBox is not implemented properly for BoxForm`ArrangedSummaryBox!!!');

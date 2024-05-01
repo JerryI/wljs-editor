@@ -44,7 +44,7 @@ Unprotect[TemplateBox]
 
 TemplateBox[list_List, "RowDefault"] := GridBox[{list}]
 
-TemplateBox[{"meow.wl"}, FileArgument]
+TemplateBox[{n_, short_String, _, units_String}, "Quantity", ___] := RowBox[{"(*VB[*)(", StringTemplate["Quantity[``, ``]"][n, units], ")(*,*)(*", ToString[Compress[ QuantityBox[n, StringDrop[StringDrop[short, -1], 1] ] ], InputForm], "*)(*]VB*)"}]
 
 TemplateBox[{number_}, "C"] := RowBox[{ SubscriptBox[C, number]}]
 
