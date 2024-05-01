@@ -8,6 +8,21 @@ core.MetaMarker = async (args, env) => {
   }
 
   const marker = await interpretate(args[0], env);
+
+  //an exception if no instance provided
+  if (!env.root) {
+    console.log('NO instance provided!!!');
+    console.log('Attaching env only');
+
+    MetaMarkers[marker] = {
+      noInstanceQ: true,
+      env: env
+    };
+
+    return null;
+  }
+
+
   const inst = env.root.instance;
 
   console.log('instance '+inst+'is marked as '+marker);
@@ -17,6 +32,7 @@ core.MetaMarker = async (args, env) => {
     MetaMarkers[marker] = {};
     MetaMarkers[marker][inst] = env;
   }
+
 
   return null;
 }
@@ -66,6 +82,23 @@ core.MarkerContainer = async (args, env) => {
 
     if (uid in MetaMarkers) {
       console.log('found Marker');
+
+      if (MetaMarkers[uid].noInstanceQ) {
+        console.log('plain env. No instance specified');
+        //execute inside given env
+        console.log('try!');
+
+        const copy = {...MetaMarkers[uid].env};
+  
+        //merge the scope
+        copy.scope = {...copy.scope, ...env.scope};
+
+        const result = await interpretate(expr, copy);
+        results.push(result);
+
+        return results;
+      }
+
       const arr =  Object.values(MetaMarkers[uid]);
       
       for (const instance of arr) {

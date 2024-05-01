@@ -78,6 +78,11 @@ class EditorWidget {
         self.epilog.string = "]"
       }
 
+      if (env.options?.Event) {
+        console.warn('Event listeners are enabled!');
+        self.events = env.options.Event;
+      }
+
       if (env.options?.String) {
         //just make a DOM element, if this is a string
         self.prolog.offset = 1;
@@ -108,6 +113,8 @@ class EditorWidget {
         
         env.global.element.appendChild(aa);
 
+        if(self.events) server.kernel.emitt(self.events, 'Null', 'Mounted');
+
         return;
       }
 
@@ -134,7 +141,10 @@ class EditorWidget {
             } }
           ])
         ]
-      });  
+      });
+
+      if(self.events) server.kernel.emitt(self.events, 'Null', 'Mounted');  
+
     });
 
   }
@@ -168,6 +178,9 @@ class EditorWidget {
       }
     }  
     this.editor.destroy();
+
+    if(this.events) server.kernel.emitt(this.events, 'Null', 'Destroy');
+
     delete this.data;
   }
 }

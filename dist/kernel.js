@@ -71412,11 +71412,32 @@ const uuidv4$2 = () => {
       this.data = json;
   
       const cuid = uuidv4$2();
+      this.cuid = cuid;
+
       let global = {call: cuid, EditorWidget: self};
       let env = {global: global, element: span}; //Created in CM6
       this.expression = json;
       this.env = env;
       this.interpretated = interpretate(json, env);
+      this.interpretated.then(() => {
+        //console.error(env);
+        if (env.options?.Event) {
+          console.warn('Event listeners are enabled!');
+          self.events = env.options.Event;
+          let firstInstanceEnv = env;
+          if (global.stack) {
+            const objs = Object.values(global.stack);
+            if (objs.length > 0) {
+              console.log('Attaching first found instance...');
+              firstInstanceEnv = objs[0].env;
+            }
+          }
+          //providing metamarker so that later you can work with it
+          interpretate(['MetaMarker', "'" + cuid + "'"], firstInstanceEnv).then(() => {
+            server.kernel.emitt(self.events, '"' + cuid + '"', 'Mounted');
+          });
+        }
+      });
 
       //ref.push(self);  
       //console.error(this.visibleValue)
@@ -71473,6 +71494,9 @@ const uuidv4$2 = () => {
       }
       //interpretate(this.expression, {...this.env, method: 'destroy'});
       //this.view.destroy();
+      if (this.events) {
+        server.kernel.emitt(this.events, '"' + this.cuid + '"', 'Destroy');
+      }
       delete this.data;
     }
   };
@@ -71637,6 +71661,11 @@ class EditorWidget {
         self.epilog.string = "]";
       }
 
+      if (env.options?.Event) {
+        console.warn('Event listeners are enabled!');
+        self.events = env.options.Event;
+      }
+
       if (env.options?.String) {
         //just make a DOM element, if this is a string
         self.prolog.offset = 1;
@@ -71667,6 +71696,8 @@ class EditorWidget {
         
         env.global.element.appendChild(aa);
 
+        if(self.events) server.kernel.emitt(self.events, 'Null', 'Mounted');
+
         return;
       }
 
@@ -71693,7 +71724,10 @@ class EditorWidget {
             } }
           ])
         ]
-      });  
+      });
+
+      if(self.events) server.kernel.emitt(self.events, 'Null', 'Mounted');  
+
     });
 
   }
@@ -71727,6 +71761,9 @@ class EditorWidget {
       }
     }  
     this.editor.destroy();
+
+    if(this.events) server.kernel.emitt(this.events, 'Null', 'Destroy');
+
     delete this.data;
   }
 }

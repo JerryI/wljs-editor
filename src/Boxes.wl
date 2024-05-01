@@ -75,7 +75,13 @@ TemplateBox[expr_List, "SummaryPanel"] := RowBox[expr]
 
 
 (*internal*)
-ViewBox[expr_, display_] := RowBox[{"(*VB[*)(", ToString[expr, InputForm], ")(*,*)(*", ToString[Compress[Hold[display]], InputForm], "*)(*]VB*)"}]
+ViewBox[expr_, display_, OptionsPattern[] ] := With[{event = OptionValue["Event"]}, If[event === Null,
+  RowBox[{"(*VB[*)(", ToString[expr, InputForm], ")(*,*)(*", ToString[Compress[Hold[display] ], InputForm], "*)(*]VB*)"}]
+,
+  RowBox[{"(*VB[*)(", ToString[expr, InputForm], ")(*,*)(*", ToString[Compress[ProvidedOptions[Hold[display], "Event"->event ] ], InputForm], "*)(*]VB*)"}]
+] ]
+
+Options[ViewBox] = {"Event" -> Null}
 
 Unprotect[Iconize]
 ClearAll[Iconize]
@@ -111,22 +117,30 @@ IconizedFile /: MakeBoxes[IconizedFile[c_, b_, opts___], StandardForm] := RowBox
 Iconized /: MakeBoxes[Iconized[c_, b_, opts___], StandardForm] := RowBox[{"(*VB[*)(Uncompress[", ToString[c, InputForm], "])(*,*)(*", ToString[Compress[Hold[IconizeBox[b, opts] ] ], InputForm], "*)(*]VB*)"}]
 
 (*TODO: MAKE IT JUST OPTIONS REMOVE IFs !!! *)
-BoxBox[expr_, display_, OptionsPattern[]] := 
+BoxBox[expr_, display_, OptionsPattern[] ] := With[{event = OptionValue["Event"]}, 
   If[OptionValue[Head] =!= Null,
-    With[{dp = ProvidedOptions[Hold[display], "Head"->ToString[OptionValue[Head], InputForm]]},
+    With[{dp = ProvidedOptions[Hold[display], "Head"->ToString[OptionValue[Head], InputForm], "Event"->event]},
       RowBox[{"(*BB[*)(", ToString[OptionValue[Head], InputForm], "[", expr, "]", ")(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]
     ]
   ,
     If[OptionValue["String"] === True,
-      With[{dp = ProvidedOptions[Hold[display], "String"->True]},
+      With[{dp = ProvidedOptions[Hold[display], "String"->True, "Event"->event]},
         RowBox[{"(*BB[*)(", expr, ")(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]
       ]
     ,
-      RowBox[{"(*BB[*)(", expr, ")(*,*)(*", ToString[Compress[Hold[display]], InputForm], "*)(*]BB*)"}]
+      If[event === Null,
+        RowBox[{"(*BB[*)(", expr, ")(*,*)(*", ToString[Compress[Hold[display] ], InputForm], "*)(*]BB*)"}]
+      ,
+        With[{dp = ProvidedOptions[Hold[display], "Event"->event]},
+          RowBox[{"(*BB[*)(", expr, ")(*,*)(*", ToString[Compress[Hold[dp] ], InputForm], "*)(*]BB*)"}]
+        ]
+      ]
     ]
   ]
+]
 
-Options[BoxBox] = {Head -> Null, "String"->False}
+
+Options[BoxBox] = {Head -> Null, "String"->False, "Event"->Null}
 
 Unprotect[PaneSelectorBox]
 
@@ -204,9 +218,11 @@ BoxForm`IconsStore = <||>;
 
 BoxForm`temporal = {};
 
-BoxForm`ArrangeSummaryBox[head_, interpretation_, icon_, above_, hidden_, ___] := With[{
-  headString = ToString[head, InputForm],
+Options[BoxForm`ArrangeSummaryBox] = {"Event" -> Null}
 
+BoxForm`ArrangeSummaryBox[head_, interpretation_, icon_, above_, hidden_, ___, OptionsPattern[] ] := With[{
+  headString = ToString[head, InputForm],
+  event = OptionValue["Event"],
   iconHash = Hash[icon]
 },
 
@@ -236,11 +252,14 @@ BoxForm`ArrangeSummaryBox[head_, interpretation_, icon_, above_, hidden_, ___] :
       ]
     ,
       With[{interpretationString = ToString[interpretation, InputForm]},
-        RowBox[{headString, "[", "(*VB[*) ", StringDrop[StringDrop[interpretationString, -1], StringLength[headString] + 1], " (*,*)(*", ToString[Compress[BoxForm`ArrangedSummaryBox[iconSymbol // FrontEndVirtual, above, hidden] ], InputForm ], "*)(*]VB*)", "]"}]
+        If[event === Null,
+          RowBox[{headString, "[", "(*VB[*) ", StringDrop[StringDrop[interpretationString, -1], StringLength[headString] + 1], " (*,*)(*", ToString[Compress[BoxForm`ArrangedSummaryBox[iconSymbol // FrontEndVirtual, above, hidden] ], InputForm ], "*)(*]VB*)", "]"}]
+        ,
+          RowBox[{headString, "[", "(*VB[*) ", StringDrop[StringDrop[interpretationString, -1], StringLength[headString] + 1], " (*,*)(*", ToString[Compress[ProvidedOptions[BoxForm`ArrangedSummaryBox[iconSymbol // FrontEndVirtual, above, hidden], "Event" -> event] ], InputForm ], "*)(*]VB*)", "]"}]
+        ]
       ]
     ]
     
-
   ]
 ]
 
