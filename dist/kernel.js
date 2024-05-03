@@ -62146,6 +62146,8 @@ class GreekWidget extends WidgetType {
       this.name
         .toLowerCase()
         .replace("sqrt", "radic")
+        .replace("undirectededge", 'harr')
+        .replace('directededge', 'rarr')
         .replace("degree", "deg") +
       ";";
 
