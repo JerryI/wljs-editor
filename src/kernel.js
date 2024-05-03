@@ -56,7 +56,7 @@ import { defaultFunctions } from "../libs/priceless-mathematica/src/mathematica/
 
 import { DropPasteHandlers } from "../libs/priceless-mathematica/src/mathematica/dropevents";
 
-import { Arrowholder, Greekholder } from "../libs/priceless-mathematica/src/sugar/misc"
+import { Greekholder } from "../libs/priceless-mathematica/src/sugar/misc"
 
 import {FractionBoxWidget} from "../libs/priceless-mathematica/src/boxes/fractionbox"
 import {SqrtBoxWidget} from "../libs/priceless-mathematica/src/boxes/sqrtbox"
@@ -326,7 +326,6 @@ compactWLEditor = (args) => {
     bracketMatching(),
     rainbowBrackets(),
     Greekholder,
-    Arrowholder,
     extras,
     
     EditorView.updateListener.of((v) => {
@@ -396,7 +395,6 @@ const mathematicaPlugins = [
   bracketMatching(),
   rainbowBrackets(),
   Greekholder,
-  Arrowholder,
   extras,
   DropPasteHandlers(wlDrop, wlPaste)
 ]

@@ -62165,7 +62165,7 @@ const ArrowMatcher = new MatchDecorator({
       widget: new ArrowWidget(match[1])
     })
 });
-const Arrowholder = ViewPlugin.fromClass(
+ViewPlugin.fromClass(
   class {
     constructor(view) {
       this.Arrowholder = ArrowMatcher.createDeco(view);
@@ -72245,7 +72245,6 @@ compactWLEditor = (args) => {
     bracketMatching(),
     rainbowBrackets(),
     Greekholder,
-    Arrowholder,
     extras,
     
     EditorView.updateListener.of((v) => {
@@ -72315,7 +72314,6 @@ const mathematicaPlugins = [
   bracketMatching(),
   rainbowBrackets(),
   Greekholder,
-  Arrowholder,
   extras,
   DropPasteHandlers(wlDrop, wlPaste)
 ];
