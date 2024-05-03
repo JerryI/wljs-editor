@@ -3,6 +3,8 @@ BeginPackage["Notebook`Utils`Notifications`", {"JerryI`Misc`Events`"}]
 Notify::usage = "Notify[message_, args__, opts] prints a message in a notification box"
 NotificationSpinner::usage = "NotificationSpinner[message_, \"Topic\"->] _Promise"
 
+HapticFeedback::usage = "HapticFeedback[] make a haptic feedback on MacOS devices (Desktop App only)"
+
 Begin["`Private`"]
 
 notRule[_Rule] = False
@@ -12,6 +14,10 @@ Unprotect[Beep]
 ClearAll[Beep]
 Beep[]  := EventFire[Internal`Kernel`Stdout[ Internal`Kernel`Hash ], Notifications`Beeper[], True]; 
 Beep[_] := Beep[]
+
+
+HapticFeedback[]  := EventFire[Internal`Kernel`Stdout[ Internal`Kernel`Hash ], Notifications`Rumble[], True]; 
+HapticFeedback[_] := HapticFeedback[]
 
 Notify[template_String, args__?notRule, OptionsPattern[] ] := With[{
     message = StringTemplate[template][args]
