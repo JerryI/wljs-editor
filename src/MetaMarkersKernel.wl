@@ -21,8 +21,8 @@ End[]
 FrontSubmit[expr_, m_MetaMarker, OptionsPattern[] ] := With[{cli = OptionValue["Window"]},
     If[OptionValue["Tracking"],     
         With[{uid = CreateUUID[]}, 
-            If[FailureQ[WLJSTransportSend[MarkerContainer[FrontEndInstance[expr, uid], m], cli] ], $Failed,
-                FrontEndInstance[uid]
+            If[FailureQ[WLJSTransportSend[MarkerContainer[FrontEndInstanceGroup[expr, uid], m], cli] ], $Failed,
+                FrontEndInstanceGroup[uid]
             ] 
         ]
     ,

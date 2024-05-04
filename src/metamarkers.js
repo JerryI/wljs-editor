@@ -70,6 +70,32 @@ core.FindMetaMarker = async (args, env) => {
   return null;
 }
 
+const instancesGroups = {};
+
+core.FrontEndInstanceGroup = async (args, env) => {
+  const before = Object.keys(env.global.stack);
+
+  const uid = await interpretate(args[1], env);
+  const result = await interpretate(args[0], env);
+
+  const after = Object.keys(env.global.stack);
+
+  instancesGroups[uid] = after.filter(x => !before.includes(x)).map((e)=>env.global.stack[e]);
+  
+
+  return result;
+}
+
+core.FrontEndInstanceGroupDestroy = async (args, env) => {
+  const uid = await interpretate(args[0], env); 
+  instancesGroups[uid].forEach((el) => {
+    el.dispose();
+  });
+
+  delete instancesGroups[uid];
+}
+
+
 core.MarkerContainer = async (args, env) => {
     const expr = args[0];
     const marker = await interpretate(args[1], {...env, hold:true});

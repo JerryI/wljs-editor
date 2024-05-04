@@ -8,13 +8,15 @@ BeginPackage["Notebook`Editor`Kernel`FrontSubmitService`", {
 
 (*Offload::usage = "Offload[exp] to keep it from evaluation on Kernel"*)
 
-FrontSubmit::usage = "FrontSubmit[expr] _FrontEndInstance (taken from global stack) to evaluation on frontend"
+FrontSubmit::usage = "FrontSubmit[expr] _FrontEndInstanceGroup (taken from global stack) to evaluation on frontend"
 CurrentWindow::usage = "Gets current window representation"
 
 FrontFetch::usage = "FrontFetch[expr] fetches an expression from frontend"
 FrontFetchAsync::usage = "FrontFetchAsync[expr] fetches an expression from frontend and returns Promise"
 
-FrontEndInstance::usage = "FrontEndInstance[uid_String] an identifier object of an executed expression on the frontend"
+FrontEndInstanceGroup::usage = "FrontEndInstanceGroup[uid_String] an identifier object of an executed expression on the frontend"
+
+FrontEndInstanceGroupDestroy;
 
 Begin["`Private`"]
 
@@ -53,19 +55,19 @@ Options[FrontFetchAsync] = {"Format"->"JSON", "Window" :> CurrentWindow[]};
 FrontSubmit[expr_, OptionsPattern[] ] := With[{cli = OptionValue["Window"]},
     If[OptionValue["Tracking"],     
         With[{uid = CreateUUID[]}, 
-            If[WLJSTransportSend[FrontEndInstance[expr, uid], cli] < 0, $Failed,
-                FrontEndInstance[uid]
+            If[FailureQ[WLJSTransportSend[FrontEndInstanceGroup[expr, uid], cli] ], $Failed,
+                FrontEndInstanceGroup[uid]
             ] 
         ]
     ,
-        If[WLJSTransportSend[expr, cli] < 0, $Failed,
+        If[FailureQ[WLJSTransportSend[expr, cli] ], $Failed,
             Null
         ]          
     ]
 ]
 
-FrontEndInstance /: Delete[FrontEndInstance[uid_String], OptionsPattern[{"Window" :> CurrentWindow[]}] ] := With[{win = OptionValue["WIndow"]},
-    If[WLJSTransportSend[FrontEndInstanceDelete[uid], win] < 0, $Failed,
+FrontEndInstanceGroup /: Delete[FrontEndInstanceGroup[uid_String], OptionsPattern[{"Window" :> CurrentWindow[]}] ] := With[{win = OptionValue["Window"]},
+    If[FailureQ[WLJSTransportSend[FrontEndInstanceGroupDestroy[uid], win] ], $Failed,
         Null
     ]
 ]
