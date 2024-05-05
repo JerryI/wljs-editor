@@ -15,6 +15,9 @@ BeginPackage["Notebook`Editor`ContextMenu`", {
 
 Begin["`Internal`"]
 
+System`ProvidedOptions;
+System`CommentBox;
+
 checkLink[notebook_, logs_] := With[{},
     If[!(notebook["Evaluator"]["Kernel"]["State"] === "Initialized") || !TrueQ[notebook["WebSocketQ"] ],
         EventFire[logs, "Warning", "Kernel is not ready"];
@@ -87,6 +90,27 @@ addListeners[notebook_Notebook, controls_, logs_, cli_] := With[{},
 
         "simplify_selected" -> Function[Null,
             processSelected[text, notebook, controls, logs, cli, "Simplify"]
+        ],
+
+        "comment_selected" -> Function[Null,
+            Then[WebUIFetch[FrontEditorSelected["Get"], cli, "Format"->"JSON"], Function[text,
+                With[{trimmed = StringTrim[text]},
+                
+                    If[StringTake[trimmed, 2] === "(*" && StringTake[trimmed, -2] === "*)",
+                        With[{new = StringRiffle[{"(*BB[*)(", StringDrop[StringDrop[trimmed,1],-1], ")(*,*)(*", ToString[Compress[ProvidedOptions[CommentBox["#777"], "String"->True,  "HeadString"->"*", "TailString"->"*"]  ], InputForm], "*)(*]BB*)"}, ""]},
+                            WebUISubmit[FrontEditorSelected["Set", new ], cli];
+                        ]
+                    ,
+                        With[{
+                            artificial = StringJoin["(*", trimmed, "*)"]
+                        },
+                            With[{new = StringRiffle[{"(*BB[*)(", StringDrop[StringDrop[artificial,1],-1], ")(*,*)(*", ToString[Compress[ProvidedOptions[CommentBox["#777"], "String"->True,  "HeadString"->"*", "TailString"->"*"]  ], InputForm], "*)(*]BB*)"}, ""]},
+                                WebUISubmit[FrontEditorSelected["Set", new ], cli];
+                            ]                        
+                        ]
+                    ]
+                ]
+            ] ];
         ],
 
         "highlight_selected" -> Function[Null,

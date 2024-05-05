@@ -75,7 +75,12 @@
         "label": "Highlight",
         "event": "highlight_selected",
         "visible": "selection"
-      }
+      },
+      {
+        "label": "Hidden comment",
+        "event": "comment_selected",
+        "visible": "selection"
+      }      
     ]
   },
   "repository": {

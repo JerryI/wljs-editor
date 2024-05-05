@@ -152,6 +152,13 @@
     console.log(data);
   }
 
+  boxes.CommentBox = async (args, env) => {
+    env.context = boxes;
+    const color = await interpretate(args[0], env);
+    env.element.style.color = color;
+    env.element.classList.add('subscript-tail', 'sm-controls', 'text-sm');
+  }
+
   boxes.StyleBox = async (args, env) => {
       env.context = boxes;
       console.log('style box');

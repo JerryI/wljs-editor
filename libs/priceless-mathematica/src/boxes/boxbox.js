@@ -90,6 +90,16 @@ class EditorWidget {
         self.epilog.offset = 1;
         self.epilog.string = '"';
 
+        if (env.options?.HeadString) {
+          self.prolog.string = env.options.HeadString;
+          self.prolog.offset = self.prolog.string.length;
+        }
+
+        if (env.options?.TailString) {
+          self.epilog.string = env.options.TailString;
+          self.epilog.offset = self.epilog.string.length;
+        }        
+
         self.editor = {
           destroy: () => {
             console.log('Nothing to destroy, this is just a text field.');
