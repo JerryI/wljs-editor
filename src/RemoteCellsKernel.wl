@@ -48,9 +48,23 @@ EvaluationNotebook[] := With[{},
     RemoteNotebook[ Global`$EvaluationContext["Notebook"] ]
 ]
 
+(* FIXME!!! NOT EFFICIENT!*)
+(* DO NOT USE BLANK PATTERN !!! *)
 RemoteNotebook /: EventHandler[ RemoteNotebook[uid_], list_] := With[{virtual = CreateUUID[]},
     EventHandler[virtual, list];
     EventFire[Internal`Kernel`CommunicationChannel, "NotebookSubscribe", <|"NotebookHash" -> uid, "Callback" -> virtual, "Kernel"->Internal`Kernel`Hash|>];
+]
+
+(* FIXME!!! NOT EFFICIENT!*)
+RemoteNotebook /: EventClone[ RemoteNotebook[uid_], list_] := With[{virtual = CreateUUID[], cloned = CreateUUID[]},
+    EventHandler[virtual, {
+        any_ :> Function[payload,
+            EventFire[cloned, any, payload]
+        ]
+    }];
+    EventFire[Internal`Kernel`CommunicationChannel, "NotebookSubscribe", <|"NotebookHash" -> uid, "Callback" -> virtual, "Kernel"->Internal`Kernel`Hash|>];
+    
+    EventObject[<|"Id"->cloned|>]
 ]
 
 RemoteCellObj /: EventHandler[ RemoteCellObj[uid_], list_] := With[{virtual = CreateUUID[]},

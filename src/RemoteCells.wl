@@ -87,7 +87,9 @@ EventHandler[NotebookEditorChannel // EventClone,
                 }]
             ]
         ],
-
+        
+        (* FIXME!!! NOT EFFICIENT!*)
+        (* DO NOT USE BLANK PATTERN !!! *)
         "NotebookSubscribe" -> Function[assoc,
             Print["NotebookSubscribe!!!!!!"];
             With[{hash = assoc["NotebookHash"], callback = assoc["Callback"], kernel = Kernel`HashMap[ assoc["Kernel"] ]},
