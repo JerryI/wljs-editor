@@ -86,7 +86,18 @@ EventHandler[NotebookEditorChannel // EventClone,
                     ]
                 }]
             ]
-        ]
+        ],
+
+        "NotebookSubscribe" -> Function[assoc,
+            Print["NotebookSubscribe!!!!!!"];
+            With[{hash = assoc["NotebookHash"], callback = assoc["Callback"], kernel = Kernel`HashMap[ assoc["Kernel"] ]},
+                EventHandler[EventClone[hash], {
+                    any_String :> Function[data,
+                        Kernel`Async[kernel, EventFire[callback, any, data] ];
+                    ]
+                }]
+            ]
+        ]        
     }
 ]
 
