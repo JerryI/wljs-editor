@@ -56,7 +56,7 @@ RemoteNotebook /: EventHandler[ RemoteNotebook[uid_], list_] := With[{virtual = 
 ]
 
 (* FIXME!!! NOT EFFICIENT!*)
-RemoteNotebook /: EventClone[ RemoteNotebook[uid_], list_] := With[{virtual = CreateUUID[], cloned = CreateUUID[]},
+RemoteNotebook /: EventClone[ RemoteNotebook[uid_] ] := With[{virtual = CreateUUID[], cloned = CreateUUID[]},
     EventHandler[virtual, {
         any_ :> Function[payload,
             EventFire[cloned, any, payload]
