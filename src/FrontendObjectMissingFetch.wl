@@ -6,7 +6,7 @@ BeginPackage["Notebook`Editor`FrontendObject`MissingFetcher`", {
 Begin["`Internal`"]
 
 (* if doen't exists, try to fetch it from an active Window *)
-Notebook`Editor`FrontendObject`Internal`$MissingHandler[uid_String, "Private"] := With[{win = CurrentWindow[]},
+Notebook`Editor`FrontendObject`Internal`$MissingHandler[uid_String, "Private"] := With[{win = CurrentWindow[]["Socket"]},
     With[{result = FrontFetch[Global`UIObjects["Get", uid], "Window"->win, "Format"->"ExpressionJSON"]},
         If[FailureQ[result],
             $Failed
