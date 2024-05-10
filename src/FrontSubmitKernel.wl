@@ -62,7 +62,7 @@ FrontSubmit[expr_, OptionsPattern[] ] := With[{cli = OptionValue["Window"]["Sock
     If[OptionValue["Tracking"],     
         With[{uid = CreateUUID[]}, 
             If[FailureQ[WLJSTransportSend[FrontEndInstanceGroup[expr, uid], cli] ], $Failed,
-                FrontEndInstanceGroup[uid]
+                FrontEndInstanceGroup[uid, OptionValue["Window"] ]
             ] 
         ]
     ,
@@ -72,8 +72,8 @@ FrontSubmit[expr_, OptionsPattern[] ] := With[{cli = OptionValue["Window"]["Sock
     ]
 ]
 
-FrontEndInstanceGroup /: Delete[FrontEndInstanceGroup[uid_String], OptionsPattern[{"Window" :> CurrentWindow[]}] ] := With[{win = OptionValue["Window"]["Socket"]},
-    If[FailureQ[WLJSTransportSend[FrontEndInstanceGroupDestroy[uid], win] ], $Failed,
+FrontEndInstanceGroup /: Delete[FrontEndInstanceGroup[uid_String, win_WindowObj], OptionsPattern[{"Window" :> CurrentWindow[]}] ] := With[{},
+    If[FailureQ[WLJSTransportSend[FrontEndInstanceGroupDestroy[uid], win["Socket"] ] ], $Failed,
         Null
     ]
 ]
