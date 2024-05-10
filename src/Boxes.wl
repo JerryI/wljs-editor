@@ -86,9 +86,9 @@ Options[ViewBox] = {"Event" -> Null}
 Unprotect[Iconize]
 ClearAll[Iconize]
 
-Iconize[expr_, opts: OptionsPattern[] ] := With[{},
+Iconize[expr_, opts: OptionsPattern[] ] := With[{UID = OptionValue["UID"]},
   If[ByteCount[expr] > 30000,
-    With[{name = "iconized-"<>StringTake[CreateUUID[], 4]<>".wl"},
+    With[{name = "iconized-"<>StringTake[UID, 4]<>".wl"},
       If[!DirectoryQ[".iconized"],  CreateDirectory[FileNameJoin[{Directory[], ".iconized"}] ]  ];
       Put[expr, FileNameJoin[{".iconized", name}] ];
       IconizedFile[{".iconized", name}, ByteCount[expr], opts]
@@ -110,7 +110,7 @@ Iconize[expr_, title_String] := With[{},
   ]
 ]
 
-Options[Iconize] = {"Label"->None}
+Options[Iconize] = {"Label"->None, "UID":>CreateUUID}
 
 
 IconizedFile /: MakeBoxes[IconizedFile[c_, b_, opts___], StandardForm] := RowBox[{"(*VB[*)(Get[FileNameJoin[", ToString[c, InputForm], "]])(*,*)(*", ToString[Compress[Hold[IconizeFileBox[b, opts] ] ], InputForm], "*)(*]VB*)"}]
