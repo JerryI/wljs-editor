@@ -33,5 +33,29 @@ FrontSubmit[expr_, m_MetaMarker, OptionsPattern[] ] := With[{cli = OptionValue["
     
 ]
 
+FrontFetchAsync[expr_, m_MetaMarker, OptionsPattern[] ] := With[{cli = OptionValue["Window"]["Socket"], format = OptionValue["Format"], event = CreateUUID[], promise = Promise[]},
+    EventHandler[event, Function[payload,
+        EventRemove[event];
+
+        With[{result = Switch[format,
+            "Raw",
+                URLDecode[payload],
+            "ExpressionJSON",
+                ImportString[URLDecode[payload], "ExpressionJSON"],
+            _,
+                ImportString[URLDecode[payload], "JSON"]
+        ]},
+            If[FailureQ[result],
+                EventFire[promise, Reject, result]
+            ,
+                EventFire[promise, Resolve, result]
+            ]
+        ]
+    ] ];
+
+    WLJSTransportSend[Global`FSAsk[MarkerContainer[expr,m], event], cli];
+
+    promise
+]
 
 EndPackage[]

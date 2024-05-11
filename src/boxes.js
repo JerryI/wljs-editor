@@ -29,8 +29,14 @@
   }
 
   boxes["ViewBox`InnerExpression"] = async (args, env) => {
+    if (args.length == 0) {
+      //console.log(env.global.EditorWidget.getDoc());
+      return env.global.EditorWidget.getDoc();
+    } 
+
     const changes = await interpretate(args[0], env);
     env.global.EditorWidget.applyChanges(changes);
+    return changes;
   }
 
   boxes["ViewBox`OuterExpression"] = async (args, env) => {
