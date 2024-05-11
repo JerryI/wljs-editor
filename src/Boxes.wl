@@ -270,5 +270,8 @@ Unprotect[Graph]
 Graph /: MakeBoxes[g_Graph, StandardForm] := With[{c = Insert[GraphPlot[g, ImageSize->120, ImagePadding->None], JerryI`Notebook`Graphics2D`Controls->False, {2,-1}] /. Notebook`Editor`StandardForm`ExpressionReplacements}, ViewBox[g, c] ]
 
 
+Unprotect[PaneBox]
+PaneBox[expr_, a__] := BoxBox[expr, Offload[PaneBox[a] ] ]
+
 (**)
 System`WLXEmbed /: MakeBoxes[w_System`WLXEmbed, StandardForm] := With[{o = CreateFrontEndObject[w]}, MakeBoxes[o, StandardForm] ]

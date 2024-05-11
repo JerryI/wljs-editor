@@ -13,6 +13,21 @@
     console.log(args);
   }
 
+  boxes.PaneBox = async (args, env) => {
+    env.element.classList.add(...('sm-controls cursor-default rounded-md 0 py-1 px-2 bg-gray-100 text-left text-gray-500 ring-1 ring-inset ring-gray-400 text-xs flex flex-row'.split(' '))); 
+  
+    const opts = await core._getRules(args, {...env, hold:true});
+    if (opts.ImageSize) {
+      const size = await interpretate(opts.ImageSize, env);
+      if (size instanceof Object === true) {
+        env.element.style.width = size[0] + 'px';
+        env.element.style.height = size[1] + 'px';
+      } else {
+        env.element.style.maxWidth = size + 'px';
+      }
+    }
+  }
+
   boxes["ViewBox`InnerExpression"] = async (args, env) => {
     const changes = await interpretate(args[0], env);
     env.global.EditorWidget.applyChanges(changes);
