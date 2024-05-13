@@ -99,7 +99,14 @@ EventHandler[NotebookEditorChannel // EventClone,
                     ]
                 }]
             ]
-        ]        
+        ],
+
+
+        "NotebookFieldSet" -> Function[assoc,
+            With[{notebook = Notebook`HashMap[ assoc["NotebookHash"] ], field = assoc["Field"], value = assoc["Value"]},
+                notebook[field] = value
+            ]
+        ]      
     }
 ]
 

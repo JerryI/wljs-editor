@@ -48,6 +48,12 @@ EvaluationNotebook[] := With[{},
     RemoteNotebook[ Global`$EvaluationContext["Notebook"] ]
 ]
 
+RemoteNotebook /: Set[RemoteNotebook[uid_][field_], value_] := With[{},
+    EventFire[Internal`Kernel`CommunicationChannel, "NotebookFieldSet", <|"NotebookHash" -> uid, "Field" -> field, "Value"->value, "Kernel"->Internal`Kernel`Hash|>];
+    Null;
+]
+
+
 (* FIXME!!! NOT EFFICIENT!*)
 (* DO NOT USE BLANK PATTERN !!! *)
 RemoteNotebook /: EventHandler[ RemoteNotebook[uid_], list_] := With[{virtual = CreateUUID[]},
