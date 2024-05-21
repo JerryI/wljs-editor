@@ -5,6 +5,7 @@ window.ObjectStorage = class {
     uid = ''
     cached = false
     cache = []
+    doNotCollect = false
   
     garbageCollect() {
       console.warn('garbage collector started...');
@@ -18,7 +19,7 @@ window.ObjectStorage = class {
         }
       });
 
-      if (toBeRemoved) {
+      if (toBeRemoved && !this.doNotCollect) {
         console.warn('No active refs. Removing...');
         delete ObjectHashMap[this.uid];
         delete this.cache;

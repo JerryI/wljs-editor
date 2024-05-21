@@ -8,7 +8,8 @@ ExpressionReplacements = {
     Graphics[opts__] :> CreateFrontEndObject[Graphics[opts] ], 
     Graphics3D[opts__] :> CreateFrontEndObject[Graphics3D[opts] ], 
     Image[opts__] :> CreateFrontEndObject[Image[opts] ],
-    Sound[opts__] :> CreateFrontEndObject[Sound[opts] ]
+    Sound[opts__] :> CreateFrontEndObject[Sound[opts] ],
+    d_Dataset :> CreateFrontEndObject[d]
 } // Quiet
 
 Unprotect[ToString]
