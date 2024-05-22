@@ -110,7 +110,7 @@ Iconize[expr_, title_String] := With[{},
   ]
 ]
 
-Options[Iconize] = {"Label"->None, "UID":>CreateUUID}
+Options[Iconize] = {"Label"->None, "UID":>CreateUUID[]}
 
 
 IconizedFile /: MakeBoxes[IconizedFile[c_, b_, opts___], StandardForm] := RowBox[{"(*VB[*)(Get[FileNameJoin[", ToString[c, InputForm], "]])(*,*)(*", ToString[Compress[Hold[IconizeFileBox[b, opts] ] ], InputForm], "*)(*]VB*)"}]
