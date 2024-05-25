@@ -72510,6 +72510,27 @@ class CodeMirrorCell {
     forceFocusNext() {
       globalCMFocus = true;
     }
+
+    setContent (data) {
+      console.warn('content mutation!');
+      if (!this.editor.viewState) return;
+  //FIXME: NO CLEAN UP
+  const editor = this.editor;
+      console.log('result');
+      console.log(data);
+      this.editor.dispatch({
+        changes: {
+          from: 0,
+          to: editor.viewState.state.doc.length
+        , insert: ''}
+    });      
+      this.editor.dispatch({
+          changes: {
+            from: 0,
+            to: editor.viewState.state.doc.length
+          , insert: data}
+      });
+    }
   
     addDisposable(el) {
       this.trash.push(el);

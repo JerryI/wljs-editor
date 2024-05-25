@@ -17,6 +17,17 @@ EventHandler[NotebookEditorChannel // EventClone,
             Delete[ CellObj`HashMap[uid] ]
         ],
 
+        "SetCellData" -> Function[assoc,
+         
+            With[{cell = CellObj`HashMap[assoc["Hash"] ]},
+                Print["Updating the content: "];
+                Print[cell];
+
+                EventFire[cell, "ChangeContent", assoc["Data"] ];
+                (*no need in setting also in an object, it will be done for the feedback from CM6 editor*)
+            ]
+        ],
+
         "AskNotebookDirectory" -> Function[data,
            With[{promise = data["Promise"], kernel = Kernel`HashMap[ data["Kernel"] ]},
             

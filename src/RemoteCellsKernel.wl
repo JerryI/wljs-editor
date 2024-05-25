@@ -82,6 +82,10 @@ RemoteCellObj /: Delete[RemoteCellObj[uid_] ] := With[{},
     EventFire[Internal`Kernel`CommunicationChannel, "DeleteCellByHash", uid];
 ]
 
+RemoteCellObj /: Set[RemoteCellObj[uid_]["Data"], data_String ] := With[{},
+    EventFire[Internal`Kernel`CommunicationChannel, "SetCellData", <|"Hash"->uid, "Data"->data|>];
+]
+
 CellPrint[str_String, opts___] := With[{hash = CreateUUID[], list = Association[opts]},
     If[AssociationQ[Global`$EvaluationContext],
         With[{r = Global`$EvaluationContext["Ref"]},
