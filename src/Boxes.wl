@@ -29,6 +29,8 @@ FrameBox[x_, opts__]  := RowBox[{"(*BB[*)(", x, ")(*,*)(*", ToString[Compress[Ho
 Unprotect[StyleBox]
 StyleBox[x_, opts__]  := RowBox[{"(*BB[*)(", x, ")(*,*)(*", ToString[Compress[Hold[StyleBox[opts]]], InputForm], "*)(*]BB*)"}]
 
+System`ProvidedOptions;
+
 (*if a string, then remove quotes*)
 Unprotect[Style]
 Style /: MakeBoxes[Style[s_String, opts__], StandardForm] := StringBox[s, opts]
