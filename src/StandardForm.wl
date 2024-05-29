@@ -3,14 +3,16 @@ RowBoxFlatten[x_List, y___] := StringJoin @@ (ToString[#] & /@ x)
 Begin["Notebook`Editor`StandardForm`"]
 
 System`DatasetWrapper;
+System`AudioWrapper;
 
 (* Being unable to change Boxes of Graphics, Graphics3D and Image, we have to use this *)
 (* FIXME *)
 ExpressionReplacements = {
-    Graphics[opts__] :> CreateFrontEndObject[Graphics[opts] ], 
-    Graphics3D[opts__] :> CreateFrontEndObject[Graphics3D[opts] ], 
-    Image[opts__] :> CreateFrontEndObject[Image[opts] ],
-    Sound[opts__] :> CreateFrontEndObject[Sound[opts] ],
+    g2d_Graphics :> CreateFrontEndObject[g2d ], 
+    g3d_Graphics3D :> CreateFrontEndObject[g3d ], 
+    i_Image :> CreateFrontEndObject[i ],
+    s_Sound :> CreateFrontEndObject[s ],
+    s_Audio :> AudioWrapper[s],
     d_Dataset :> DatasetWrapper[d]
 } // Quiet
 
