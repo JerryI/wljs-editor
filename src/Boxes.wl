@@ -81,8 +81,33 @@ TagBox[any_, f_Function] := any
 Unprotect[FrameBox]
 FrameBox[x_, opts__]  := RowBox[{"(*BB[*)(", x, ")(*,*)(*", ToString[Compress[Hold[FrameBox[opts]]], InputForm], "*)(*]BB*)"}]
 
+(* FIXME!!! *)
+Kernel`Internal`trimStringCharacters[s_String] := With[{
+  c = StringTake[s, 1]
+},
+  If[c === "\"",
+    StringDrop[StringDrop[s, -1], 1]
+  ,
+    StringReplace[s, "\[Times]"-> (ToString[Style[" x ", RGBColor[0.5,0.5,0.5] ], StandardForm]) ]
+  ]
+]
+
 Unprotect[StyleBox]
-StyleBox[x_, opts__]  := RowBox[{"(*BB[*)(", x, ")(*,*)(*", ToString[Compress[Hold[StyleBox[opts]]], InputForm], "*)(*]BB*)"}]
+
+(* FIXME!!! *)
+(* FIXME!!! *)
+(* FIXME!!! *)
+StyleBox[x_, opts__]  := With[{list = Association[List[opts] ]},
+  If[KeyExistsQ[list, ShowStringCharacters], 
+    If[!list[ShowStringCharacters],
+      RowBox[{"(*BB[*)(", ReplaceAll[x, s_String :> Kernel`Internal`trimStringCharacters[s] ], ")(*,*)(*", ToString[Compress[Hold[StyleBox[opts]]], InputForm], "*)(*]BB*)"}]  
+    ,
+      RowBox[{"(*BB[*)(", x, ")(*,*)(*", ToString[Compress[Hold[StyleBox[opts]]], InputForm], "*)(*]BB*)"}]
+    ]
+  ,
+    RowBox[{"(*BB[*)(", x, ")(*,*)(*", ToString[Compress[Hold[StyleBox[opts]]], InputForm], "*)(*]BB*)"}]
+  ]
+]
 
 System`ProvidedOptions;
 

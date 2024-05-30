@@ -523,6 +523,7 @@
 
     }
 
+    boxes.ShowStringCharacters = () => "ShowStringCharacters"
     boxes.ShowSpecialCharacters = () => "ShowSpecialCharacters"
     
     boxes.Row = async (args, env) => {
