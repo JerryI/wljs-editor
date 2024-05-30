@@ -101,7 +101,23 @@ Unprotect[TemplateBox]
 
 TemplateBox[list_List, "RowDefault"] := GridBox[{list}]
 
-TemplateBox[{n_, short_String, _, units_String}, "Quantity", ___] := RowBox[{"(*VB[*)(", StringTemplate["Quantity[``, ``]"][n, units], ")(*,*)(*", ToString[Compress[ QuantityBox[n, StringDrop[StringDrop[short, -1], 1] ] ], InputForm], "*)(*]VB*)"}]
+(* I HATE YOU WOLFRAM !!! *)
+(*TemplateBox[a:{n_, short_String, long_String, units_String}, "Quantity", o___] := Module[{test}, With[{
+  expr = Quantity[n // ToExpression, units] // QuantityMagnitude
+}, 
+  test = {a, o};
+  With[{realUnits = test[[1,1]] // ToExpression},
+    RowBox[{"(*VB[*)(", StringTemplate["Quantity[``, ``]"][realUnits, units], ")(*,*)(*", ToString[Compress[ QuantityBox[realUnits, StringDrop[StringDrop[short, -1], 1] ] ], InputForm], "*)(*]VB*)"}]
+  ]
+] ]*)
+
+System`QuantityWrapper;
+QuantityWrapper /: MakeBoxes[QuantityWrapper[q_Quantity], StandardForm] := With[{
+  n = QuantityMagnitude[q],
+  units = QuantityUnit[q]
+},
+  ViewBox[q, QuantityBox[n, units] ]
+] 
 
 TemplateBox[{number_}, "C"] := RowBox[{ SubscriptBox[C, number]}]
 

@@ -426,21 +426,104 @@
       
     }
 
+    const quantity = {};
+
+    function isDOM(Obj) { 
+              
+      // Function that checks whether  
+      // object is of type Element 
+     return Obj instanceof Element; 
+ } 
+
+    boxes.MixedMagnitude = core.List
+    quantity.MixedUnit = core.List
+
+    quantity.Power = (args, env) => {
+      const string = interpretate(args[0], env);
+      const power = interpretate(args[1], env);
+
+      const container = document.createElement('span');
+      const sup = document.createElement('sup');
+      if (isDOM(string)) {
+        container.appendChild(string);
+      } else {
+        container.innerText = string;
+      }
+
+      if (isDOM(string)) {
+        sup.appendChild(power);
+      } else {
+        sup.innerText = power;
+      }
+
+      container.appendChild(sup);
+      
+      return container;
+    }
+
+    quantity.Times = (args, env) => {
+      const a = args.map((el) => interpretate(el, env));
+      const doc = document.createElement('span');
+
+      a.forEach((el, index) => {
+        if (isDOM(el)) {
+          doc.appendChild(el);
+        } else {
+          const item = document.createElement('text');
+          item.innerText = el;
+          doc.appendChild(item);
+        } 
+        if (index < a.length - 1) {
+          const sep = document.createElement('text');
+          sep.innerHTML = "&middot;";
+          doc.appendChild(sep);
+        }
+      });
+
+      return doc;
+    }
+
     boxes.QuantityBox = async (args, env) => {
       const n = await interpretate(args[0], env);
-      const units = await interpretate(args[1], env);
+      const units = await interpretate(args[1], {...env, context:quantity});
 
       
       env.element.classList.add(...('text-gray-500 ring-gray-300 ring-1 rounded-lg px-2 text-sm'.split(' ')));
       env.element.style.verticalAlign = 'baseline';
-      const text = document.createTextNode(n);
-      const u = document.createElement('span');
-      u.classList.add('ml-1');
-      u.innerText = units;
 
-      env.element.appendChild(text);
-      env.element.appendChild(u);
+      const add = (nn, nunits, gap = false) => {
+        const text = document.createTextNode(nn);
+        const u = document.createElement('span');
+        u.classList.add('ml-1');
+        if (gap) u.classList.add('mr-1');
+
+        if (isDOM(nunits))
+          u.appendChild(nunits);
+        else
+          u.innerText = nunits;
+  
+        env.element.appendChild(text);
+        env.element.appendChild(u);
+      }
+
+      //console.error([n, units, args]);
+      
+      if (Array.isArray(n)) {
+        n[0].forEach((number, index) => {
+          //console.error({number, index});
+          if (index === n[0].length - 1) 
+            add(number, units[0][index], false);
+          else 
+            add(number, units[0][index], true);
+        });
+      } else {
+        add(n, units);
+      }
+
+
     }
+
+    boxes.ShowSpecialCharacters = () => "ShowSpecialCharacters"
     
     boxes.Row = async (args, env) => {
       console.warn('RowBox is not implemented properly for BoxForm`ArrangedSummaryBox!!!');
