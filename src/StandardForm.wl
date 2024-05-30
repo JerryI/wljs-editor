@@ -4,6 +4,7 @@ Begin["Notebook`Editor`StandardForm`"]
 
 System`DatasetWrapper;
 System`AudioWrapper;
+System`ByteArrayWrapper;
 
 (* Being unable to change Boxes of Graphics, Graphics3D and Image, we have to use this *)
 (* FIXME *)
@@ -13,6 +14,7 @@ ExpressionReplacements = {
     i_Image :> CreateFrontEndObject[i ],
     s_Sound :> CreateFrontEndObject[s ],
     s_Audio :> AudioWrapper[s],
+    b_ByteArray :> ByteArrayWrapper[b],
     d_Dataset :> DatasetWrapper[d]
 } // Quiet
 

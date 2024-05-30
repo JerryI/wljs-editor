@@ -18,6 +18,61 @@ GridBox[list_List, a___] := RowBox@(Join@@(Join[{{"(*GB[*){"}}, Riffle[#, {{"(*|
 Unprotect[TagBox]
 TagBox[x_, opts___] := x
 
+System`ByteArrayWrapper;
+ByteArrayWrapper /: MakeBoxes[ByteArrayWrapper[b_ByteArray], form_] := ByteArrayBox[b, form]
+
+Kernel`Internal`garbage = {};
+
+ByteArrayBox[b_ByteArray, form_] := With[{
+  size = UnitConvert[Quantity[ByteCount[b], "Bytes"], "Conventional"] // TextString
+},
+  If[ByteCount[b] > 1024,
+    LeakyModule[{
+      store
+    },
+      With[{view = 
+        Module[{above, below},
+              above = { 
+                {BoxForm`SummaryItem[{"Size: ", Style[size, Bold]}]},
+                {BoxForm`SummaryItem[{"Location", Style["Kernel", Italic, Red]}]}
+              };
+
+              BoxForm`ArrangeSummaryBox[
+                 ByteArray, (* head *)
+                 ByteArray[store],      (* interpretation *)
+                 None,    (* icon, use None if not needed *)
+                 (* above and below must be in a format suitable for Grid or Column *)
+                 above,    (* always shown content *)
+                 Null (* expandable content. Currently not supported!*)
+              ] // Quiet
+          ]        
+        },
+       
+        AppendTo[Kernel`Internal`garbage , Hold[store] ]; (* Garbage collector bug for ByteArrays *)
+        store = BaseEncode[b];
+        
+
+        view
+      ]
+    ]
+  ,
+    Module[{above, below},
+        above = { 
+          {BoxForm`SummaryItem[{"Size: ", Style[size, Bold]}]}
+        };
+
+        BoxForm`ArrangeSummaryBox[
+           ByteArray, (* head *)
+           b,      (* interpretation *)
+           None,    (* icon, use None if not needed *)
+           (* above and below must be in a format suitable for Grid or Column *)
+           above,    (* always shown content *)
+           Null (* expandable content. Currently not supported!*)
+        ]
+    ]
+  ]
+] // Quiet
+
 TagBox["ByteArray", "SummaryHead"] = ""
 
 (* FIX for WL14 *)
