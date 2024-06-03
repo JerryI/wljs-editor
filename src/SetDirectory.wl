@@ -43,6 +43,7 @@ attachListeners[notebook_Notebook] := With[{},
             ];       
         ],
         "OnClose" -> Function[payload,
+            Print[""];
             (*With[{dir = FileNameSplit[ notebook["Path"] // DirectoryName ]},
                 Kernel`Init[notebook["Evaluator"]["Kernel"], Unevaluated[
                     Notebook`DirectorySetter`Private`NotebookDirectoryRemove[dir];
