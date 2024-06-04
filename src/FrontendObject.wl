@@ -1,5 +1,10 @@
 BeginPackage["Notebook`Editor`FrontendObject`"]
 
+System`CreateFrontEndObject;
+System`FrontEndRef;
+System`FrontEndExecutable;
+System`FrontEndVirtual;
+
 CreateFrontEndObject::usage = "CreateFrontEndObject[expr_, uid_, opts] to force an expression to be evaluated on the frontend inside the container. There are two copies (on Kernel, on Frontend) can be specified using \"Store\"->\"Kernel\", \"Frontend\" or All (by default)"
 FrontEndRef::usage = "A readable representation of a stored expression on the kernel"
 FrontEndExecutable::usage = "A representation of a stored expression on the frontend"
