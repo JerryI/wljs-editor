@@ -77,6 +77,7 @@ ByteArrayBox[b_ByteArray, form_] := With[{
   ]
 ] // Quiet
 
+
 TagBox["ByteArray", "SummaryHead"] = ""
 
 (* FIX for WL14 *)
@@ -319,6 +320,9 @@ BoxForm`ArrangeSummaryBox[head_, interpretation_, icon_, above_, hidden_, ___, O
     
   ]
 ]
+
+Options[BoxForm`ArrangeSummaryBox] = Append[Options[BoxForm`ArrangeSummaryBox], "Event"->Null]
+
 
 
 SetAttributes[BoxForm`ArrangeSummaryBox, HoldAll]
