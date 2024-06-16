@@ -553,7 +553,7 @@
     
       console.log(iconElement.getBoundingClientRect());
     
-      const iconWidth = 35;
+      const iconWidth = 35 * window.devicePixelRatio;
     
       
     
