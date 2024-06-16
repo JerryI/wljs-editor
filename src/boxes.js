@@ -558,7 +558,15 @@
       
     
       interpretate(args[0], {...env, element: iconElement,  global: env.global, imageSize:[iconWidth, iconWidth]});
-      interpretate(args[1], {...env, context: boxes, element: tbodyElement, static:true, local: false});
+      await interpretate(args[1], {...env, context: boxes, element: tbodyElement, static:true, local: false});
+
+      if (env.options.DataOnKernel) {
+        const warn = document.createElement('span');
+        warn.innerText = "Data is on Kernel";
+        warn.classList.add('text-gray-400');
+
+        tbodyElement.appendChild(warn);
+      }
     }
 
 

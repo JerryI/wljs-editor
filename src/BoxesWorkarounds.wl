@@ -300,30 +300,34 @@ BoxForm`ArrangeSummaryBox[head_, interpretation_, icon_, above_, hidden_, ___, O
                       ]
                       
                     ]},
-  
-    If[False (* not supported for NOW *),
+  With[{interpretationString = ToString[interpretation, InputForm]},
+    If[StringLength[interpretationString] > 25000 (* not supported for NOW *),
       Module[{temporalStorage},
         With[{
-          result = RowBox[{headString, "[", "(*VB[*) ", ToString[temporalStorage, InputForm], " (*,*)(*", ToString[Compress[BoxForm`ArrangedSummaryBox[iconSymbol // FrontEndVirtual, above, hidden] ], InputForm ], "*)(*]VB*)", "]"}]
+          tempSymbol = ToString[temporalStorage, InputForm],
+          viewBox = StringRiffle[{headString, "[(*VB[*) ", "(*,*)(*", ToString[Compress[ProvidedOptions[BoxForm`ArrangedSummaryBox[iconSymbol // FrontEndVirtual, above, hidden], "DataOnKernel"->True ] ], InputForm ], "*)(*]VB*)]"}, ""]
         },
           AppendTo[BoxForm`temporal, Hold[temporalStorage] ];
 
-          temporalStorage = Sequence @@ interpretation;
-          result
+          temporalStorage = interpretation;
+
+          With[{fakeEditor = EditorView[viewBox, "ReadOnly"->True]},
+            RowBox[{"(*VB[*)", tempSymbol, "(*,*)(*", ToString[Compress[fakeEditor], InputForm ], "*)(*]VB*)"}]
+          ]
         ]
       ]
     ,
-      With[{interpretationString = ToString[interpretation, InputForm]},
+      
         If[event === Null,
           RowBox[{headString, "[", "(*VB[*) ", StringDrop[StringDrop[interpretationString, -1], StringLength[headString] + 1], " (*,*)(*", ToString[Compress[BoxForm`ArrangedSummaryBox[iconSymbol // FrontEndVirtual, above, hidden] ], InputForm ], "*)(*]VB*)", "]"}]
         ,
           RowBox[{headString, "[", "(*VB[*) ", StringDrop[StringDrop[interpretationString, -1], StringLength[headString] + 1], " (*,*)(*", ToString[Compress[ProvidedOptions[BoxForm`ArrangedSummaryBox[iconSymbol // FrontEndVirtual, above, hidden], "Event" -> event] ], InputForm ], "*)(*]VB*)", "]"}]
         ]
-      ]
+      
     ]
-    
   ]
-]
+  ]
+] // Quiet
 
 Options[BoxForm`ArrangeSummaryBox] = Append[Options[BoxForm`ArrangeSummaryBox], "Event"->Null]
 
