@@ -1,6 +1,6 @@
-RowBoxFlatten[x_List, y___] := StringJoin @@ (ToString[#] & /@ x)
-
 Begin["Notebook`Editor`StandardForm`"]
+
+RowBoxFlatten[x_List, y___] := StringJoin @@ (ToString[#] & /@ x)
 
 System`DatasetWrapper;
 System`AudioWrapper;

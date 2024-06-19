@@ -283,6 +283,8 @@
       return undefined;
   }
 
+  boxes.FontWeight = () => 'FontWeight'
+
   /*boxes.PaneSelectorBox = async (args, env) => {
       const list = await interpretate(args[0], {...env, hold:true});
       //needs an editor View

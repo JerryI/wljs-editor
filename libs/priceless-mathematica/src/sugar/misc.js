@@ -54,6 +54,8 @@ class GreekWidget extends WidgetType {
         .replace("sqrt", "radic")
         .replace("undirectededge", 'harr')
         .replace('directededge', 'rarr')
+        .replace('curlyepsilon', 'epsilon')
+        .replace('curlytheta', 'theta')
         .replace("degree", "deg") +
       ";";
 
