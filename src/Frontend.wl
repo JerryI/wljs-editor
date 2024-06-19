@@ -22,6 +22,10 @@ NotebookEditorChannel = CreateUUID[];
 
 rootFolder = $InputFileName // DirectoryName;
 
+specialCharsFix[s_String] := With[{},
+    s
+]
+
 evaluator  = StandardEvaluator["Name" -> "Wolfram Evaluator", "InitKernel" -> init, "Priority"->(999)];
 
     StandardEvaluator`ReadyQ[evaluator, k_] := (
@@ -38,6 +42,7 @@ evaluator  = StandardEvaluator["Name" -> "Wolfram Evaluator", "InitKernel" -> in
 
     StandardEvaluator`Evaluate[evaluator, k_, t_] := Module[{list},
      t["Evaluator"] = Notebook`Editor`WolframEvaluator;
+     t["Data"] = specialCharsFix[t["Data"] ];
 
      With[{check = CheckSyntax[t["Data"] ]},
         If[! TrueQ[check],

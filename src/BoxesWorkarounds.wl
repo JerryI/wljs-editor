@@ -12,6 +12,19 @@ Unprotect[SuperscriptBox]
 SuperscriptBox[a_, b_] := RowBox[{"(*SpB[*)Power[", a, "(*|*),(*|*)",  b, "](*]SpB*)"}]
 SuperscriptBox[a_, b_, _] := RowBox[{"(*SpB[*)Power[", a, "(*|*),(*|*)",  b, "](*]SpB*)"}]
 
+
+SuperscriptBox[a_, "\[Transpose]"] := RowBox[{"Transpose[", a, "]"}]
+
+
+Unprotect[SubsuperscriptBox]
+SubsuperscriptBox[x_?(Not[# === "\[Sum]"]&), y_, z_] := SuperscriptBox[SubscriptBox[x,y], z]
+SubsuperscriptBox[x_?(Not[# === "\[Sum]"]&), y_, z_, __] := SuperscriptBox[SubscriptBox[x,y], z]
+
+Unprotect[RowBox]
+RowBox[{first___, SubsuperscriptBox["\[Sum]", iterator_, till_], f_, rest___}] := RowBox[{first, "Sum[", f, ", {", iterator, ",", till, "}]",  rest}]
+RowBox[{first___, SubsuperscriptBox["\[Sum]", RowBox[{iterator_, "=", initial_}], till_], f_, rest___}] := RowBox[{first, "Sum[", f, ", {", iterator, ",", initial, ",", till, "}]",  rest}]
+
+
 Unprotect[SubscriptBox]
 SubscriptBox[a_, b_] := RowBox[{"(*SbB[*)Subscript[", a, "(*|*),(*|*)",  b, "](*]SbB*)"}]
 SubscriptBox[a_, b_, _] := RowBox[{"(*SbB[*)Subscript[", a, "(*|*),(*|*)",  b, "](*]SbB*)"}]
