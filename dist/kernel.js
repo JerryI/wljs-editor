@@ -62150,6 +62150,7 @@ class GreekWidget extends WidgetType {
         .replace('directededge', 'rarr')
         .replace('curlyepsilon', 'epsilon')
         .replace('curlytheta', 'theta')
+        .replace('transpose', '#7488')
         .replace("degree", "deg") +
       ";";
 
