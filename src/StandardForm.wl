@@ -1,3 +1,4 @@
+System`RowBoxFlatten;
 RowBoxFlatten[x_List, y___] := StringJoin @@ (ToString[#] & /@ x)
 
 
