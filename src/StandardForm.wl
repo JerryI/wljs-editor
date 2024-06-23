@@ -4,9 +4,9 @@ RowBoxFlatten[x_List, y___] := StringJoin @@ (ToString[#] & /@ x)
 
 Begin["Notebook`Editor`StandardForm`"]
 
-
 System`DatasetWrapper;
 System`AudioWrapper;
+System`VideoWrapper;
 System`ByteArrayWrapper;
 System`QuantityWrapper;
 
@@ -21,7 +21,8 @@ ExpressionReplacements = {
     a_Audio :> AudioWrapper[a],
     b_ByteArray :> ByteArrayWrapper[b],
     d_Dataset :> DatasetWrapper[d],
-    u_Quantity :> QuantityWrapper[u]
+    u_Quantity :> QuantityWrapper[u],
+    v_Video :> VideoWrapper[v]
 } // Quiet
 
 Unprotect[ToString]

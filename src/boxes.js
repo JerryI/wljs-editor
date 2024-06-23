@@ -26,6 +26,14 @@
         env.element.style.maxWidth = size + 'px';
       }
     }
+
+    if (opts.Event) {
+      const ev = await interpretate(opts.Event, env);
+      env.element.addEventListener('click', () => {
+        console.log('clicked!');
+        server.kernel.emitt(ev, 'True', 'Click')
+      })
+    }
   }
 
   boxes["ViewBox`InnerExpression"] = async (args, env) => {
@@ -396,6 +404,11 @@
       env.element.style.background = "#f0f0f0";
 
       env.element.appendChild(editor); 
+      if (options.Event) {
+        env.element.addEventListener('click', () => {
+          server.kernel.emitt(options.Event, 'True', 'Click')
+        })
+      }
     }
 
     boxes["Internal`RawText"] = async (args, env) => {

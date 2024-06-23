@@ -134,9 +134,17 @@ Unprotect[Style]
 Style /: MakeBoxes[Style[s_String, opts__], StandardForm] := StringBox[s, opts]
 StringBox[x_String, opts__]  := RowBox[{"(*BB[*)(", ToString[x, InputForm], ")(*,*)(*", ToString[Compress[ProvidedOptions[Hold[StringBox[opts] ], "String"->True ] ], InputForm], "*)(*]BB*)"}, "String"->True]
 
+Unprotect[Panel]
+Panel /: EventHandler[p_Panel, list_List] := With[{
+  uid = CreateUUID[],
+  assoc = Association[list]
+},
+  EventHandler[uid, assoc["Click"] ];
+  Insert[p, "Event"->uid, -1]
+]
 
 Unprotect[PanelBox]
-PanelBox[x_, opts__]  := RowBox[{"(*BB[*)(Panel[", x, "])(*,*)(*", ToString[Compress[Hold[ProvidedOptions[PanelBox[opts], "Head"->"Panel"]]], InputForm], "*)(*]BB*)"}]
+PanelBox[x_, opts___]  := RowBox[{"(*BB[*)(Panel[", x, "])(*,*)(*", ToString[Compress[Hold[ProvidedOptions[PanelBox[opts], "Head"->"Panel"]]], InputForm], "*)(*]BB*)"}]
 
 iHighlight[expr_] := Style[expr, Background->Yellow]
 
@@ -358,5 +366,14 @@ Graph /: MakeBoxes[g_Graph, StandardForm] := With[{c = Insert[GraphPlot[g, Image
 
 Unprotect[PaneBox]
 PaneBox[expr_, a__] := BoxBox[expr, Offload[PaneBox[a] ] ]
+
+Unprotect[Pane]
+Pane /: EventHandler[p_Pane, list_List] := With[{
+  uid = CreateUUID[],
+  assoc = Association[list]
+},
+  EventHandler[uid, assoc["Click"] ];
+  Insert[p, "Event"->uid, -1]
+]
 
 
