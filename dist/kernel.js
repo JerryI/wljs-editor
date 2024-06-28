@@ -72600,6 +72600,10 @@ class CodeMirrorCell {
       ext.push(EditorState.readOnly.of(true));
     }
 
+    if (options.ForceUpdate) {
+      env.local.forceUpdate = options.ForceUpdate;
+    }
+
     if (options.Event) {
       //then it means this is like a slider
       updateFunction = (data) => {
@@ -72633,9 +72637,19 @@ class CodeMirrorCell {
     if (!env.local.editor) return;
     const textData = unicodeToChar2(await interpretate(args[0], env));
     console.log('editor view: dispatch');
-    env.local.editor.dispatch({
-      changes: {from: 0, to: env.local.editor.state.doc.length, insert: textData}
-    });
+    if (env.local.forceUpdate) {
+      env.local.editor.dispatch({
+        changes: {from: 0, to: env.local.editor.state.doc.length, insert: ''}
+      });
+      env.local.editor.dispatch({
+        changes: {from: 0, to: 0, insert: textData}
+      });
+    } else {
+      env.local.editor.dispatch({
+        changes: {from: 0, to: env.local.editor.state.doc.length, insert: textData}
+      });
+    }
+
   };
 
   core.EditorView.destroy = async (args, env) => {
