@@ -12457,7 +12457,7 @@ class Placeholder extends WidgetType {
 Extension that enables a placeholder—a piece of example content
 to show when the editor is empty.
 */
-function placeholder$7(content) {
+function placeholder$8(content) {
     return ViewPlugin.fromClass(class {
         constructor(view) {
             this.view = view;
@@ -62838,13 +62838,13 @@ var BallancedMatchDecorator2 = /** @class */ (function () {
     return BallancedMatchDecorator2;
 }());
 
-var compactCMEditor$5; 
+var compactCMEditor$6; 
 
 function FractionBoxWidget(viewEditor) {
-  compactCMEditor$5 = viewEditor;
+  compactCMEditor$6 = viewEditor;
   return [
     //mathematicaMathDecoration,
-    placeholder$6,
+    placeholder$7,
     keymap.of([{ key: "Ctrl-/", run: snippet$3() }])
   ];
 }
@@ -62875,7 +62875,7 @@ function snippet$3() {
   };
 }
 
-let EditorWidget$6 = class EditorWidget {
+let EditorWidget$7 = class EditorWidget {
 
   constructor(visibleValue, view, enumenator, denumenator, ref) {
     this.view = view;
@@ -62891,7 +62891,7 @@ let EditorWidget$6 = class EditorWidget {
 
     let topEditor, bottomEditor;
 
-    topEditor = compactCMEditor$5({
+    topEditor = compactCMEditor$6({
       doc: self.args[0].body.slice(2,-1),
       parent: enumenator,
       update: (upd) => this.applyChanges(upd, 0),
@@ -62919,7 +62919,7 @@ let EditorWidget$6 = class EditorWidget {
       ]
     });
 
-    bottomEditor = compactCMEditor$5({
+    bottomEditor = compactCMEditor$6({
       doc: self.args[2].body.slice(1,-2),
       parent: denumenator,
       update: (upd) => this.applyChanges(upd, 2),
@@ -63011,7 +63011,7 @@ let EditorWidget$6 = class EditorWidget {
   }
 };
 
-let Widget$6 = class Widget extends WidgetType {
+let Widget$7 = class Widget extends WidgetType {
   constructor(visibleValue, ref, view) {
     super();
     this.view = view;
@@ -63060,7 +63060,7 @@ let Widget$6 = class Widget extends WidgetType {
     const denumenator = document.createElement("td");
     trd.appendChild(denumenator);
 
-    span.EditorWidget = new EditorWidget$6(this.visibleValue, view, enumenator, denumenator, []);
+    span.EditorWidget = new EditorWidget$7(this.visibleValue, view, enumenator, denumenator, []);
     const self = this;
       
     this.reference.push({destroy: () => {
@@ -63079,28 +63079,28 @@ let Widget$6 = class Widget extends WidgetType {
   }
 };
 
-const matcher$6 = (ref, view) => {
+const matcher$7 = (ref, view) => {
   return new BallancedMatchDecorator2({
     tag: 'FB',
     decoration: (match) => {
       
       return Decoration.replace({
-        widget: new Widget$6(match, ref, view)
+        widget: new Widget$7(match, ref, view)
       });
     }
   });
 };
 
-const placeholder$6 = ViewPlugin.fromClass(
+const placeholder$7 = ViewPlugin.fromClass(
   class {
     constructor(view) {
       this.disposable = [];
-      this.placeholder = matcher$6(this.disposable, view).createDeco(view);
+      this.placeholder = matcher$7(this.disposable, view).createDeco(view);
     }
     update(update) {
       //console.log('update Deco');
       //console.log(this.disposable );
-      this.placeholder = matcher$6(this.disposable, update).updateDeco(
+      this.placeholder = matcher$7(this.disposable, update).updateDeco(
         update,
         this.placeholder
       );
@@ -63129,13 +63129,13 @@ const placeholder$6 = ViewPlugin.fromClass(
   }
 );
 
-var compactCMEditor$4; 
+var compactCMEditor$5; 
   
   function SqrtBoxWidget(viewEditor) {
-    compactCMEditor$4 = viewEditor;
+    compactCMEditor$5 = viewEditor;
     return [
       //mathematicaMathDecoration,
-      placeholder$5,
+      placeholder$6,
       keymap.of([{ key: "Ctrl-2", run: snippet$2() }])
     ];
   }
@@ -63166,7 +63166,7 @@ var compactCMEditor$4;
     };
   }
 
-  let EditorWidget$5 = class EditorWidget {
+  let EditorWidget$6 = class EditorWidget {
 
     constructor(visibleValue, view, dom, sliceRanges, ref) {
       this.view = view;
@@ -63179,7 +63179,7 @@ var compactCMEditor$4;
 
       //(self);
 
-      this.editor = compactCMEditor$4({
+      this.editor = compactCMEditor$5({
         //slice SqB[...]
         doc: visibleValue.str.slice(...sliceRanges),
         parent: dom,
@@ -63243,7 +63243,7 @@ var compactCMEditor$4;
     }
   };
   
-  let Widget$5 = class Widget extends WidgetType {
+  let Widget$6 = class Widget extends WidgetType {
     constructor(visibleValue, ref, view) {
       super();
       this.view = view;
@@ -63279,7 +63279,7 @@ var compactCMEditor$4;
       const head = document.createElement("span");
       head.classList.add("radicand");
       
-      span.EditorWidget = new EditorWidget$5(this.visibleValue, view, head, [5,-1], []);
+      span.EditorWidget = new EditorWidget$6(this.visibleValue, view, head, [5,-1], []);
 
       span.appendChild(head);
 
@@ -63301,28 +63301,28 @@ var compactCMEditor$4;
     }
   };
   
-  const matcher$5 = (ref, view) => {
+  const matcher$6 = (ref, view) => {
     return new BallancedMatchDecorator2({
       tag: 'SqB',
       decoration: (match) => {
         
         return Decoration.replace({
-          widget: new Widget$5(match, ref, view)
+          widget: new Widget$6(match, ref, view)
         });
       }
     });
   };
   
-  const placeholder$5 = ViewPlugin.fromClass(
+  const placeholder$6 = ViewPlugin.fromClass(
     class {
       constructor(view) {
         this.disposable = [];
-        this.placeholder = matcher$5(this.disposable, view).createDeco(view);
+        this.placeholder = matcher$6(this.disposable, view).createDeco(view);
       }
       update(update) {
         //console.log('update Deco');
         //console.log(this.disposable );
-        this.placeholder = matcher$5(this.disposable, update).updateDeco(
+        this.placeholder = matcher$6(this.disposable, update).updateDeco(
           update,
           this.placeholder
         );
@@ -63351,13 +63351,13 @@ var compactCMEditor$4;
     }
   );
 
-var compactCMEditor$3; 
+var compactCMEditor$4; 
 
 function SubscriptBoxWidget(viewEditor) {
-  compactCMEditor$3 = viewEditor;
+  compactCMEditor$4 = viewEditor;
   return [
     //mathematicaMathDecoration,
-    placeholder$4,
+    placeholder$5,
     keymap.of([{ key: "Ctrl--", run: snippet$1() }])
   ];
 }
@@ -63388,7 +63388,7 @@ function snippet$1() {
   };
 }
 
-let EditorWidget$4 = class EditorWidget {
+let EditorWidget$5 = class EditorWidget {
 
   constructor(visibleValue, view, head, sub, ref) {
     this.view = view;
@@ -63405,7 +63405,7 @@ let EditorWidget$4 = class EditorWidget {
 
     console.log(self.visibleValue);
 
-    topEditor = compactCMEditor$3({
+    topEditor = compactCMEditor$4({
       doc: self.args[0].body.slice(10),
       parent: head,
       update: (upd) => this.applyChanges(upd, 0),
@@ -63425,7 +63425,7 @@ let EditorWidget$4 = class EditorWidget {
       ]
     });
 
-    bottomEditor = compactCMEditor$3({
+    bottomEditor = compactCMEditor$4({
       doc: self.args[2].body.slice(0, -1),
       parent: sub,
       update: (upd) => this.applyChanges(upd, 2),
@@ -63511,7 +63511,7 @@ let EditorWidget$4 = class EditorWidget {
   }
 };
 
-let Widget$4 = class Widget extends WidgetType {
+let Widget$5 = class Widget extends WidgetType {
   constructor(visibleValue, ref, view) {
     super();
     this.view = view;
@@ -63547,7 +63547,7 @@ let Widget$4 = class Widget extends WidgetType {
     span.appendChild(head);
     span.appendChild(sub);
 
-    span.EditorWidget = new EditorWidget$4(this.visibleValue, view, head, sub, []);
+    span.EditorWidget = new EditorWidget$5(this.visibleValue, view, head, sub, []);
 
     const self = this;
       
@@ -63567,28 +63567,28 @@ let Widget$4 = class Widget extends WidgetType {
   }
 };
 
-const matcher$4 = (ref, view) => {
+const matcher$5 = (ref, view) => {
   return new BallancedMatchDecorator2({
     tag: 'SbB',
     decoration: (match) => {
       
       return Decoration.replace({
-        widget: new Widget$4(match, ref, view)
+        widget: new Widget$5(match, ref, view)
       });
     }
   });
 };
 
-const placeholder$4 = ViewPlugin.fromClass(
+const placeholder$5 = ViewPlugin.fromClass(
   class {
     constructor(view) {
       this.disposable = [];
-      this.placeholder = matcher$4(this.disposable, view).createDeco(view);
+      this.placeholder = matcher$5(this.disposable, view).createDeco(view);
     }
     update(update) {
       //console.log('update Deco');
       //console.log(this.disposable );
-      this.placeholder = matcher$4(this.disposable, update).updateDeco(
+      this.placeholder = matcher$5(this.disposable, update).updateDeco(
         update,
         this.placeholder
       );
@@ -63617,13 +63617,13 @@ const placeholder$4 = ViewPlugin.fromClass(
   }
 );
 
-var compactCMEditor$2; 
+var compactCMEditor$3; 
   
   function SupscriptBoxWidget(viewEditor) {
-    compactCMEditor$2 = viewEditor;
+    compactCMEditor$3 = viewEditor;
     return [
       //mathematicaMathDecoration,
-      placeholder$3,
+      placeholder$4,
       keymap.of([{ key: "Ctrl-6", run: snippet() }])
     ];
   }
@@ -63654,7 +63654,7 @@ var compactCMEditor$2;
     };
   }
   
-  let EditorWidget$3 = class EditorWidget {
+  let EditorWidget$4 = class EditorWidget {
   
     constructor(visibleValue, view, head, sub, ref) {
       this.view = view;
@@ -63671,7 +63671,7 @@ var compactCMEditor$2;
   
       //console.log(self.visibleValue);
   
-      topEditor = compactCMEditor$2({
+      topEditor = compactCMEditor$3({
         doc: self.args[0].body.slice(6),
         parent: head,
         update: (upd) => this.applyChanges(upd, 0),
@@ -63691,7 +63691,7 @@ var compactCMEditor$2;
         ]
       });
   
-      bottomEditor = compactCMEditor$2({
+      bottomEditor = compactCMEditor$3({
         doc: self.args[2].body.slice(0, -1),
         parent: sub,
         update: (upd) => this.applyChanges(upd, 2),
@@ -63777,7 +63777,7 @@ var compactCMEditor$2;
     }
   };
   
-  let Widget$3 = class Widget extends WidgetType {
+  let Widget$4 = class Widget extends WidgetType {
     constructor(visibleValue, ref, view) {
       super();
       this.view = view;
@@ -63812,7 +63812,7 @@ var compactCMEditor$2;
       span.appendChild(head);
       span.appendChild(sub);
   
-      span.EditorWidget = new EditorWidget$3(this.visibleValue, view, head, sub, []);
+      span.EditorWidget = new EditorWidget$4(this.visibleValue, view, head, sub, []);
       const self = this;
 
       this.reference.push({destroy: () => {
@@ -63831,28 +63831,28 @@ var compactCMEditor$2;
     }
   };
   
-  const matcher$3 = (ref, view) => {
+  const matcher$4 = (ref, view) => {
     return new BallancedMatchDecorator2({
       tag: 'SpB',
       decoration: (match) => {
         
         return Decoration.replace({
-          widget: new Widget$3(match, ref, view)
+          widget: new Widget$4(match, ref, view)
         });
       }
     });
   };
   
-  const placeholder$3 = ViewPlugin.fromClass(
+  const placeholder$4 = ViewPlugin.fromClass(
     class {
       constructor(view) {
         this.disposable = [];
-        this.placeholder = matcher$3(this.disposable, view).createDeco(view);
+        this.placeholder = matcher$4(this.disposable, view).createDeco(view);
       }
       update(update) {
         //console.log('update Deco');
         //console.log(this.disposable );
-        this.placeholder = matcher$3(this.disposable, update).updateDeco(
+        this.placeholder = matcher$4(this.disposable, update).updateDeco(
           update,
           this.placeholder
         );
@@ -63881,18 +63881,18 @@ var compactCMEditor$2;
     }
   );
 
-var compactCMEditor$1; 
+var compactCMEditor$2; 
   
   function GridBoxWidget(viewEditor) {
-    compactCMEditor$1 = viewEditor;
+    compactCMEditor$2 = viewEditor;
     return [
       //mathematicaMathDecoration,
-      placeholder$2,
+      placeholder$3,
       //keymap.of([{ key: "Ctrl-m", run: snippet() }])
     ];
   }
   
-  let EditorWidget$2 = class EditorWidget {
+  let EditorWidget$3 = class EditorWidget {
   
     constructor(visibleValue, view, tbody, ref) {
       this.view = view;
@@ -63928,7 +63928,7 @@ var compactCMEditor$1;
           if (j == cols.length-1 && i == this.args.length-1) text = text.slice(0,-2);
           if (j == cols.length-1 && i != this.args.length-1) text = text.slice(0,-1);
 
-          cols[j].editor = compactCMEditor$1({
+          cols[j].editor = compactCMEditor$2({
             doc: text,
             parent: td,
             update: (upd) => this.applyChanges(upd, i,j),
@@ -64050,7 +64050,7 @@ var compactCMEditor$1;
     }
   };
   
-  let Widget$2 = class Widget extends WidgetType {
+  let Widget$3 = class Widget extends WidgetType {
     constructor(visibleValue, ref, view) {
       super();
       this.view = view;
@@ -64085,7 +64085,7 @@ var compactCMEditor$1;
       const tbody      = document.createElement("tbody");
       table.appendChild(tbody);
   
-      span.EditorWidget = new EditorWidget$2(this.visibleValue, view, tbody, []);
+      span.EditorWidget = new EditorWidget$3(this.visibleValue, view, tbody, []);
       const self = this;
       
       this.reference.push({destroy: () => {
@@ -64104,28 +64104,28 @@ var compactCMEditor$1;
     }
   };
   
-  const matcher$2 = (ref, view) => {
+  const matcher$3 = (ref, view) => {
     return new BallancedMatchDecorator2({
       tag: 'GB',
       decoration: (match) => {
         
         return Decoration.replace({
-          widget: new Widget$2(match, ref, view)
+          widget: new Widget$3(match, ref, view)
         });
       }
     });
   };
   
-  const placeholder$2 = ViewPlugin.fromClass(
+  const placeholder$3 = ViewPlugin.fromClass(
     class {
       constructor(view) {
         this.disposable = [];
-        this.placeholder = matcher$2(this.disposable, view).createDeco(view);
+        this.placeholder = matcher$3(this.disposable, view).createDeco(view);
       }
       update(update) {
         //console.log('update Deco');
         //console.log(this.disposable );
-        this.placeholder = matcher$2(this.disposable, update).updateDeco(
+        this.placeholder = matcher$3(this.disposable, update).updateDeco(
           update,
           this.placeholder
         );
@@ -71384,7 +71384,7 @@ Mma.toArray = function (obj) {
     return text;
 };
 
-const uuidv4$2 = () => { 
+const uuidv4$3 = () => { 
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
       var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
       return v.toString(16);
@@ -71394,11 +71394,11 @@ const uuidv4$2 = () => {
   function ViewBoxWidget(viewEditor) {
     return [
       //mathematicaMathDecoration,
-      placeholder$1
+      placeholder$2
     ];
   }
   
-  let EditorWidget$1 = class EditorWidget {
+  let EditorWidget$2 = class EditorWidget {
   
     constructor(visibleValue, view, span, ref) {
       this.view = view;
@@ -71416,7 +71416,7 @@ const uuidv4$2 = () => {
 
       this.data = json;
   
-      const cuid = uuidv4$2();
+      const cuid = uuidv4$3();
       this.cuid = cuid;
 
       let global = {call: cuid, EditorWidget: self};
@@ -71506,7 +71506,7 @@ const uuidv4$2 = () => {
     }
   };
   
-  let Widget$1 = class Widget extends WidgetType {
+  let Widget$2 = class Widget extends WidgetType {
     constructor(visibleValue, ref, view) {
       super();
       this.view = view;
@@ -71536,7 +71536,7 @@ const uuidv4$2 = () => {
       let span = document.createElement("span");
       span.classList.add("frontend-view");
   
-      span.EditorWidget = new EditorWidget$1(this.visibleValue, view, span);
+      span.EditorWidget = new EditorWidget$2(this.visibleValue, view, span);
   
       this.reference.push({destroy: () => {
         self.destroy(span);
@@ -71555,28 +71555,28 @@ const uuidv4$2 = () => {
     }
   };
   
-  const matcher$1 = (ref, view) => {
+  const matcher$2 = (ref, view) => {
     return new BallancedMatchDecorator2({
       tag: 'VB',
       decoration: (match) => {
         
         return Decoration.replace({
-          widget: new Widget$1(match, ref, view)
+          widget: new Widget$2(match, ref, view)
         });
       }
     });
   };
   
-  const placeholder$1 = ViewPlugin.fromClass(
+  const placeholder$2 = ViewPlugin.fromClass(
     class {
       constructor(view) {
         this.disposable = [];
-        this.placeholder = matcher$1(this.disposable, view).createDeco(view);
+        this.placeholder = matcher$2(this.disposable, view).createDeco(view);
       }
       update(update) {
         //console.log('update Deco');
         //console.log(this.disposable );
-        this.placeholder = matcher$1(this.disposable, update).updateDeco(
+        this.placeholder = matcher$2(this.disposable, update).updateDeco(
           update,
           this.placeholder
         );
@@ -71605,9 +71605,9 @@ const uuidv4$2 = () => {
     }
   );
 
-var compactCMEditor; 
+var compactCMEditor$1; 
 
-const uuidv4$1 = () => { 
+const uuidv4$2 = () => { 
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
@@ -71615,14 +71615,14 @@ const uuidv4$1 = () => {
 };
 
 function BoxBoxWidget(viewEditor) {
-  compactCMEditor = viewEditor;
+  compactCMEditor$1 = viewEditor;
   return [
     //mathematicaMathDecoration,
-    placeholder
+    placeholder$1
   ];
 }
 
-class EditorWidget {
+let EditorWidget$1 = class EditorWidget {
 
   constructor(visibleValue, view, span, ref) {
     this.view = view;
@@ -71653,7 +71653,7 @@ class EditorWidget {
 
     this.data = json;
 
-    const cuid = uuidv4$1();
+    const cuid = uuidv4$2();
     let global = {call: cuid, element: span, origin: self};
     let env = {global: global, element: span}; //Created in CM6
     this.env = env;
@@ -71718,7 +71718,7 @@ class EditorWidget {
 
       
 
-      self.editor = compactCMEditor({
+      self.editor = compactCMEditor$1({
         doc: self.args[0].body.slice(1 + self.prolog.offset, -1 - self.epilog.offset),
         parent: env.global.element,
         update: (upd) => this.applyChanges(upd),
@@ -71781,6 +71781,240 @@ class EditorWidget {
 
     delete this.data;
   }
+};
+
+let Widget$1 = class Widget extends WidgetType {
+  constructor(visibleValue, ref, view) {
+    super();
+    this.view = view;
+    this.visibleValue = visibleValue;
+    this.reference = ref;
+    //console.log('construct');
+  }
+
+  eq(other) {
+    return false;
+  }
+
+  updateDOM(dom, view) {
+    //console.log(this.visibleValue);
+    //console.log(this);
+    console.log('update widget DOM');
+    dom.EditorWidget.update(this.visibleValue);
+
+    return true
+  }
+
+  toDOM(view) {
+    console.log('Create a new one!');
+
+    let span = document.createElement("span");
+    span.classList.add("subscript-tail");
+
+    span.EditorWidget = new EditorWidget$1(this.visibleValue, view, span, []);
+
+    const self = this;
+    
+    this.reference.push({destroy: () => {
+      self.destroy(span);
+    }});      
+
+
+    return span;
+  }
+
+  ignoreEvent() {
+    return true;
+  }
+
+  destroy(dom) {
+    dom.EditorWidget.destroy();
+  }
+};
+
+const matcher$1 = (ref, view) => {
+  return new BallancedMatchDecorator2({
+    tag: 'BB',
+    decoration: (match) => {
+      
+      return Decoration.replace({
+        widget: new Widget$1(match, ref, view)
+      });
+    }
+  });
+};
+
+const placeholder$1 = ViewPlugin.fromClass(
+  class {
+    constructor(view) {
+      this.disposable = [];
+      this.placeholder = matcher$1(this.disposable, view).createDeco(view);
+    }
+    update(update) {
+      //console.log('update Deco');
+      //console.log(this.disposable );
+      this.placeholder = matcher$1(this.disposable, update).updateDeco(
+        update,
+        this.placeholder
+      );
+    }
+    destroy() {
+      //console.log("removed holder");
+      //console.log("disposable");
+      //console.log(this.disposable);
+      this.disposable.forEach((el) => {
+        el.destroy();
+      });
+    }
+  },
+  {
+    decorations: (instance) => instance.placeholder,
+    provide: (plugin) =>
+      EditorView.atomicRanges.of((view) => {
+        var _a;
+      
+        return (
+          ((_a = view.plugin(plugin)) === null || _a === void 0
+            ? void 0
+            : _a.placeholder) || Decoration.none
+        );
+      })
+  }
+);
+
+var compactCMEditor; 
+
+const uuidv4$1 = () => { 
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
+
+function TemplateBoxWidget(viewEditor) {
+  compactCMEditor = viewEditor;
+  return [
+    //mathematicaMathDecoration,
+    placeholder
+  ];
+}
+
+class EditorWidget {
+
+  constructor(visibleValue, view, span, ref) {
+    this.view = view;
+    this.visibleValue = visibleValue;
+
+    this.args = matchArguments(visibleValue.str, /\(\*\|\*\)/gm);
+
+    const self = this;
+    
+
+    //ref.push(self);
+    //console.log(visibleValue);
+
+    
+
+
+    const indexes = Array.from({ length: Math.ceil((self.args.length - 3)  / 2) }, (v, i) => i * 2 + 1);
+    self.indexes = indexes;
+
+    const spans = [];
+    for (let i=0; i<indexes.length; ++i) {
+      spans.push(document.createElement('span'));
+    }
+  
+    
+    const string = this.args[this.args.length - 1].body.slice(2,-2);
+  
+    const decoded = Mma.DecompressDecode(string);
+    const json = Mma.toArray(decoded.parts[0]);
+
+    this.data = json;
+
+    const cuid = uuidv4$1();
+    let global = {call: cuid, element: span, children: spans, origin: self};
+    let env = {global: global, element: span, children: spans}; //Created in CM6
+    this.env = env;
+
+    
+
+    interpretate(json, env).then(() => {
+      
+
+      if (env.options?.Event) {
+        console.warn('Event listeners are enabled!');
+        self.events = env.options.Event;
+      }      
+
+
+
+      self.editors = indexes.map((index, i) => compactCMEditor({
+        doc: self.args[index].body,
+        parent: spans[i],
+        update: (upd) => this.applyChanges(upd, index),
+        eval: () => {
+          view.viewState.state.config.eval();
+        },
+        extensions: [
+          keymap.of([
+            { key: "ArrowLeft", run: function (editor, key) {  
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+                view.focus();
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            } }, 
+            { key: "ArrowRight", run: function (editor, key) {  
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+                view.focus();
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            } }
+          ])
+        ]
+      }));
+
+      if(self.events) server.kernel.emitt(self.events, 'Null', 'Mounted');  
+
+    });
+
+  }
+
+  applyChanges(update, index) {
+      const args = this.args;
+      const relative = this.visibleValue.argsPos;
+  
+      console.log(args);
+
+      const changes = {from: relative + args[index].from, to:relative + args[index].from + args[index].length, insert: update};
+
+      const delta = update.length - args[index].length;
+      args[index].length = update.length;
+      for (let i = index + 1; i < args.length; ++i)
+        args[i].from = args[i].from + delta;
+
+ 
+      this.view.dispatch({changes: changes});
+  }    
+
+  update(visibleValue) {
+    //console.log('Update instance: new ranges & arguments');
+    this.visibleValue.pos = visibleValue.pos;
+    this.visibleValue.argsPos = visibleValue.argsPos;
+  }
+
+  destroy() {
+    console.warn('destroy Instance of Widget');
+    console.log(this);
+    if (this.env.global.stack) {
+      for (const obj of Object.values(this.env.global.stack))  {
+        obj.dispose();
+      }
+    }  
+    this.editors.forEach((i)=>i.destroy());
+
+    if(this.events) server.kernel.emitt(this.events, 'Null', 'Destroy');
+
+    delete this.data;
+  }
 }
 
 class Widget extends WidgetType {
@@ -71809,7 +72043,7 @@ class Widget extends WidgetType {
     console.log('Create a new one!');
 
     let span = document.createElement("span");
-    span.classList.add("subscript-tail");
+    span.classList.add("inline-flex");
 
     span.EditorWidget = new EditorWidget(this.visibleValue, view, span, []);
 
@@ -71834,7 +72068,7 @@ class Widget extends WidgetType {
 
 const matcher = (ref, view) => {
   return new BallancedMatchDecorator2({
-    tag: 'BB',
+    tag: 'TB',
     decoration: (match) => {
       
       return Decoration.replace({
@@ -72255,6 +72489,7 @@ compactWLEditor = (args) => {
     GridBoxWidget(compactWLEditor),
     ViewBoxWidget(),
     BoxBoxWidget(compactWLEditor),
+    TemplateBoxWidget(compactWLEditor),
     bracketMatching(),
     rainbowBrackets(),
     Greekholder,
@@ -72324,6 +72559,7 @@ const mathematicaPlugins = [
   GridBoxWidget(compactWLEditor),
   ViewBoxWidget(),
   BoxBoxWidget(compactWLEditor),  
+  TemplateBoxWidget(compactWLEditor),
   bracketMatching(),
   rainbowBrackets(),
   Greekholder,
@@ -72445,7 +72681,7 @@ window.EditorExtensions = [
   () => syntaxHighlighting(defaultHighlightStyle, { fallback: false }),
   () => highlightSelectionMatches(),
   () => cellTypesHighlight,
-  () => placeholder$7('Type Wolfram Expression / .md / .html / .js'),
+  () => placeholder$8('Type Wolfram Expression / .md / .html / .js'),
   
   (self, initialLang) => languageConf.of(initialLang),
   () => autoLanguage, 

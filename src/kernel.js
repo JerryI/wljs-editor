@@ -66,6 +66,7 @@ import {GridBoxWidget} from "../libs/priceless-mathematica/src/boxes/gridbox"
 
 import {ViewBoxWidget} from "../libs/priceless-mathematica/src/boxes/viewbox"
 import {BoxBoxWidget} from "../libs/priceless-mathematica/src/boxes/boxbox"
+import {TemplateBoxWidget} from "../libs/priceless-mathematica/src/boxes/templatebox"
 
 import { cellTypesHighlight } from "../libs/priceless-mathematica/src/sugar/cells"
 
@@ -323,6 +324,7 @@ compactWLEditor = (args) => {
     GridBoxWidget(compactWLEditor),
     ViewBoxWidget(compactWLEditor),
     BoxBoxWidget(compactWLEditor),
+    TemplateBoxWidget(compactWLEditor),
     bracketMatching(),
     rainbowBrackets(),
     Greekholder,
@@ -392,6 +394,7 @@ const mathematicaPlugins = [
   GridBoxWidget(compactWLEditor),
   ViewBoxWidget(compactWLEditor),
   BoxBoxWidget(compactWLEditor),  
+  TemplateBoxWidget(compactWLEditor),
   bracketMatching(),
   rainbowBrackets(),
   Greekholder,

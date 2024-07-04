@@ -12,9 +12,100 @@ Unprotect[SuperscriptBox]
 SuperscriptBox[a_, b_] := RowBox[{"(*SpB[*)Power[", a, "(*|*),(*|*)",  b, "](*]SpB*)"}]
 SuperscriptBox[a_, b_, _] := RowBox[{"(*SpB[*)Power[", a, "(*|*),(*|*)",  b, "](*]SpB*)"}]
 
+SuperscriptBox[a_, "\[Prime]", _] := RowBox[{a, "'"}]
+SuperscriptBox[a_, ",", _] := RowBox[{a, "'"}]
+
+TransposeBox;
+Unprotect[Transpose]
+Transpose /: MakeBoxes[t: Transpose[expr_], StandardForm]:= With[{boxes = MakeBoxes[expr, StandardForm]},
+  BoxBox[expr, TransposeBox["T"], Head->Transpose]
+]
+
+Unprotect[ConjugateTranspose]
+ConjugateTranspose /: MakeBoxes[t: ConjugateTranspose[expr_], StandardForm]:= With[{boxes = MakeBoxes[expr, StandardForm]},
+  BoxBox[expr, TransposeBox["&dagger;"], Head->ConjugateTranspose]
+]
+
+Unprotect[Sum]
+SumBox;
+
+Sum /: MakeBoxes[Sum[expr_, {x_Symbol, min_, max_}], s: StandardForm] := With[{func = MakeBoxes[expr, s]},
+    With[{dp = SumBox[1, True], symbol = MakeBoxes[x, s], bmin = MakeBoxes[min, s], bmax = MakeBoxes[max, s]},
+      RowBox[{"(*TB[*)Sum[(*|*)", func, "(*|*), {(*|*)", symbol, "(*|*),(*|*)", bmin, "(*|*),(*|*)", bmax, "(*|*)}](*|*)(*", Compress[dp], "*)(*]TB*)"}]
+    ]
+]
+
+Sum /: MakeBoxes[Sum[expr_, vars__List], s: StandardForm] := With[{list = List[vars]},
+    With[{dp = SumBox[1, True], func = MakeBoxes[expr, s], symbols = Riffle[
+        With[{sym = #[[1]], min = #[[2]], max = #[[3]]},
+          If[Length[#] === 3,
+            {"{(*|*)", MakeBoxes[sym, s], "(*|*),(*|*)", MakeBoxes[min, s], "(*|*),(*|*)", MakeBoxes[max, s], "(*|*)}"}
+          ,
+            {"{(*|*)", MakeBoxes[sym, s], "(*|*),(*|*)", MakeBoxes[min, s], "(*|*),(*|*)", MakeBoxes[max, s], "(*|*)", ToString[#[[4]], InputForm],"}"}
+          ]
+          
+        ] &/@ list
+      , ","] // Flatten // RowBox
+    },
+      RowBox[{"(*TB[*)Sum[(*|*)", func, "(*|*), ", symbols, "](*|*)(*", Compress[dp], "*)(*]TB*)"}]
+    ]
+]
+
+Sum /: MakeBoxes[Sum[expr_, {x_Symbol, min_, max_, step_}], s: StandardForm] := With[{func = MakeBoxes[expr, s]},
+    With[{dp = SumBox[1, True], symbol = MakeBoxes[x, s], bmin = MakeBoxes[min, s], bmax = MakeBoxes[max, s], bstep = MakeBoxes[step, s]},
+      RowBox[{"(*TB[*)Sum[(*|*)", func, "(*|*), {(*|*)", symbol, "(*|*),(*|*)", bmin, "(*|*),(*|*)", bmax, "(*|*)", bstep, "}](*|*)(*", Compress[dp], "*)(*]TB*)"}]
+    ]
+]
+
+Unprotect[Derivative]
+Derivative /: MakeBoxes[Derivative[single_][f_], s: StandardForm] := With[{},
+  RowBox[{MakeBoxes[f, s], StringJoin @@ Table["'", {i, single}]}]
+]
+
+DerivativeBox;
+
+Derivative /: MakeBoxes[Derivative[multi__][f_], s: StandardForm] := With[{list = List[multi]},
+  With[{func = MakeBoxes[f, s], head = "Derivative["<>StringRiffle[ToString/@list, ","]<>"]"},
+    With[{dp = ProvidedOptions[DerivativeBox[list], "Head"->head]},
+      RowBox[{"(*BB[*)(", head, "[", func, "])(*,*)(*", ToString[Compress[dp ], InputForm], "*)(*]BB*)"}]
+    ]
+  ]
+]
+
+Unprotect[Integrate]
+IntegrateBox;
+
+Integrate /: MakeBoxes[Integrate[f_, x_Symbol], s: StandardForm ] := With[{},
+    With[{dp = IntegrateBox[1, False], func = MakeBoxes[f, s], symbol = MakeBoxes[x, s]},
+      RowBox[{"(*TB[*)Integrate[(*|*)", func, "(*|*), (*|*)", symbol, "(*|*)](*|*)(*", Compress[dp], "*)(*]TB*)"}]
+    ]
+]
+
+Integrate /: MakeBoxes[Integrate[f_, x__Symbol], s: StandardForm ] := With[{list = List[x]},
+    With[{dp = IntegrateBox[list // Length, False], func = MakeBoxes[f, s], symbols = RowBox[Riffle[MakeBoxes[#, s]&/@list, "(*|*),(*|*)"] ]},
+      RowBox[{"(*TB[*)Integrate[(*|*)", func, "(*|*), (*|*)", symbols, "(*|*)](*|*)(*", Compress[dp], "*)(*]TB*)"}]
+    ]
+]
+
+Integrate /: MakeBoxes[Integrate[f_, {x_Symbol, min_, max_}], s: StandardForm ] := With[{},
+    With[{dp = IntegrateBox[1, True], func = MakeBoxes[f, s], symbol = MakeBoxes[x, s], xmin = MakeBoxes[min, s], xmax = MakeBoxes[max, s]},
+      RowBox[{"(*TB[*)Integrate[(*|*)", func, "(*|*), {(*|*)", symbol, "(*|*),(*|*)",xmin,"(*|*),(*|*)",xmax,"(*|*)}](*|*)(*", Compress[dp], "*)(*]TB*)"}]
+    ]
+]
+
+Integrate /: MakeBoxes[Integrate[f_, bond__List], s: StandardForm ] := With[{list = List[bond]},
+    With[{dp = IntegrateBox[list // Length, True], func = MakeBoxes[f, s], symbols = RowBox[Riffle[{
+        With[{var = #[[1]], min = #[[2]], max = #[[3]]},
+          {"{(*|*)", MakeBoxes[var, s], "(*|*),(*|*)", MakeBoxes[min, s], "(*|*),(*|*)", MakeBoxes[max, s], "(*|*)}"}
+        ]
+      }&/@list, ","] // Flatten ]},
+      RowBox[{"(*TB[*)Integrate[(*|*)", func, "(*|*), ", symbols, "](*|*)(*", Compress[dp], "*)(*]TB*)"}]
+    ]
+]
 
 SuperscriptBox[a_, "\[Transpose]"] := RowBox[{"Transpose[", a, "]"}]
 
+RowBox[{SuperscriptBox["f", TagBox[RowBox[{"(", RowBox[{"1", ",", "1"}], ")"}], Derivative], MultilineFunction -> None], "[", RowBox[{"x", ",", "y"}], "]"}]
 
 Unprotect[SubsuperscriptBox]
 SubsuperscriptBox[x_?(Not[# === "\[Sum]"]&), y_, z_] := SuperscriptBox[SubscriptBox[x,y], z]
@@ -31,6 +122,26 @@ SubscriptBox[a_, b_, _] := RowBox[{"(*SbB[*)Subscript[", a, "(*|*),(*|*)",  b, "
 
 Unprotect[GridBox]
 GridBox[list_List, a___] := RowBox@(Join@@(Join[{{"(*GB[*){"}}, Riffle[#, {{"(*||*),(*||*)"}}] &@ (Join[{"{"}, Riffle[#, "(*|*),(*|*)"], {"}"}] &/@ list), {{"}(*]GB*)"}}]))
+
+
+PiecewiseBox;
+(* I HATE YOU WOLFRAM. WHY DID MAKE IT IMPOSSIBLE TO OVERWRITE MAKEBOXES ON PIECEWISE!!!? *)
+GridBox[{{"\[Piecewise]", whatever_}}, a___] := With[{original = whatever /. {RowBox -> RowBoxFlatten} // ToString // ToExpression},
+  With[{
+    dp = PiecewiseBox[ Length[original] ]
+  },
+    With[{boxes = Riffle[
+      With[{
+        val = #[[1]],
+        cond = #[[2]]
+      },
+        {"{(*|*)", MakeBoxes[val, StandardForm], "(*|*),(*|*)", MakeBoxes[cond, StandardForm], "(*|*)}"}
+      ]& /@ original
+    , ","] // Flatten // RowBox},
+      RowBox[{"(*TB[*)Piecewise[{", boxes, "}](*|*)(*", Compress[dp], "*)(*]TB*)"}]
+    ]
+  ]
+]
 
 Unprotect[TagBox]
 TagBox[x_, opts___] := x
@@ -169,6 +280,9 @@ QuantityWrapper /: MakeBoxes[QuantityWrapper[q_Quantity], StandardForm] := With[
 },
   ViewBox[q, QuantityBox[n, units] ]
 ] 
+
+RootBox;
+TemplateBox[{"Root", m_, raw_, approx_}, opts___] := RowBox[{"(*VB[*)(", approx /. {RowBox->RowBoxFlatten} // ToString, ")(*,*)(*", ToString[Compress[RootBox[approx] ] , InputForm], "*)(*]VB*)"}]
 
 TemplateBox[{number_}, "C"] := RowBox[{ SubscriptBox[C, number]}]
 
