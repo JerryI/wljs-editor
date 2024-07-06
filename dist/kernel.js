@@ -9658,7 +9658,7 @@ function buildTheme(main, spec, scopes) {
         }
     });
 }
-const baseTheme$1$1 = /*@__PURE__*/buildTheme("." + baseThemeID, {
+const baseTheme$1 = /*@__PURE__*/buildTheme("." + baseThemeID, {
     "&": {
         position: "relative !important",
         boxSizing: "border-box",
@@ -11017,7 +11017,7 @@ class EditorView {
     }
     mountStyles() {
         this.styleModules = this.state.facet(styleModule);
-        StyleModule.mount(this.root, this.styleModules.concat(baseTheme$1$1).reverse());
+        StyleModule.mount(this.root, this.styleModules.concat(baseTheme$1).reverse());
     }
     readMeasured() {
         if (this.updateState == 2 /* UpdateState.Updating */)
@@ -17167,66 +17167,7 @@ const defaultHighlightStyle$1 = /*@__PURE__*/HighlightStyle.define([
     { tag: tags$1.invalid,
         color: "#f00" }
 ]);
-
-const baseTheme$1 = /*@__PURE__*/EditorView.baseTheme({
-    "&.cm-focused .cm-matchingBracket": { backgroundColor: "#328c8252" },
-    "&.cm-focused .cm-nonmatchingBracket": { backgroundColor: "#bb555544" }
-});
 const DefaultScanDist = 10000, DefaultBrackets = "()[]{}";
-const bracketMatchingConfig = /*@__PURE__*/Facet.define({
-    combine(configs) {
-        return combineConfig(configs, {
-            afterCursor: true,
-            brackets: DefaultBrackets,
-            maxScanDistance: DefaultScanDist,
-            renderMatch: defaultRenderMatch
-        });
-    }
-});
-const matchingMark = /*@__PURE__*/Decoration.mark({ class: "cm-matchingBracket" }), nonmatchingMark = /*@__PURE__*/Decoration.mark({ class: "cm-nonmatchingBracket" });
-function defaultRenderMatch(match) {
-    let decorations = [];
-    let mark = match.matched ? matchingMark : nonmatchingMark;
-    decorations.push(mark.range(match.start.from, match.start.to));
-    if (match.end)
-        decorations.push(mark.range(match.end.from, match.end.to));
-    return decorations;
-}
-const bracketMatchingState = /*@__PURE__*/StateField.define({
-    create() { return Decoration.none; },
-    update(deco, tr) {
-        if (!tr.docChanged && !tr.selection)
-            return deco;
-        let decorations = [];
-        let config = tr.state.facet(bracketMatchingConfig);
-        for (let range of tr.state.selection.ranges) {
-            if (!range.empty)
-                continue;
-            let match = matchBrackets(tr.state, range.head, -1, config)
-                || (range.head > 0 && matchBrackets(tr.state, range.head - 1, 1, config))
-                || (config.afterCursor &&
-                    (matchBrackets(tr.state, range.head, 1, config) ||
-                        (range.head < tr.state.doc.length && matchBrackets(tr.state, range.head + 1, -1, config))));
-            if (match)
-                decorations = decorations.concat(config.renderMatch(match, tr.state));
-        }
-        return Decoration.set(decorations, true);
-    },
-    provide: f => EditorView.decorations.from(f)
-});
-const bracketMatchingUnique = [
-    bracketMatchingState,
-    baseTheme$1
-];
-/**
-Create an extension that enables bracket matching. Whenever the
-cursor is next to a bracket, that bracket and the one it matches
-are highlighted. Or, when no matching bracket is found, another
-highlighting style is used to indicate this.
-*/
-function bracketMatching(config = {}) {
-    return [bracketMatchingConfig.of(config), bracketMatchingUnique];
-}
 /**
 When larger syntax nodes, such as HTML tags, are marked as
 opening/closing, it can be a bit messy to treat the whole node as
@@ -62842,9 +62783,29 @@ var compactCMEditor$6;
 
 function FractionBoxWidget(viewEditor) {
   compactCMEditor$6 = viewEditor;
+  const ref = {};
   return [
     //mathematicaMathDecoration,
-    placeholder$7,
+
+
+    /*EditorState.transactionFilter.of((tr) => {
+      console.log(tr);
+      console.log(ref.placeholder);//.placeholder.chunk[0]);
+      if (tr.selection && ref.placeholder) {
+        if (tr.selection.ranges[0].from == tr.selection.ranges[0].to && ref.placeholder.placeholder.chunk[0]) {
+          console.log(tr.changes.sections[0]);
+          console.log({pos: ref.placeholder.placeholder.chunk[0].from, chunk: ref.placeholder.placeholder.chunk[0].to});
+          
+          if (findRegion(ref.placeholder.placeholder.chunkPos[0], ref.placeholder.placeholder.chunk[0].from, ref.placeholder.placeholder.chunk[0].to, tr.selection.ranges[0].from) > -1) {
+            return false;
+          }
+        }
+      }
+      // return false;
+      return tr
+    }),*/
+
+    placeholder$7(ref),
     keymap.of([{ key: "Ctrl-/", run: snippet$3() }])
   ];
 }
@@ -63091,11 +63052,13 @@ const matcher$7 = (ref, view) => {
   });
 };
 
-const placeholder$7 = ViewPlugin.fromClass(
+const placeholder$7 = (ref) => ViewPlugin.fromClass(
   class {
     constructor(view) {
       this.disposable = [];
       this.placeholder = matcher$7(this.disposable, view).createDeco(view);
+      ref.placeholder = this;
+      //ref.view = view});
     }
     update(update) {
       //console.log('update Deco');
@@ -63119,6 +63082,7 @@ const placeholder$7 = ViewPlugin.fromClass(
     provide: (plugin) =>
       EditorView.atomicRanges.of((view) => {
         var _a;
+        //console.warn(view);
       
         return (
           ((_a = view.plugin(plugin)) === null || _a === void 0
@@ -72490,7 +72454,7 @@ compactWLEditor = (args) => {
     ViewBoxWidget(),
     BoxBoxWidget(compactWLEditor),
     TemplateBoxWidget(compactWLEditor),
-    bracketMatching(),
+    //bracketMatching(),
     rainbowBrackets(),
     Greekholder,
     extras,
@@ -72560,7 +72524,7 @@ const mathematicaPlugins = [
   ViewBoxWidget(),
   BoxBoxWidget(compactWLEditor),  
   TemplateBoxWidget(compactWLEditor),
-  bracketMatching(),
+  //bracketMatching(),
   rainbowBrackets(),
   Greekholder,
   extras,
@@ -72650,8 +72614,8 @@ window.EditorExtensionsMinimal = [
   () => drawSelection(),
   () => dropCursor(),
   () => indentOnInput(),
-  () => bracketMatching(),
-  () => closeBrackets(),
+  //() => bracketMatching(),
+  //() => closeBrackets(),
   () => EditorView.lineWrapping,
   () => autocompletion(),
   () => syntaxHighlighting(defaultHighlightStyle, { fallback: false }),
@@ -72674,7 +72638,8 @@ window.EditorExtensions = [
       return [];
     },
   () => indentOnInput(),
-  () => bracketMatching(),
+  //() => bracketMatching(),
+ // () => test(),
   () => closeBrackets(),
   () => EditorView.lineWrapping,
   () => autocompletion(),

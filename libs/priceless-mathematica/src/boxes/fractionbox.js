@@ -5,6 +5,7 @@ import {
   WidgetType,
   MatchDecorator
 } from "@codemirror/view";
+import { EditorState, Compartment } from "@codemirror/state"
 import { isCursorInside } from "./utils";
 
 import { BallancedMatchDecorator2, matchArguments } from "./matcher";
@@ -17,11 +18,55 @@ import { Balanced } from "node-balanced";
 
 var compactCMEditor; 
 
+
+function findRegion(offset, from, to, point) {
+  let left = 0;
+  let right = from.length - 1;
+  console.log('testing');
+  console.log(point);
+  console.log(from.map((el) => el + offset));
+  console.log(to.map((el) => el + offset));
+
+  while (left <= right) {
+      let mid = Math.floor((left + right) / 2);
+
+      if (from[mid] + offset <= point && point <= to[mid] + offset) {
+          return mid; // Point P is in the region [from[mid], to[mid]]
+      } else if (point < from[mid] + offset) {
+          right = mid - 1;
+      } else {
+          left = mid + 1;
+      }
+  }
+
+  return -1; // Point P does not belong to any region
+}
+
 export function FractionBoxWidget(viewEditor) {
   compactCMEditor = viewEditor;
+  const ref = {};
   return [
     //mathematicaMathDecoration,
-    placeholder,
+
+
+    /*EditorState.transactionFilter.of((tr) => {
+      console.log(tr);
+      console.log(ref.placeholder);//.placeholder.chunk[0]);
+      if (tr.selection && ref.placeholder) {
+        if (tr.selection.ranges[0].from == tr.selection.ranges[0].to && ref.placeholder.placeholder.chunk[0]) {
+          console.log(tr.changes.sections[0]);
+          console.log({pos: ref.placeholder.placeholder.chunk[0].from, chunk: ref.placeholder.placeholder.chunk[0].to});
+          
+          if (findRegion(ref.placeholder.placeholder.chunkPos[0], ref.placeholder.placeholder.chunk[0].from, ref.placeholder.placeholder.chunk[0].to, tr.selection.ranges[0].from) > -1) {
+            return false;
+          }
+        }
+      }
+      // return false;
+      return tr
+    }),*/
+
+    placeholder(ref),
     keymap.of([{ key: "Ctrl-/", run: snippet() }])
   ];
 }
@@ -269,11 +314,13 @@ const matcher = (ref, view) => {
   });
 };
 
-const placeholder = ViewPlugin.fromClass(
+const placeholder = (ref) => ViewPlugin.fromClass(
   class {
     constructor(view) {
       this.disposable = [];
       this.placeholder = matcher(this.disposable, view).createDeco(view);
+      ref.placeholder = this;
+      //ref.view = view});
     }
     update(update) {
       //console.log('update Deco');
@@ -297,6 +344,7 @@ const placeholder = ViewPlugin.fromClass(
     provide: (plugin) =>
       EditorView.atomicRanges.of((view) => {
         var _a;
+        //console.warn(view);
       
         return (
           ((_a = view.plugin(plugin)) === null || _a === void 0
