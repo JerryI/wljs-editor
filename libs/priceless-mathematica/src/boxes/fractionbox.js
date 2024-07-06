@@ -302,7 +302,8 @@ class Widget extends WidgetType {
     return true
   }
 
-  skipPosition(pos, oldPos) {
+  skipPosition(pos, oldPos, selected) {
+    if (oldPos.from != oldPos.to || selected) return pos;
     //this.DOMElement.EditorWidget.wantedPosition = pos;
     if (pos.from - oldPos.from > 0) {
       this.DOMElement.EditorWidget.topEditor.focus();

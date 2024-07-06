@@ -126,7 +126,7 @@ let mainEditor = new EditorView({
    // bracketMatching(),
     rainbowBrackets(),
     Greekholder,
-    Arrowholder,
+    Arrowholder
   ],
   parent: document.querySelector("#editor")
 });

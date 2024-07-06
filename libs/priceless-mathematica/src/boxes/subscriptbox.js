@@ -211,8 +211,9 @@ class Widget extends WidgetType {
     return this.visibleValue.str === other.visibleValue.str;
   }
 
-  skipPosition(pos, oldPos) {
-    //this.DOMElement.EditorWidget.wantedPosition = pos;
+  skipPosition(pos, oldPos, selected) {
+    if (oldPos.from != oldPos.to || selected) return pos;
+    
     if (pos.from - oldPos.from > 0) {
       this.DOMElement.EditorWidget.topEditor.focus();
     } else {

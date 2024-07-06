@@ -193,7 +193,9 @@ import {
       return span;
     }
 
-    skipPosition(pos, oldPos) {
+    skipPosition(pos, oldPos, selected) {
+      if (oldPos.from != oldPos.to || selected) return pos;
+      
       //this.DOMElement.EditorWidget.wantedPosition = pos;
       this.DOMElement.EditorWidget.editor.focus();
   

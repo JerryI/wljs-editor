@@ -259,8 +259,9 @@ import {
       return span;
     }
 
-    skipPosition(pos, oldPos) {
-      //this.DOMElement.EditorWidget.wantedPosition = pos;
+    skipPosition(pos, oldPos, selected) {
+      if (oldPos.from != oldPos.to || selected) return pos;
+      
       if (pos.from - oldPos.from > 0) {
         this.DOMElement.EditorWidget.args[0].body[0].editor.focus();
       } else {

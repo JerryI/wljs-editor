@@ -7614,7 +7614,8 @@ function moveVertically(view, start, forward, distance) {
             return EditorSelection.cursor(pos, start.assoc, undefined, goal);
     }
 }
-function skipAtoms(view, oldPos, pos) {
+function skipAtoms(view, oldPos, pos, selected) {
+    //console.log(view);
     let atoms = view.state.facet(atomicRanges).map(f => f(view));
     for (;;) {
         let moved = false;
@@ -7625,7 +7626,7 @@ function skipAtoms(view, oldPos, pos) {
                     moved = true;
 
                     if (value.widget.skipPosition) {
-                        pos = value.widget.skipPosition(pos, oldPos);
+                        pos = value.widget.skipPosition(pos, oldPos, selected);
                     }                    
                 }
             });
@@ -11142,7 +11143,13 @@ class EditorView {
     whether it should also be moved over.
     */
     moveByChar(start, forward, by) {
+        //console.log('Normal move');
         return skipAtoms(this, start, moveByChar(this, start, forward, by));
+    }
+
+    moveByCharSelected(start, forward, by) {
+        //console.log('Select move');
+        return skipAtoms(this, start, moveByChar(this, start, forward, by), true);
     }
     /**
     Move a cursor position across the next group of either
@@ -18537,7 +18544,8 @@ function extendSel(view, how) {
     return true;
 }
 function selectByChar(view, forward) {
-    return extendSel(view, range => view.moveByChar(range, forward));
+    console.log('Select!');
+    return extendSel(view, range => view.moveByCharSelected(range, forward));
 }
 /**
 Move the selection head one character to the left, while leaving
@@ -63045,7 +63053,8 @@ let Widget$7 = class Widget extends WidgetType {
     return true
   }
 
-  skipPosition(pos, oldPos) {
+  skipPosition(pos, oldPos, selected) {
+    if (oldPos.from != oldPos.to || selected) return pos;
     //this.DOMElement.EditorWidget.wantedPosition = pos;
     if (pos.from - oldPos.from > 0) {
       this.DOMElement.EditorWidget.topEditor.focus();
@@ -63336,7 +63345,9 @@ var compactCMEditor$5;
       return span;
     }
 
-    skipPosition(pos, oldPos) {
+    skipPosition(pos, oldPos, selected) {
+      if (oldPos.from != oldPos.to || selected) return pos;
+      
       //this.DOMElement.EditorWidget.wantedPosition = pos;
       this.DOMElement.EditorWidget.editor.focus();
   
@@ -63597,8 +63608,9 @@ let Widget$5 = class Widget extends WidgetType {
     return false;
   }
 
-  skipPosition(pos, oldPos) {
-    //this.DOMElement.EditorWidget.wantedPosition = pos;
+  skipPosition(pos, oldPos, selected) {
+    if (oldPos.from != oldPos.to || selected) return pos;
+    
     if (pos.from - oldPos.from > 0) {
       this.DOMElement.EditorWidget.topEditor.focus();
     } else {
@@ -63934,8 +63946,10 @@ var compactCMEditor$3;
       return true;
     }
 
-    skipPosition(pos, oldPos) {
-      //this.DOMElement.EditorWidget.wantedPosition = pos;
+    skipPosition(pos, oldPos, selected) {
+      if (oldPos.from != oldPos.to || selected) return pos;
+
+
       if (pos.from - oldPos.from > 0) {
         this.DOMElement.EditorWidget.topEditor.focus();
       } else {
@@ -64239,8 +64253,9 @@ var compactCMEditor$2;
       return span;
     }
 
-    skipPosition(pos, oldPos) {
-      //this.DOMElement.EditorWidget.wantedPosition = pos;
+    skipPosition(pos, oldPos, selected) {
+      if (oldPos.from != oldPos.to || selected) return pos;
+      
       if (pos.from - oldPos.from > 0) {
         this.DOMElement.EditorWidget.args[0].body[0].editor.focus();
       } else {
@@ -72000,7 +72015,8 @@ let Widget$1 = class Widget extends WidgetType {
     return span;
   }
 
-  skipPosition(pos, oldPos) {
+  skipPosition(pos, oldPos, selected) {
+    if (oldPos.from != oldPos.to || selected) return pos;
     //this.DOMElement.EditorWidget.wantedPosition = pos;
     this.DOMElement.EditorWidget.editor.focus();
 
@@ -72143,13 +72159,31 @@ class EditorWidget {
         extensions: [
           keymap.of([
             { key: "ArrowLeft", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                view.focus();
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                if (i > 0) {
+                  self.editors[i - 1].focus();
+                } else {
+                  view.dispatch({selection: {anchor: self.visibleValue.pos}});
+                  view.focus();
+                }
+                editor.editorLastCursor = undefined;
+                return;
+              }
+          
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
             } }, 
             { key: "ArrowRight", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                view.focus();
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                if (i < indexes.length - 1) {
+                  self.editors[i + 1].focus();
+                } else {
+                  view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
+                  view.focus();
+                }
+                editor.editorLastCursor = undefined;
+                return;
+              }
+                
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
             } }
           ])
@@ -72175,7 +72209,7 @@ class EditorWidget {
       for (let i = index + 1; i < args.length; ++i)
         args[i].from = args[i].from + delta;
 
- 
+      this.visibleValue.length += delta;
       this.view.dispatch({changes: changes});
   }    
 
@@ -72217,6 +72251,7 @@ class Widget extends WidgetType {
   updateDOM(dom, view) {
     //console.log(this.visibleValue);
     //console.log(this);
+    this.DOMElement = dom;
     console.log('update widget DOM');
     dom.EditorWidget.update(this.visibleValue);
 
@@ -72232,6 +72267,8 @@ class Widget extends WidgetType {
     span.EditorWidget = new EditorWidget(this.visibleValue, view, span, []);
 
     const self = this;
+
+    this.DOMElement = span;
     
     this.reference.push({destroy: () => {
       self.destroy(span);
@@ -72240,6 +72277,19 @@ class Widget extends WidgetType {
 
     return span;
   }
+
+  skipPosition(pos, oldPos, selected) {
+    if (oldPos.from != oldPos.to || selected) return pos;
+
+    const editors = this.DOMElement.EditorWidget.editors;
+    if (pos.from - oldPos.from < 0) {
+      editors[editors.length - 1].focus();
+    } else {
+      editors[0].focus();
+    }    
+
+    return oldPos;
+  }  
 
   ignoreEvent() {
     return true;
