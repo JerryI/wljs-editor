@@ -26,31 +26,7 @@ import {
     ];
   }
   
-  function snippet() {
-    return ({ state, dispatch }) => {
-      if (state.readOnly) return false;
-      let changes = state.changeByRange((range) => {
-        let { from, to } = range;
-        //if (atEof) from = to = (to <= line.to ? line : state.doc.lineAt(to)).to
-        const prev = state.sliceDoc(from, to);
-        if (prev.length === 0) {
-          return {
-            changes: { from, to, insert: "(*GridBox[*)Subscript[_(*|*),(*|*)_](*]SubscriptBox*)" },
-            range: EditorSelection.cursor(from)
-          };
-        }
-        return {
-          changes: { from, to, insert: "(*GridBox[*)Subscript["+ prev +"(*|*),(*|*)_](*]SubscriptBox*)" },
-          range: EditorSelection.cursor(from)
-        };
-      });
   
-      dispatch(
-        state.update(changes, { scrollIntoView: true, userEvent: "input" })
-      );
-      return true;
-    };
-  }
   
   class EditorWidget {
   
@@ -97,37 +73,58 @@ import {
               keymap.of([
                 { key: "ArrowLeft", run: function (editor, key) {  
                   if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                    if (j - 2 >= 0)
+                    if (j - 2 >= 0) {
                       cols[j-2].editor.focus();
-                    else
+                      editor.editorLastCursor = undefined;
+                      return;
+                    } else {
+                      view.dispatch({selection: {anchor: self.visibleValue.pos}});
                       view.focus();
+
+                      editor.editorLastCursor = undefined;
+                      return;
+                    }
   
                   editor.editorLastCursor = editor.state.selection.ranges[0].to;  
                 } }, 
                 { key: "ArrowRight", run: function (editor, key) {  
                   if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                    if (j + 2 < cols.length)
+                    if (j + 2 < cols.length) {
                       cols[j+2].editor.focus();
-                    else
+                      editor.editorLastCursor = undefined;
+                      return;
+                    } else {
+                      //view.focus();
+                      view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
                       view.focus();
+
+                      editor.editorLastCursor = undefined;
+                      return;
+                    }
   
                   editor.editorLastCursor = editor.state.selection.ranges[0].to;  
                 } },             
                 { key: "ArrowUp", run: function (editor, key) {  
                   if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                    if (i - 2 >= 0)
+                    if (i - 2 >= 0) {
                       args[i-2].body[j].editor.focus();
-                    else
-                      view.focus();
+                      editor.editorLastCursor = undefined;
+                      return;
+                    } else {
+                      //view.focus();
+                    }
   
                   editor.editorLastCursor = editor.state.selection.ranges[0].to;  
                 } },             
                 { key: "ArrowDown", run: function (editor, key) {  
                   if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                    if (i + 2 < args.length)
+                    if (i + 2 < args.length) {
                       args[i+2].body[j].editor.focus();
-                    else
-                      view.focus();
+                      editor.editorLastCursor = undefined;
+                      return;
+                    } else {
+                      //view.focus();
+                    }
   
                   editor.editorLastCursor = editor.state.selection.ranges[0].to;  
                 } }
@@ -168,18 +165,20 @@ import {
       const oldLength = parent[j].length;
       const changes = {from: relative1 + relative2 + parent[j].from, to: relative1 + relative2 + parent[j].from + oldLength, insert: text};
    
+      const delta = text.length - oldLength;
       //shift the next in a row
       for (let jj=j+1; jj<parent.length; jj+=1) {
-        parent[jj].from += (text.length - oldLength);
+        parent[jj].from += delta;
       }
 
       //shift the next in the col
       for (let ii=i+1; ii<args.length; ii+=1) {
-        args[ii].from += (text.length - oldLength);
+        args[ii].from += delta;
       }
 
-      this.args[i].length += (text.length - oldLength);
+      this.args[i].length += delta;
 
+      this.visibleValue.length = this.visibleValue.length + delta;
 
       //apply 
       parent[j].length = text.length;
@@ -229,6 +228,7 @@ import {
       //console.log(this.visibleValue);
       //console.log(this);
       console.log('update widget DOM');
+      this.DOMElement = dom;
       dom.EditorWidget.update(this.visibleValue);
   
       return true
@@ -253,9 +253,24 @@ import {
       this.reference.push({destroy: () => {
         self.destroy(span);
       }});  
+
+      this.DOMElement = span;
   
       return span;
     }
+
+    skipPosition(pos, oldPos) {
+      //this.DOMElement.EditorWidget.wantedPosition = pos;
+      if (pos.from - oldPos.from > 0) {
+        this.DOMElement.EditorWidget.args[0].body[0].editor.focus();
+      } else {
+        const args = this.DOMElement.EditorWidget.args;
+        //console.log(this.DOMElement.EditorWidget);
+        args[args.length - 1].body[args[args.length - 1].body.length - 1].editor.focus();
+      }
+  
+      return oldPos;
+    }    
   
     ignoreEvent() {
       return true;

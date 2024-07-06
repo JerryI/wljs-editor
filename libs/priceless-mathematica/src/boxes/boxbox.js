@@ -140,13 +140,30 @@ class EditorWidget {
         extensions: [
           keymap.of([
             { key: "ArrowLeft", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                view.focus()
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+
+                console.log(self.visibleValue.pos);
+                //if (self.visibleValue.pos == 0) return;
+  
+                view.dispatch({selection: {anchor: self.visibleValue.pos}});
+                view.focus();
+
+                editor.editorLastCursor = undefined;
+                return;
+              }
+                
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
             } }, 
             { key: "ArrowRight", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                view.focus()
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                console.log(self.visibleValue.pos);
+                //if (self.visibleValue.pos == 0) return;
+  
+                view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
+                view.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              }
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
             } }
           ])
@@ -166,8 +183,9 @@ class EditorWidget {
       const data = '('+this.prolog.string+update+this.epilog.string+')';
       const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
 
-  
+      const delta = data.length - args[0].length
       args[0].length = data.length;
+      this.visibleValue.length = this.visibleValue.length + delta;
 
 
       this.view.dispatch({changes: changes});
@@ -213,6 +231,7 @@ class Widget extends WidgetType {
     //console.log(this.visibleValue);
     //console.log(this);
     console.log('update widget DOM');
+    this.DOMElement = dom;
     dom.EditorWidget.update(this.visibleValue);
 
     return true
@@ -232,9 +251,17 @@ class Widget extends WidgetType {
       self.destroy(span);
     }});      
 
+    this.DOMElement = span;
 
     return span;
   }
+
+  skipPosition(pos, oldPos) {
+    //this.DOMElement.EditorWidget.wantedPosition = pos;
+    this.DOMElement.EditorWidget.editor.focus();
+
+    return oldPos;
+  }  
 
   ignoreEvent() {
     return true;

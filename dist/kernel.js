@@ -7623,9 +7623,14 @@ function skipAtoms(view, oldPos, pos) {
                 if (pos.from > from && pos.from < to) {
                     pos = oldPos.head > pos.from ? EditorSelection.cursor(from, 1) : EditorSelection.cursor(to, -1);
                     moved = true;
+
+                    if (value.widget.skipPosition) {
+                        pos = value.widget.skipPosition(pos, oldPos);
+                    }                    
                 }
             });
         }
+
         if (!moved)
             return pos;
     }
@@ -62838,9 +62843,11 @@ function snippet$3() {
 
 let EditorWidget$7 = class EditorWidget {
 
-  constructor(visibleValue, view, enumenator, denumenator, ref) {
+  constructor(visibleValue, view, enumenator, denumenator, ref, placeholder) {
     this.view = view;
     this.visibleValue = visibleValue;
+    this.placeholder = placeholder;
+    console.log(placeholder);
 
     this.args = matchArguments(visibleValue.str, /\(\*,\*\)/gm);
 
@@ -62862,18 +62869,34 @@ let EditorWidget$7 = class EditorWidget {
       extensions: [
         keymap.of([
           { key: "ArrowLeft", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              //const range = self.placeholder.placeholder.placeholder;
+              console.log(self.visibleValue.pos);
+              //if (self.visibleValue.pos == 0) return;
+
+              view.dispatch({selection: {anchor: self.visibleValue.pos}});
               view.focus();
-            editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+              editor.editorLastCursor = undefined;
+              return;
+            } else {
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            }
+            
           } }, 
           { key: "ArrowRight", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-              view.focus();
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              bottomEditor.focus();
+              editor.editorLastCursor = undefined;
+              return;
+            }
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
           } },             
           { key: "ArrowDown", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
               bottomEditor.focus();
+              editor.editorLastCursor = undefined;
+              return;
+            }
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
           } }
         ])
@@ -62890,21 +62913,37 @@ let EditorWidget$7 = class EditorWidget {
       extensions: [
         keymap.of([
           { key: "ArrowLeft", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-              view.focus();
-            editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              //const range = self.placeholder.placeholder.placeholder;
+              topEditor.focus();
+              editor.editorLastCursor = undefined;
+              return;
+            } else {
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            }
+            
           } }, 
           { key: "ArrowRight", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              
+              view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
               view.focus();
+            
+
+              editor.editorLastCursor = undefined;
+              return;
+            }
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
           } },             
           { key: "ArrowUp", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
               topEditor.focus();
+              editor.editorLastCursor = undefined;
+              return;
+            }
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
           } }
-        ])
+        ])        
       ]  
     });  
 
@@ -62934,10 +62973,14 @@ let EditorWidget$7 = class EditorWidget {
       const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
 
       //shift other positions
-      args[0].to = args[0].to + (data.length - args[0].length);
-      args[2].from = args[2].from + (data.length - args[0].length);
+      const delta = data.length - args[0].length;
+
+      args[0].to = args[0].to + delta;
+      args[2].from = args[2].from + delta;
 
       args[0].length = data.length;
+
+      this.visibleValue.length = this.visibleValue.length + delta;
 
       //console.log(changes);
 
@@ -62948,8 +62991,11 @@ let EditorWidget$7 = class EditorWidget {
       const changes = {from: relative + args[2].from, to: relative + args[2].from + args[2].length, insert: data};
 
       //shift other positions
-      args[2].to = args[2].to + (data.length - args[2].length);
+      const delta = (data.length - args[2].length);
+      args[2].to = args[2].to + delta;
       args[2].length = data.length;
+
+      this.visibleValue.length = this.visibleValue.length + delta;
 
       //console.log(changes);
 
@@ -62959,9 +63005,10 @@ let EditorWidget$7 = class EditorWidget {
   }
 
 
-  update(visibleValue) {
+  update(visibleValue, placeholder) {
     //console.log('Update instance: new ranges & arguments');
     this.visibleValue.pos = visibleValue.pos;
+    this.placeholder = placeholder;
     this.visibleValue.argsPos = visibleValue.argsPos;
   }
 
@@ -62973,11 +63020,13 @@ let EditorWidget$7 = class EditorWidget {
 };
 
 let Widget$7 = class Widget extends WidgetType {
-  constructor(visibleValue, ref, view) {
+  constructor(visibleValue, ref, view, placeholder) {
     super();
     this.view = view;
     this.visibleValue = visibleValue;
     this.reference = ref;
+    this.placeholder = placeholder;
+    //console.log(atomicInstance);
     //console.log('construct');
   }
 
@@ -62987,11 +63036,24 @@ let Widget$7 = class Widget extends WidgetType {
 
   updateDOM(dom, view) {
     //console.log(this.visibleValue);
-    //console.log(this);
+    console.log(this);
     console.log('update widget DOM');
-    dom.EditorWidget.update(this.visibleValue);
+    this.DOMElement = dom;
+
+    dom.EditorWidget.update(this.visibleValue, this);
 
     return true
+  }
+
+  skipPosition(pos, oldPos) {
+    //this.DOMElement.EditorWidget.wantedPosition = pos;
+    if (pos.from - oldPos.from > 0) {
+      this.DOMElement.EditorWidget.topEditor.focus();
+    } else {
+      this.DOMElement.EditorWidget.bottomEditor.focus();
+    }
+
+    return oldPos;
   }
 
   toDOM(view) {
@@ -63021,8 +63083,12 @@ let Widget$7 = class Widget extends WidgetType {
     const denumenator = document.createElement("td");
     trd.appendChild(denumenator);
 
-    span.EditorWidget = new EditorWidget$7(this.visibleValue, view, enumenator, denumenator, []);
     const self = this;
+
+    span.EditorWidget = new EditorWidget$7(this.visibleValue, view, enumenator, denumenator, [], this);
+    
+
+    this.DOMElement = span;
       
     this.reference.push({destroy: () => {
       self.destroy(span);
@@ -63040,13 +63106,13 @@ let Widget$7 = class Widget extends WidgetType {
   }
 };
 
-const matcher$7 = (ref, view) => {
+const matcher$7 = (ref, view, placeholder) => {
   return new BallancedMatchDecorator2({
     tag: 'FB',
     decoration: (match) => {
       
       return Decoration.replace({
-        widget: new Widget$7(match, ref, view)
+        widget: new Widget$7(match, ref, view, placeholder)
       });
     }
   });
@@ -63056,14 +63122,14 @@ const placeholder$7 = (ref) => ViewPlugin.fromClass(
   class {
     constructor(view) {
       this.disposable = [];
-      this.placeholder = matcher$7(this.disposable, view).createDeco(view);
+      this.placeholder = matcher$7(this.disposable, view, this).createDeco(view);
       ref.placeholder = this;
       //ref.view = view});
     }
     update(update) {
       //console.log('update Deco');
       //console.log(this.disposable );
-      this.placeholder = matcher$7(this.disposable, update).updateDeco(
+      this.placeholder = matcher$7(this.disposable, update, this).updateDeco(
         update,
         this.placeholder
       );
@@ -63154,13 +63220,22 @@ var compactCMEditor$5;
         extensions: [
           keymap.of([
             { key: "ArrowRight", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
                 view.focus();
+
+                editor.editorLastCursor = undefined;
+                return;
+              }
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
             } },   
             { key: "ArrowLeft", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                view.dispatch({selection: {anchor: self.visibleValue.pos}});
                 view.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              }
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
             } }
           ])
@@ -63188,7 +63263,9 @@ var compactCMEditor$5;
 
       //console.log('insert change');
       //console.log(changes);
-      this.length = data.length;
+      const delta = this.length - data.length;
+      this.length = this.length + delta;
+      this.visibleValue.length = this.visibleValue.length + delta;
       
       this.view.dispatch({changes: changes});
     }
@@ -63224,6 +63301,7 @@ var compactCMEditor$5;
       //console.log(this.visibleValue);
       //console.log(this);
       //console.log('update widget DOM');
+      this.DOMElement = dom;
       dom.EditorWidget.update(this.visibleValue);
 
       return true
@@ -63253,7 +63331,16 @@ var compactCMEditor$5;
         self.destroy(span);
       }});      
 
+      this.DOMElement = span;
+
       return span;
+    }
+
+    skipPosition(pos, oldPos) {
+      //this.DOMElement.EditorWidget.wantedPosition = pos;
+      this.DOMElement.EditorWidget.editor.focus();
+  
+      return oldPos;
     }
   
     ignoreEvent() {
@@ -63376,13 +63463,21 @@ let EditorWidget$5 = class EditorWidget {
       extensions: [
         keymap.of([
           { key: "ArrowLeft", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              view.dispatch({selection: {anchor: self.visibleValue.pos }});
               view.focus();
+              editor.editorLastCursor = undefined;
+              return;
+            }
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
           } },   
           { key: "ArrowRight", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
               bottomEditor.focus();
+              editor.editorLastCursor = undefined;
+            
+              return;
+            }
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
           } }
         ])
@@ -63396,13 +63491,21 @@ let EditorWidget$5 = class EditorWidget {
       extensions: [
         keymap.of([
           { key: "ArrowRight", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
               view.focus();
+              editor.editorLastCursor = undefined;
+              return;
+            }
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
           } },   
           { key: "ArrowLeft", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
               topEditor.focus();
+              editor.editorLastCursor = undefined;
+              return;
+            }
+              
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
           } }
         ])
@@ -63439,7 +63542,10 @@ let EditorWidget$5 = class EditorWidget {
       args[0].to = args[0].to + (data.length - args[0].length);
       args[2].from = args[2].from + (data.length - args[0].length);
 
+      const delta = data.length - args[0].length;
       args[0].length = data.length;
+
+      this.visibleValue.length = this.visibleValue.length + delta;
 
       //console.log(changes);
 
@@ -63451,9 +63557,11 @@ let EditorWidget$5 = class EditorWidget {
 
       //shift other positions
       args[2].to = args[2].to + (data.length - args[2].length);
+      const delta = data.length - args[2].length;
       args[2].length = data.length;
 
       //console.log(changes);
+      this.visibleValue.length = this.visibleValue.length + delta;
 
       this.view.dispatch({changes: changes});
       //lower one
@@ -63489,10 +63597,22 @@ let Widget$5 = class Widget extends WidgetType {
     return false;
   }
 
+  skipPosition(pos, oldPos) {
+    //this.DOMElement.EditorWidget.wantedPosition = pos;
+    if (pos.from - oldPos.from > 0) {
+      this.DOMElement.EditorWidget.topEditor.focus();
+    } else {
+      this.DOMElement.EditorWidget.bottomEditor.focus();
+    }    
+
+    return oldPos;
+  }
+
   updateDOM(dom, view) {
     //console.log(this.visibleValue);
     //console.log(this);
     console.log('update widget DOM');
+    this.DOMElement = dom;
     dom.EditorWidget.update(this.visibleValue);
 
     return true
@@ -63518,6 +63638,8 @@ let Widget$5 = class Widget extends WidgetType {
     this.reference.push({destroy: () => {
       self.destroy(span);
     }});
+
+    this.DOMElement = span;
 
     return span;
   }
@@ -63642,13 +63764,21 @@ var compactCMEditor$3;
         extensions: [
           keymap.of([
             { key: "ArrowLeft", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                
+                view.dispatch({selection: {anchor: self.visibleValue.pos}});
                 view.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              }
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
             } },   
             { key: "ArrowRight", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
                 bottomEditor.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              }
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
             } }
           ])
@@ -63662,13 +63792,20 @@ var compactCMEditor$3;
         extensions: [
           keymap.of([
             { key: "ArrowRight", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
                 view.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              }
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
             } },   
             { key: "ArrowLeft", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
                 topEditor.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              }
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
             } }
           ])
@@ -63705,8 +63842,10 @@ var compactCMEditor$3;
         //shift other positions
         args[0].to = args[0].to + (data.length - args[0].length);
         args[2].from = args[2].from + (data.length - args[0].length);
-  
+        const delta = data.length - args[0].length;
         args[0].length = data.length;
+
+        this.visibleValue.length = this.visibleValue.length + delta;
   
         //console.log(changes);
   
@@ -63718,7 +63857,10 @@ var compactCMEditor$3;
   
         //shift other positions
         args[2].to = args[2].to + (data.length - args[2].length);
+        const delta = data.length - args[2].length;
         args[2].length = data.length;
+
+        this.visibleValue.length = this.visibleValue.length + delta;
   
         //console.log(changes);
   
@@ -63758,6 +63900,7 @@ var compactCMEditor$3;
       //console.log(this.visibleValue);
       //console.log(this);
       console.log('update widget DOM');
+      this.DOMElement = dom;
       dom.EditorWidget.update(this.visibleValue);
   
       return true
@@ -63782,12 +63925,24 @@ var compactCMEditor$3;
       this.reference.push({destroy: () => {
         self.destroy(span);
       }});
+      this.DOMElement = span;
   
       return span;
     }
   
     ignoreEvent() {
       return true;
+    }
+
+    skipPosition(pos, oldPos) {
+      //this.DOMElement.EditorWidget.wantedPosition = pos;
+      if (pos.from - oldPos.from > 0) {
+        this.DOMElement.EditorWidget.topEditor.focus();
+      } else {
+        this.DOMElement.EditorWidget.bottomEditor.focus();
+      }    
+  
+      return oldPos;
     }
   
     destroy(dom) {
@@ -63856,11 +64011,14 @@ var compactCMEditor$2;
     ];
   }
   
+  
+  
   let EditorWidget$3 = class EditorWidget {
   
     constructor(visibleValue, view, tbody, ref) {
       this.view = view;
       this.visibleValue = visibleValue;
+      const self = this;
 
       //ref.push(self);
 
@@ -63900,37 +64058,54 @@ var compactCMEditor$2;
               keymap.of([
                 { key: "ArrowLeft", run: function (editor, key) {  
                   if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                    if (j - 2 >= 0)
+                    if (j - 2 >= 0) {
                       cols[j-2].editor.focus();
-                    else
+                      editor.editorLastCursor = undefined;
+                      return;
+                    } else {
+                      view.dispatch({selection: {anchor: self.visibleValue.pos}});
                       view.focus();
+
+                      editor.editorLastCursor = undefined;
+                      return;
+                    }
   
                   editor.editorLastCursor = editor.state.selection.ranges[0].to;  
                 } }, 
                 { key: "ArrowRight", run: function (editor, key) {  
                   if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                    if (j + 2 < cols.length)
+                    if (j + 2 < cols.length) {
                       cols[j+2].editor.focus();
-                    else
+                      editor.editorLastCursor = undefined;
+                      return;
+                    } else {
+                      //view.focus();
+                      view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
                       view.focus();
+
+                      editor.editorLastCursor = undefined;
+                      return;
+                    }
   
                   editor.editorLastCursor = editor.state.selection.ranges[0].to;  
                 } },             
                 { key: "ArrowUp", run: function (editor, key) {  
                   if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                    if (i - 2 >= 0)
+                    if (i - 2 >= 0) {
                       args[i-2].body[j].editor.focus();
-                    else
-                      view.focus();
+                      editor.editorLastCursor = undefined;
+                      return;
+                    }
   
                   editor.editorLastCursor = editor.state.selection.ranges[0].to;  
                 } },             
                 { key: "ArrowDown", run: function (editor, key) {  
                   if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                    if (i + 2 < args.length)
+                    if (i + 2 < args.length) {
                       args[i+2].body[j].editor.focus();
-                    else
-                      view.focus();
+                      editor.editorLastCursor = undefined;
+                      return;
+                    }
   
                   editor.editorLastCursor = editor.state.selection.ranges[0].to;  
                 } }
@@ -63971,18 +64146,20 @@ var compactCMEditor$2;
       const oldLength = parent[j].length;
       const changes = {from: relative1 + relative2 + parent[j].from, to: relative1 + relative2 + parent[j].from + oldLength, insert: text};
    
+      const delta = text.length - oldLength;
       //shift the next in a row
       for (let jj=j+1; jj<parent.length; jj+=1) {
-        parent[jj].from += (text.length - oldLength);
+        parent[jj].from += delta;
       }
 
       //shift the next in the col
       for (let ii=i+1; ii<args.length; ii+=1) {
-        args[ii].from += (text.length - oldLength);
+        args[ii].from += delta;
       }
 
-      this.args[i].length += (text.length - oldLength);
+      this.args[i].length += delta;
 
+      this.visibleValue.length = this.visibleValue.length + delta;
 
       //apply 
       parent[j].length = text.length;
@@ -64031,6 +64208,7 @@ var compactCMEditor$2;
       //console.log(this.visibleValue);
       //console.log(this);
       console.log('update widget DOM');
+      this.DOMElement = dom;
       dom.EditorWidget.update(this.visibleValue);
   
       return true
@@ -64055,9 +64233,24 @@ var compactCMEditor$2;
       this.reference.push({destroy: () => {
         self.destroy(span);
       }});  
+
+      this.DOMElement = span;
   
       return span;
     }
+
+    skipPosition(pos, oldPos) {
+      //this.DOMElement.EditorWidget.wantedPosition = pos;
+      if (pos.from - oldPos.from > 0) {
+        this.DOMElement.EditorWidget.args[0].body[0].editor.focus();
+      } else {
+        const args = this.DOMElement.EditorWidget.args;
+        //console.log(this.DOMElement.EditorWidget);
+        args[args.length - 1].body[args[args.length - 1].body.length - 1].editor.focus();
+      }
+  
+      return oldPos;
+    }    
   
     ignoreEvent() {
       return true;
@@ -71692,13 +71885,30 @@ let EditorWidget$1 = class EditorWidget {
         extensions: [
           keymap.of([
             { key: "ArrowLeft", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+
+                console.log(self.visibleValue.pos);
+                //if (self.visibleValue.pos == 0) return;
+  
+                view.dispatch({selection: {anchor: self.visibleValue.pos}});
                 view.focus();
+
+                editor.editorLastCursor = undefined;
+                return;
+              }
+                
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
             } }, 
             { key: "ArrowRight", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                console.log(self.visibleValue.pos);
+                //if (self.visibleValue.pos == 0) return;
+  
+                view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
                 view.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              }
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
             } }
           ])
@@ -71718,8 +71928,9 @@ let EditorWidget$1 = class EditorWidget {
       const data = '('+this.prolog.string+update+this.epilog.string+')';
       const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
 
-  
+      const delta = data.length - args[0].length;
       args[0].length = data.length;
+      this.visibleValue.length = this.visibleValue.length + delta;
 
 
       this.view.dispatch({changes: changes});
@@ -71764,6 +71975,7 @@ let Widget$1 = class Widget extends WidgetType {
     //console.log(this.visibleValue);
     //console.log(this);
     console.log('update widget DOM');
+    this.DOMElement = dom;
     dom.EditorWidget.update(this.visibleValue);
 
     return true
@@ -71783,9 +71995,17 @@ let Widget$1 = class Widget extends WidgetType {
       self.destroy(span);
     }});      
 
+    this.DOMElement = span;
 
     return span;
   }
+
+  skipPosition(pos, oldPos) {
+    //this.DOMElement.EditorWidget.wantedPosition = pos;
+    this.DOMElement.EditorWidget.editor.focus();
+
+    return oldPos;
+  }  
 
   ignoreEvent() {
     return true;

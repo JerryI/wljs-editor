@@ -76,13 +76,22 @@ import {
         extensions: [
           keymap.of([
             { key: "ArrowRight", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                view.focus()
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
+                view.focus();
+
+                editor.editorLastCursor = undefined;
+                return;
+              }
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
             } },   
             { key: "ArrowLeft", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                view.focus()
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                view.dispatch({selection: {anchor: self.visibleValue.pos}});
+                view.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              }
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
             } }
           ])
@@ -110,7 +119,9 @@ import {
 
       //console.log('insert change');
       //console.log(changes);
-      this.length = data.length;
+      const delta = this.length - data.length;
+      this.length = this.length + delta;
+      this.visibleValue.length = this.visibleValue.length + delta;
       
       this.view.dispatch({changes: changes});
     }
@@ -147,6 +158,7 @@ import {
       //console.log(this.visibleValue);
       //console.log(this);
       //console.log('update widget DOM');
+      this.DOMElement = dom;
       dom.EditorWidget.update(this.visibleValue);
 
       return true
@@ -176,7 +188,16 @@ import {
         self.destroy(span);
       }});      
 
+      this.DOMElement = span;
+
       return span;
+    }
+
+    skipPosition(pos, oldPos) {
+      //this.DOMElement.EditorWidget.wantedPosition = pos;
+      this.DOMElement.EditorWidget.editor.focus();
+  
+      return oldPos;
     }
   
     ignoreEvent() {

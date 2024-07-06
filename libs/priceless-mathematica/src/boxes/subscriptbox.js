@@ -76,13 +76,21 @@ class EditorWidget {
       extensions: [
         keymap.of([
           { key: "ArrowLeft", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-              view.focus()
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              view.dispatch({selection: {anchor: self.visibleValue.pos }});
+              view.focus();
+              editor.editorLastCursor = undefined;
+              return;
+            }
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
           } },   
           { key: "ArrowRight", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
               bottomEditor.focus();
+              editor.editorLastCursor = undefined;
+            
+              return;
+            }
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
           } }
         ])
@@ -96,13 +104,21 @@ class EditorWidget {
       extensions: [
         keymap.of([
           { key: "ArrowRight", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-              view.focus()
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
+              view.focus();
+              editor.editorLastCursor = undefined;
+              return;
+            }
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
           } },   
           { key: "ArrowLeft", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
               topEditor.focus();
+              editor.editorLastCursor = undefined;
+              return;
+            }
+              
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
           } }
         ])
@@ -139,7 +155,10 @@ class EditorWidget {
       args[0].to = args[0].to + (data.length - args[0].length);
       args[2].from = args[2].from + (data.length - args[0].length);
 
+      const delta = data.length - args[0].length;
       args[0].length = data.length;
+
+      this.visibleValue.length = this.visibleValue.length + delta;
 
       //console.log(changes);
 
@@ -151,9 +170,11 @@ class EditorWidget {
 
       //shift other positions
       args[2].to = args[2].to + (data.length - args[2].length);
+      const delta = data.length - args[2].length;
       args[2].length = data.length;
 
       //console.log(changes);
+      this.visibleValue.length = this.visibleValue.length + delta;
 
       this.view.dispatch({changes: changes});
       //lower one
@@ -190,10 +211,22 @@ class Widget extends WidgetType {
     return this.visibleValue.str === other.visibleValue.str;
   }
 
+  skipPosition(pos, oldPos) {
+    //this.DOMElement.EditorWidget.wantedPosition = pos;
+    if (pos.from - oldPos.from > 0) {
+      this.DOMElement.EditorWidget.topEditor.focus();
+    } else {
+      this.DOMElement.EditorWidget.bottomEditor.focus();
+    }    
+
+    return oldPos;
+  }
+
   updateDOM(dom, view) {
     //console.log(this.visibleValue);
     //console.log(this);
     console.log('update widget DOM');
+    this.DOMElement = dom;
     dom.EditorWidget.update(this.visibleValue);
 
     return true
@@ -219,6 +252,8 @@ class Widget extends WidgetType {
     this.reference.push({destroy: () => {
       self.destroy(span);
     }});
+
+    this.DOMElement = span;
 
     return span;
   }
