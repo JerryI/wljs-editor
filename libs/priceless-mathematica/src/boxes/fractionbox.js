@@ -99,9 +99,11 @@ function snippet() {
 
 class EditorWidget {
 
-  constructor(visibleValue, view, enumenator, denumenator, ref) {
+  constructor(visibleValue, view, enumenator, denumenator, ref, placeholder) {
     this.view = view;
     this.visibleValue = visibleValue;
+    this.placeholder = placeholder;
+    console.log(placeholder);
 
     this.args = matchArguments(visibleValue.str, /\(\*,\*\)/gm);
 
@@ -123,19 +125,32 @@ class EditorWidget {
       extensions: [
         keymap.of([
           { key: "ArrowLeft", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-              view.focus()
-            editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              //const range = self.placeholder.placeholder.placeholder;
+              console.log(self.visibleValue.pos);
+              //if (self.visibleValue.pos == 0) return;
+
+              view.dispatch({selection: {anchor: self.visibleValue.pos}});
+              view.focus();
+              editor.editorLastCursor = undefined;
+              return;
+            } else {
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            }
+            
           } }, 
           { key: "ArrowRight", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-              view.focus()
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              bottomEditor.dispatch({selection: {anchor: 0}});
+              bottomEditor.focus();
+              editor.editorLastCursor = undefined;
+              return;
+            }
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
           } },             
           { key: "ArrowDown", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-              bottomEditor.focus();
-            editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            bottomEditor.focus();
+            editor.editorLastCursor = undefined; 
           } }
         ])
       ]
@@ -151,21 +166,34 @@ class EditorWidget {
       extensions: [
         keymap.of([
           { key: "ArrowLeft", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-              view.focus()
-            editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              //const range = self.placeholder.placeholder.placeholder;
+              topEditor.dispatch({selection: {anchor: topEditor.state.doc.length}});
+              topEditor.focus();
+              editor.editorLastCursor = undefined;
+              return;
+            } else {
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            }
+            
           } }, 
           { key: "ArrowRight", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-              view.focus()
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              
+              view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
+              view.focus();
+            
+
+              editor.editorLastCursor = undefined;
+              return;
+            }
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
           } },             
           { key: "ArrowUp", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-              topEditor.focus();
-            editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            topEditor.focus();
+            editor.editorLastCursor = undefined;
           } }
-        ])
+        ])        
       ]  
     });  
 
@@ -195,10 +223,14 @@ class EditorWidget {
       const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
 
       //shift other positions
-      args[0].to = args[0].to + (data.length - args[0].length);
-      args[2].from = args[2].from + (data.length - args[0].length);
+      const delta = data.length - args[0].length;
+
+      args[0].to = args[0].to + delta;
+      args[2].from = args[2].from + delta;
 
       args[0].length = data.length;
+
+      this.visibleValue.length = this.visibleValue.length + delta;
 
       //console.log(changes);
 
@@ -209,8 +241,11 @@ class EditorWidget {
       const changes = {from: relative + args[2].from, to: relative + args[2].from + args[2].length, insert: data};
 
       //shift other positions
-      args[2].to = args[2].to + (data.length - args[2].length);
+      const delta = (data.length - args[2].length);
+      args[2].to = args[2].to + delta;
       args[2].length = data.length;
+
+      this.visibleValue.length = this.visibleValue.length + delta;
 
       //console.log(changes);
 
@@ -220,25 +255,28 @@ class EditorWidget {
   }
 
 
-  update(visibleValue) {
+  update(visibleValue, placeholder) {
     //console.log('Update instance: new ranges & arguments');
     this.visibleValue.pos = visibleValue.pos;
+    this.placeholder = placeholder;
     this.visibleValue.argsPos = visibleValue.argsPos;
   }
 
   destroy() {
-    console.warn('destroy Instance of Widget!');
+    //console.warn('destroy Instance of Widget!');
     this.topEditor.destroy();
     this.bottomEditor.destroy();
   }
 }
 
 class Widget extends WidgetType {
-  constructor(visibleValue, ref, view) {
+  constructor(visibleValue, ref, view, placeholder) {
     super();
     this.view = view;
     this.visibleValue = visibleValue;
     this.reference = ref;
+    this.placeholder = placeholder;
+    //console.log(atomicInstance);
     //console.log('construct');
   }
 
@@ -250,10 +288,30 @@ class Widget extends WidgetType {
   updateDOM(dom, view) {
     //console.log(this.visibleValue);
     //console.log(this);
-    console.log('update widget DOM');
-    dom.EditorWidget.update(this.visibleValue);
+    //console.log('update widget DOM');
+    this.DOMElement = dom;
+
+    dom.EditorWidget.update(this.visibleValue, this);
 
     return true
+  }
+
+  skipPosition(pos, oldPos, selected) {
+    if (oldPos.from != oldPos.to || selected) return pos;
+    //this.DOMElement.EditorWidget.wantedPosition = pos;
+    if (pos.from - oldPos.from > 0) {
+      //this.DOMElement.EditorWidget.topEditor.dispatch()
+      this.DOMElement.EditorWidget.topEditor.dispatch({selection: {anchor: 0}});
+      this.DOMElement.EditorWidget.topEditor.focus();
+      //this.DOMElement.EditorWidget.topEditor.focus();
+    } else {
+      const editor = this.DOMElement.EditorWidget.bottomEditor;
+      editor.dispatch({selection: {anchor: editor.state.doc.length}});
+      editor.focus();
+      //this.DOMElement.EditorWidget.bottomEditor.focus();
+    }
+
+    return oldPos;
   }
 
   toDOM(view) {
@@ -283,8 +341,12 @@ class Widget extends WidgetType {
     const denumenator = document.createElement("td");
     trd.appendChild(denumenator);
 
-    span.EditorWidget = new EditorWidget(this.visibleValue, view, enumenator, denumenator, []);
     const self = this;
+
+    span.EditorWidget = new EditorWidget(this.visibleValue, view, enumenator, denumenator, [], this);
+    
+
+    this.DOMElement = span;
       
     this.reference.push({destroy: () => {
       self.destroy(span);
@@ -298,17 +360,18 @@ class Widget extends WidgetType {
   }
 
   destroy(dom) {
+    //console.warn('destroy WindgetType')
     dom.EditorWidget.destroy();
   }
 }
 
-const matcher = (ref, view) => {
+const matcher = (ref, view, placeholder) => {
   return new BallancedMatchDecorator2({
     tag: 'FB',
     decoration: (match) => {
-      
+      //console.log(match);
       return Decoration.replace({
-        widget: new Widget(match, ref, view)
+        widget: new Widget(match, ref, view, placeholder)
       });
     }
   });
@@ -318,14 +381,14 @@ const placeholder = (ref) => ViewPlugin.fromClass(
   class {
     constructor(view) {
       this.disposable = [];
-      this.placeholder = matcher(this.disposable, view).createDeco(view);
+      this.placeholder = matcher(this.disposable, view, this).createDeco(view);
       ref.placeholder = this;
       //ref.view = view});
     }
     update(update) {
       //console.log('update Deco');
       //console.log(this.disposable );
-      this.placeholder = matcher(this.disposable, update).updateDeco(
+      this.placeholder = matcher(this.disposable, update, this).updateDeco(
         update,
         this.placeholder
       );
