@@ -326,7 +326,7 @@ compactWLEditor = (args) => {
     BoxBoxWidget(compactWLEditor),
     TemplateBoxWidget(compactWLEditor),
     //bracketMatching(),
-    rainbowBrackets(),
+    //rainbowBrackets(),
     Greekholder,
     extras,
     
@@ -395,8 +395,8 @@ const mathematicaPlugins = [
   ViewBoxWidget(compactWLEditor),
   BoxBoxWidget(compactWLEditor),  
   TemplateBoxWidget(compactWLEditor),
-  //bracketMatching(),
-  rainbowBrackets(),
+  bracketMatching(),
+  //rainbowBrackets(),
   Greekholder,
   extras,
   DropPasteHandlers(wlDrop, wlPaste)
@@ -489,7 +489,7 @@ window.EditorExtensionsMinimal = [
   () => drawSelection(),
   () => dropCursor(),
   () => indentOnInput(),
-  //() => bracketMatching(),
+  () => bracketMatching(),
   //() => closeBrackets(),
   () => EditorView.lineWrapping,
   () => autocompletion(),
@@ -513,9 +513,9 @@ window.EditorExtensions = [
       return [];
     },
   () => indentOnInput(),
-  //() => bracketMatching(),
+  () => bracketMatching(),
  // () => test(),
-  () => closeBrackets(),
+  //() => closeBrackets(),
   () => EditorView.lineWrapping,
   () => autocompletion(),
   () => syntaxHighlighting(defaultHighlightStyle, { fallback: false }),
@@ -537,16 +537,16 @@ window.EditorExtensions = [
       editor.editorLastCursor = editor.state.selection.ranges[0].to;  
     } },                      
     { key: "ArrowUp", run: function (editor, key) {  
-      console.log('arrowup');
-      console.log(editor.state.selection.ranges[0]);
+      //console.log('arrowup');
+      //console.log(editor.state.selection.ranges[0]);
       if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
       self.origin.focusPrev(self.origin);
 
       editor.editorLastCursor = editor.state.selection.ranges[0].to;  
     } },
     { key: "ArrowDown", run: function (editor, key) { 
-      console.log('arrowdown');
-      console.log(editor.state.selection.ranges[0]);
+      //console.log('arrowdown');
+      //console.log(editor.state.selection.ranges[0]);
       if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
       self.origin.focusNext(self.origin);
 

@@ -68,12 +68,16 @@ import {
           cols[j].editor = compactCMEditor({
             doc: text,
             parent: td,
+            eval: () => {
+              view.viewState.state.config.eval();
+            },
             update: (upd) => this.applyChanges(upd, i,j),
             extensions: [
               keymap.of([
                 { key: "ArrowLeft", run: function (editor, key) {  
                   if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
                     if (j - 2 >= 0) {
+                      cols[j-2].editor.dispatch({selection:{anchor:cols[j-2].editor.state.doc.length}});
                       cols[j-2].editor.focus();
                       editor.editorLastCursor = undefined;
                       return;
@@ -90,6 +94,7 @@ import {
                 { key: "ArrowRight", run: function (editor, key) {  
                   if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
                     if (j + 2 < cols.length) {
+                      cols[j+2].editor.dispatch({selection:{anchor:0}});
                       cols[j+2].editor.focus();
                       editor.editorLastCursor = undefined;
                       return;
@@ -105,7 +110,7 @@ import {
                   editor.editorLastCursor = editor.state.selection.ranges[0].to;  
                 } },             
                 { key: "ArrowUp", run: function (editor, key) {  
-                  if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+                  //if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
                     if (i - 2 >= 0) {
                       args[i-2].body[j].editor.focus();
                       editor.editorLastCursor = undefined;
@@ -114,10 +119,10 @@ import {
                       //view.focus();
                     }
   
-                  editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+                  //editor.editorLastCursor = editor.state.selection.ranges[0].to;  
                 } },             
                 { key: "ArrowDown", run: function (editor, key) {  
-                  if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+                  //if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
                     if (i + 2 < args.length) {
                       args[i+2].body[j].editor.focus();
                       editor.editorLastCursor = undefined;
@@ -126,7 +131,7 @@ import {
                       //view.focus();
                     }
   
-                  editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+                  //editor.editorLastCursor = editor.state.selection.ranges[0].to;  
                 } }
               ])
             ] 
@@ -261,13 +266,16 @@ import {
 
     skipPosition(pos, oldPos, selected) {
       if (oldPos.from != oldPos.to || selected) return pos;
-      
+
       if (pos.from - oldPos.from > 0) {
+        this.DOMElement.EditorWidget.args[0].body[0].editor.dispatch({selection: {anchor: 0}});
         this.DOMElement.EditorWidget.args[0].body[0].editor.focus();
       } else {
         const args = this.DOMElement.EditorWidget.args;
         //console.log(this.DOMElement.EditorWidget);
-        args[args.length - 1].body[args[args.length - 1].body.length - 1].editor.focus();
+        const editor = args[args.length - 1].body[args[args.length - 1].body.length - 1].editor;
+        editor.dispatch({selection: {anchor: editor.state.doc.length}});
+        editor.focus();
       }
   
       return oldPos;

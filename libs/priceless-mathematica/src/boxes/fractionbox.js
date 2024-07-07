@@ -141,6 +141,7 @@ class EditorWidget {
           } }, 
           { key: "ArrowRight", run: function (editor, key) {  
             if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              bottomEditor.dispatch({selection: {anchor: 0}});
               bottomEditor.focus();
               editor.editorLastCursor = undefined;
               return;
@@ -148,12 +149,8 @@ class EditorWidget {
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
           } },             
           { key: "ArrowDown", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
-              bottomEditor.focus();
-              editor.editorLastCursor = undefined;
-              return;
-            }
-            editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            bottomEditor.focus();
+            editor.editorLastCursor = undefined; 
           } }
         ])
       ]
@@ -171,6 +168,7 @@ class EditorWidget {
           { key: "ArrowLeft", run: function (editor, key) {  
             if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
               //const range = self.placeholder.placeholder.placeholder;
+              topEditor.dispatch({selection: {anchor: topEditor.state.doc.length}});
               topEditor.focus();
               editor.editorLastCursor = undefined;
               return;
@@ -192,12 +190,8 @@ class EditorWidget {
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
           } },             
           { key: "ArrowUp", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
-              topEditor.focus();
-              editor.editorLastCursor = undefined;
-              return;
-            }
-            editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            topEditor.focus();
+            editor.editorLastCursor = undefined;
           } }
         ])        
       ]  
@@ -269,7 +263,7 @@ class EditorWidget {
   }
 
   destroy() {
-    console.warn('destroy Instance of Widget!');
+    //console.warn('destroy Instance of Widget!');
     this.topEditor.destroy();
     this.bottomEditor.destroy();
   }
@@ -293,8 +287,8 @@ class Widget extends WidgetType {
 
   updateDOM(dom, view) {
     //console.log(this.visibleValue);
-    console.log(this);
-    console.log('update widget DOM');
+    //console.log(this);
+    //console.log('update widget DOM');
     this.DOMElement = dom;
 
     dom.EditorWidget.update(this.visibleValue, this);
@@ -306,9 +300,15 @@ class Widget extends WidgetType {
     if (oldPos.from != oldPos.to || selected) return pos;
     //this.DOMElement.EditorWidget.wantedPosition = pos;
     if (pos.from - oldPos.from > 0) {
+      //this.DOMElement.EditorWidget.topEditor.dispatch()
+      this.DOMElement.EditorWidget.topEditor.dispatch({selection: {anchor: 0}});
       this.DOMElement.EditorWidget.topEditor.focus();
+      //this.DOMElement.EditorWidget.topEditor.focus();
     } else {
-      this.DOMElement.EditorWidget.bottomEditor.focus();
+      const editor = this.DOMElement.EditorWidget.bottomEditor;
+      editor.dispatch({selection: {anchor: editor.state.doc.length}});
+      editor.focus();
+      //this.DOMElement.EditorWidget.bottomEditor.focus();
     }
 
     return oldPos;
@@ -360,6 +360,7 @@ class Widget extends WidgetType {
   }
 
   destroy(dom) {
+    //console.warn('destroy WindgetType')
     dom.EditorWidget.destroy();
   }
 }
@@ -368,7 +369,7 @@ const matcher = (ref, view, placeholder) => {
   return new BallancedMatchDecorator2({
     tag: 'FB',
     decoration: (match) => {
-      
+      //console.log(match);
       return Decoration.replace({
         widget: new Widget(match, ref, view, placeholder)
       });

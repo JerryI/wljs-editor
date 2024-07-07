@@ -195,9 +195,17 @@ import {
 
     skipPosition(pos, oldPos, selected) {
       if (oldPos.from != oldPos.to || selected) return pos;
-      
+
+      if (pos.from - oldPos.from > 0) {
+        this.DOMElement.EditorWidget.editor.dispatch({selection: {anchor: 0}});
+        this.DOMElement.EditorWidget.editor.focus();
+      } else {
+        const editor = this.DOMElement.EditorWidget.editor;
+        editor.dispatch({selection: {anchor: editor.state.doc.length}});
+        editor.focus();
+      }
       //this.DOMElement.EditorWidget.wantedPosition = pos;
-      this.DOMElement.EditorWidget.editor.focus();
+      
   
       return oldPos;
     }

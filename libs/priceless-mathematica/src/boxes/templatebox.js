@@ -219,10 +219,14 @@ class Widget extends WidgetType {
 
     const editors = this.DOMElement.EditorWidget.editors;
     if (pos.from - oldPos.from < 0) {
+      editors[editors.length - 1].dispatch({selection: {anchor: editors[editors.length - 1].state.doc.length}});
       editors[editors.length - 1].focus();
     } else {
+      editors[0].dispatch({selection: {anchor: 0}});
       editors[0].focus();
     }    
+
+
 
     return oldPos;
   }  
