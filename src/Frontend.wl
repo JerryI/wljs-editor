@@ -22,6 +22,10 @@ NotebookEditorChannel = CreateUUID[];
 
 rootFolder = $InputFileName // DirectoryName;
 
+specialCharsFix[s_String] := With[{},
+    s
+]
+
 evaluator  = StandardEvaluator["Name" -> "Wolfram Evaluator", "InitKernel" -> init, "Priority"->(999)];
 
     StandardEvaluator`ReadyQ[evaluator, k_] := (
@@ -38,6 +42,7 @@ evaluator  = StandardEvaluator["Name" -> "Wolfram Evaluator", "InitKernel" -> in
 
     StandardEvaluator`Evaluate[evaluator, k_, t_] := Module[{list},
      t["Evaluator"] = Notebook`Editor`WolframEvaluator;
+     t["Data"] = specialCharsFix[t["Data"] ];
 
      With[{check = CheckSyntax[t["Data"] ]},
         If[! TrueQ[check],
@@ -58,10 +63,10 @@ evaluator  = StandardEvaluator["Name" -> "Wolfram Evaluator", "InitKernel" -> in
                 If[StringTake[message, -1] === ";", 
                     transaction["Nohup"] = True;
                     transaction["EvaluationContext"] = t["EvaluationContext"];
-                    transaction["Data"] = StringDrop[StringReplace[message, "%" -> "Global`$$out"], -1];
+                    transaction["Data"] = StringDrop[message, -1];
                 ,
                     transaction["EvaluationContext"] = t["EvaluationContext"];
-                    transaction["Data"] = StringReplace[message, "%" -> "Global`$$out"];
+                    transaction["Data"] = message;
                 ];
                 (*  FIXME TODO Normal OUT Support *)
                 (*  FIXME TODO Normal OUT Support *)
@@ -110,13 +115,13 @@ init[k_] := Module[{},
           Block[{
             Global`$EvaluationContext = Join[t["EvaluationContext"], <|"ResultCellHash" -> hash|>]
           },
-            With[{result = ToExpression[ t["Data"], InputForm, Hold] // ReleaseHold },
+            With[{result = (ToExpression[ t["Data"], InputForm, Hold] /. Out -> $PreviousOut) // ReleaseHold },
                 If[KeyExistsQ[t, "Nohup"],
                     EventFire[Internal`Kernel`Stdout[ t["Hash"] ], "Result", <|"Data" -> Null |> ];
                 ,   
                     (* check length *)
                     With[{string = ToString[result, StandardForm]},
-                        If[StringLength[string] < 10000,
+                        If[StringLength[string] < 30000,
                             EventFire[Internal`Kernel`Stdout[ t["Hash"] ], "Result", <|"Data" -> string, "Meta"->Sequence["Hash"->hash] |> ];
                         ,
                             With[{truncated = ToString[result, InputForm]},
@@ -128,16 +133,16 @@ init[k_] := Module[{},
                 ];
                 
                 (*  FIXME TODO Normal OUT Support *)
-                Global`$$out = result;
+                $PreviousOut[] = result;
             ];
           ];
         ] ];
     ];
 
-    (* !!!! Unknown bug with Boxes... have to do it separately *)
+    (* !!!! Unknown bug with Boxes... have to do it separately
     With[{p = Import[FileNameJoin[{rootFolder, "Boxes.wl"}], "String"]},
         Kernel`Init[k,   ToExpression[p, InputForm]; , "Once"->True];
-    ];
+    ];*)
 ]
 
 SplitExpression[astr_] := With[{str = StringReplace[astr, {"$Pi$"->"\[Pi]"}]},

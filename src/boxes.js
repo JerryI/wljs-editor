@@ -13,20 +13,325 @@
     console.log(args);
   }
 
+  boxes.PaneBox = async (args, env) => {
+    env.element.classList.add(...('sm-controls cursor-default rounded-md 0 py-1 px-2 bg-gray-100 text-left text-gray-500 ring-1 ring-inset ring-gray-400 text-xs flex flex-row'.split(' '))); 
+  
+    const opts = await core._getRules(args, {...env, hold:true});
+    if (opts.ImageSize) {
+      const size = await interpretate(opts.ImageSize, env);
+      if (size instanceof Object === true) {
+        env.element.style.width = size[0] + 'px';
+        env.element.style.height = size[1] + 'px';
+      } else {
+        env.element.style.maxWidth = size + 'px';
+      }
+    }
+
+    if (opts.Event) {
+      const ev = await interpretate(opts.Event, env);
+      env.element.addEventListener('click', () => {
+        console.log('clicked!');
+        server.kernel.emitt(ev, 'True', 'Click')
+      })
+    }
+  }
+
+  boxes.RootBox = async (args, env) => {
+    const approx = await interpretate(args[0], env);
+
+    env.element.classList.add(...('sm-controls cursor-default rounded-md 0 py-1 px-2 bg-gray-100 text-left text-gray-500 ring-1 ring-inset ring-gray-400 text-xs flex flex-row items-center'.split(' '))); 
+    
+    
+    const logo = document.createElement('span');
+    logo.innerHTML = `<svg class="w-5 h-5 text-teal-500" viewBox="0 0 512 512" >
+<g fill="currentColor">
+	<g>
+		<path d="M491.841,156.427c-19.471-45.946-51.936-85.013-92.786-112.637C358.217,16.166,308.893-0.007,256,0
+			c-35.254-0.002-68.946,7.18-99.571,20.158C110.484,39.63,71.416,72.093,43.791,112.943C16.167,153.779-0.007,203.104,0,256
+			c-0.002,35.255,7.181,68.948,20.159,99.573c19.471,45.946,51.937,85.013,92.786,112.637C153.783,495.834,203.107,512.007,256,512
+			c35.253,0.002,68.946-7.18,99.571-20.158c45.945-19.471,85.013-51.935,112.638-92.785C495.834,358.22,512.007,308.894,512,256
+			C512.002,220.744,504.819,187.052,491.841,156.427z M460.413,342.257c-16.851,39.781-45.045,73.724-80.476,97.677
+			c-35.443,23.953-78.02,37.926-123.936,37.933c-30.619-0.002-59.729-6.218-86.255-17.454
+			c-39.781-16.85-73.724-45.044-97.677-80.475C48.114,344.495,34.14,301.917,34.133,256c0.002-30.62,6.219-59.731,17.454-86.257
+			c16.851-39.781,45.045-73.724,80.476-97.677C167.506,48.112,210.084,34.139,256,34.132c30.619,0.002,59.729,6.218,86.255,17.454
+			c39.781,16.85,73.724,45.044,97.677,80.475c23.953,35.443,37.927,78.02,37.934,123.938
+			C477.864,286.62,471.648,315.731,460.413,342.257z"/>
+	</g>
+</g>
+<g fill="currentColor">
+	<g>
+		<path d="M389.594,128.108v-0.136h-77.93c-6.234,0-11.905,3.64-14.693,9.217L189.203,352.792l-52.104-104.309
+			c-2.789-5.576-8.459-9.182-14.693-9.182H89.007c-9.073,0-16.428,7.626-16.428,16.699c0,9.072,7.355,16.699,16.428,16.699h23.245
+			l62.256,124.377c2.789,5.576,8.459,9.013,14.693,9.013c6.234,0,11.905-3.402,14.693-8.979l117.923-235.74h67.777
+			c9.072,0,16.428-7.558,16.428-16.631C406.022,135.667,398.668,128.108,389.594,128.108z"/>
+	</g>
+</g>
+</svg>`;
+    const a = document.createElement('span');
+    if (Complex.isComplex(approx)) {
+      a.innerText = `${approx.re} + i ${approx.im}`;
+    } else {
+      a.innerText = approx;
+    }
+    a.classList.add('px-1');
+    env.element.appendChild(logo);
+    env.element.appendChild(a);
+
+
+  }
+  boxes.TransposeBox = async (args, env) => {
+    const post = document.createElement('sup');
+  
+    post.innerHTML = await interpretate(args[0], env)
+    
+  
+    const editor = document.createElement('span');
+    env.global.element = editor;
+  
+    env.element.style.display = "inline-flex";
+    env.element.style.alignItems = "baseline";
+  
+    env.element.appendChild(editor);
+    env.element.appendChild(post); 
+  }
+
+  boxes.DerivativeBox = async (args, env) => {
+    const post = document.createElement('sup');
+    const powers = await interpretate(args[0], env);
+  
+    post.innerHTML = "("+powers.join(',')+")";
+  
+    const editor = document.createElement('span');
+    env.global.element = editor;
+  
+    env.element.style.display = "inline-flex";
+    env.element.style.alignItems = "baseline";
+  
+    env.element.appendChild(editor);
+    env.element.appendChild(post);    
+  }
+
+  boxes.PiecewiseBox = async (args, env) => {
+    //let vars = await interpretate(args[0], env);
+    const taken = env.children;
+    const bonds = [];
+    for (let i=0; i<taken.length; i = i + 2) {
+      bonds.push([taken[i], taken[i+1]]);
+    }       
+
+    const outerDiv = document.createElement('table');
+    outerDiv.style.paddingLeft = "0.5rem";
+    outerDiv.style.borderLeft = "1px solid black";
+    outerDiv.style.borderBottomLeftRadius ="10px";
+    outerDiv.style.borderTopLeftRadius = "10px";
+    env.element.appendChild(outerDiv);
+    outerDiv.classList.add('flex', 'flex-row', 'items-center');
+
+    const table = document.createElement('tbody');
+    //table.classList.add('flex', 'flex-col');
+    bonds.forEach((pair) => {
+      const p = document.createElement('tr');
+      //p.classList.add('flex', 'flex-row');
+      const cell1 = document.createElement('td');
+      cell1.appendChild(pair[0]);
+      const cell2 = document.createElement('td');
+      cell2.classList.add('pl-5');
+      cell2.appendChild(pair[1]);
+      p.appendChild(cell1);
+      p.appendChild(cell2);
+
+      table.appendChild(p);
+    });
+
+    outerDiv.appendChild(table);
+
+
+  }
+
+  boxes.SumBox = async (args, env) => {
+    let vars = await interpretate(args[0], env);
+    let bonds = await interpretate(args[1], env);
+    
+    const number = vars;
+    const taken = env.children.slice(1);
+    vars = [];
+    bonds = [];
+    for (let i=0; i<taken.length; i = i + 3) {
+      vars.push(taken[i]);
+      bonds.push([taken[i+1], taken[i+2]]);
+    }   
+
+    const outerDiv = document.createElement('div');
+    env.element.appendChild(outerDiv);
+    outerDiv.classList.add('flex', 'flex-row', 'items-center');
+    // Create the SVG container div
+    for (let i=0; i<vars.length; ++i) {
+      const svgContainer = document.createElement('div');
+      svgContainer.innerHTML = `<svg class="w-7 h-13 text-gray-800" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.809 22H3.46l8.386-10.483L3.386 2H19v3h-1V3H5.613l7.541 8.483L5.54 21h12.65l.92-1.838.894.447z"/><path fill="none" d="M0 0h24v24H0z"/></svg>`;
+    
+      // Append the SVG container to the outer div
+      //outerDiv.appendChild(svgContainer);
+      if (bonds) {
+        if (i == vars.length - 1) continue;
+        const flexColDiv = document.createElement('div');
+        flexColDiv.classList.add('flex', 'flex-col', 'h-full', 'justify-between', 'mr-1');
+        bonds[i][1].classList.add('text-xs');
+        flexColDiv.appendChild(bonds[i][1]);
+
+        const wrapper = document.createElement('span');
+        wrapper.classList.add('text-xs', 'flex', 'flex-row');
+        wrapper.appendChild(vars[i]);
+        wrapper.appendChild(document.createTextNode('='));
+        wrapper.appendChild(bonds[i][0]);
+        flexColDiv.appendChild(svgContainer);
+        flexColDiv.appendChild(wrapper); 
+        outerDiv.appendChild(flexColDiv);       
+      }
+    }
+    // Create the flex-col div
+    const flexColDiv = document.createElement('div');
+    flexColDiv.classList.add('flex', 'flex-col');
+    // Create the first text div
+
+    // Create the middle div containing spans
+    const middleDiv = document.createElement('div');
+    middleDiv.classList.add('flex', 'flex-row');
+
+    if (bonds) {
+      const lastBound = bonds[bonds.length - 1];
+      lastBound[0].classList.add('text-xs');
+      lastBound[1].classList.add('text-xs');
+      
+
+
+      lastBound[1].classList.add('text-xs');
+      flexColDiv.appendChild(lastBound[1]);
+
+      const svgContainer = document.createElement('div');
+      svgContainer.innerHTML = `<svg class="w-7 h-13 text-gray-800" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.809 22H3.46l8.386-10.483L3.386 2H19v3h-1V3H5.613l7.541 8.483L5.54 21h12.65l.92-1.838.894.447z"/><path fill="none" d="M0 0h24v24H0z"/></svg>`;
+    
+
+      const wrapper = document.createElement('span');
+      wrapper.classList.add('text-xs', 'flex', 'flex-row');
+      wrapper.appendChild(vars[bonds.length - 1]);
+      wrapper.appendChild(document.createTextNode('='));
+      wrapper.appendChild(lastBound[0]);
+      flexColDiv.appendChild(svgContainer);
+      flexColDiv.appendChild(wrapper); 
+
+    } else {
+      flexColDiv.appendChild(middleDiv);
+    }
+
+    outerDiv.appendChild(flexColDiv);
+
+    outerDiv.appendChild(env.children[0]);
+    // Create the second text div
+    // Append the text and middle divs to the flex-col div
+    return;
+  }
+
+  boxes.IntegrateBox = async (args, env) => {
+    //const options = await core._getRules(args, env);
+
+    let vars = await interpretate(args[0], env);
+    let bonds = await interpretate(args[1], env);
+
+    const number = vars;
+    if (bonds) {
+      const taken = env.children.slice(1);
+      vars = [];
+      bonds = [];
+      for (let i=0; i<taken.length; i = i + 3) {
+        vars.push(taken[i]);
+        bonds.push([taken[i+1], taken[i+2]]);
+      }
+    } else {
+      vars = env.children.slice(1, number + 1); 
+    }
+
+   
+
+    const outerDiv = document.createElement('div');
+    env.element.appendChild(outerDiv);
+    outerDiv.classList.add('flex', 'flex-row', 'items-center');
+    // Create the SVG container div
+    for (let i=0; i<vars.length; ++i) {
+      const svgContainer = document.createElement('div');
+      svgContainer.innerHTML = `<svg class="w-4 h-10 text-gray-800" viewBox="28 7 2.000000 55.000000" preserveAspectRatio="xMidYMid meet">
+
+<g transform="translate(0.000000,75.000000) scale(0.100000,-0.100000)" fill="#000000" stroke="none">
+<path d="M342 648 c-24 -29 -49 -130 -87 -343 -19 -107 -33 -155 -46 -155 -5 0 -8 3 -7 7 2 5 0 9 -4 11 -5 1 -8 0 -8 -3 0 -3 0 -9 0 -15 0 -5 9 -10 20 -10 32 0 48 47 90 262 40 203 59 271 67 236 6 -23 26 -23 21 -1 -4 22 -31 28 -46 11z"></path>
+</g>
+</svg>`;
+    
+      // Append the SVG container to the outer div
+      outerDiv.appendChild(svgContainer);
+      if (bonds) {
+        if (i == vars.length - 1) continue;
+        const flexColDiv = document.createElement('div');
+        flexColDiv.classList.add('flex', 'flex-col', 'h-full', 'justify-between', 'mr-1');
+        bonds[i][0].classList.add('text-xs', '-ml-2');
+
+        bonds[i][1].classList.add('text-xs');
+        flexColDiv.appendChild(bonds[i][1]);
+        flexColDiv.appendChild(bonds[i][0]); 
+        outerDiv.appendChild(flexColDiv);       
+      }
+    }
+    // Create the flex-col div
+    const flexColDiv = document.createElement('div');
+    flexColDiv.classList.add('flex', 'flex-col');
+    // Create the first text div
+
+    // Create the middle div containing spans
+    const middleDiv = document.createElement('div');
+    middleDiv.classList.add('flex', 'flex-row');
+
+    if (bonds) {
+      const lastBound = bonds[bonds.length - 1];
+      lastBound[0].classList.add('text-xs', '-ml-2');
+      lastBound[1].classList.add('text-xs');
+      
+      flexColDiv.appendChild(lastBound[1]);
+      flexColDiv.appendChild(middleDiv);
+      flexColDiv.appendChild(lastBound[0]);
+    } else {
+      flexColDiv.appendChild(middleDiv);
+    }
+
+    outerDiv.appendChild(flexColDiv);
+
+    middleDiv.appendChild(env.children[0]);
+
+    for (let i=0; i<vars.length; ++i) {
+      const sign = document.createElement('span');
+      sign.innerHTML = "&dd;";
+      sign.classList.add('ml-1');
+      middleDiv.appendChild(sign);
+      middleDiv.appendChild(vars[i]);
+    }
+    // Create the second text div
+    // Append the text and middle divs to the flex-col div
+    return;
+
+  }
+
   boxes["ViewBox`InnerExpression"] = async (args, env) => {
+    if (args.length == 0) {
+      //console.log(env.global.EditorWidget.getDoc());
+      return env.global.EditorWidget.getDoc();
+    } 
+
     const changes = await interpretate(args[0], env);
     env.global.EditorWidget.applyChanges(changes);
+    return changes;
   }
 
   boxes["ViewBox`OuterExpression"] = async (args, env) => {
     const changes = await interpretate(args[0], env);
     env.global.EditorWidget.applyOuterChanges(changes);
   }  
-
-  boxes.ProvidedOptions = async (args, env) => {
-    env.options = await core._getRules(args.slice(1), env);
-    return await interpretate(args[0], env);
-  }
 
   boxes.FrameBox = async (args, env) => {
       env.element.classList.add('frame-box');
@@ -82,17 +387,141 @@
 
   }
 
+  boxes.Italic = () => "Italic"
+  boxes.Bold = () => "Bold"
+  boxes.Underlined = () => "Underlined"
+  boxes.FontSize = () => "FontSize"
+  boxes.FontFamily = () => "FontFamily"
+
+  boxes.StringBox = async (args, env) => {
+    env.context = boxes;
+    console.log('string style box');
+    
+    console.log(args);
+
+    //sort all rules to the end
+    args.sort((el) => {
+      if(Array.isArray(el)) {
+        if (el[0] == 'Rule') return 1;
+      }
+      return -1;
+    });
+
+    const options = await core._getRules(args, env) || {};
+
+    env.element.style.fontFamily = 'system-ui';
+    
+    if ('Background' in options) {
+      env.element.style.backgroundColor = options.Background;
+    } 
+
+    if ('FontSize' in options) {
+      env.element.style.fontSize = String(options.FontSize) + 'pt';
+    } 
+
+    if ('FontFamily' in options) {
+      env.element.style.fontFamily = options.FontFamily.toLowerCase();
+    }
+    
+    const data = [];
+    for (let i=0; i<(args.length - Object.keys(options).length); ++i) {
+      let result = await interpretate(args[i], env);
+
+      if (typeof result == 'string') {
+        result = result.toLocaleLowerCase();
+        
+        if (result.slice(0,3) == 'rgb') {
+          //this is a color
+          env.element.style.color = result;
+        } else {
+          //this is a font-face
+          if (result == 'italic') {
+            env.element.style.fontStyle = result;
+          } else if (result == 'bold') {
+            env.element.style.fontWeight = result;
+          } else {
+            env.element.style.textDecoration = result;
+          }
+        }
+        continue;
+      }
+
+      
+      if (typeof result === 'number') {
+
+        env.element.style.fontSize = String(result) + 'pt';
+        continue;
+      }
+    }
+
+    console.log(data);
+  }
+
+  boxes.CommentBox = async (args, env) => {
+    env.context = boxes;
+    const color = await interpretate(args[0], env);
+    env.element.style.color = color;
+    env.element.classList.add('subscript-tail', 'sm-controls', 'text-sm');
+  }
+
   boxes.StyleBox = async (args, env) => {
       env.context = boxes;
       console.log('style box');
       
-      console.log(args);
+      //sort all rules to the end
+      args.sort((el) => {
+        if(Array.isArray(el)) {
+          if (el[0] == 'Rule') return 1;
+        }
+        return -1;
+      });
 
       const options = await core._getRules(args, env) || {};
-      
+
+      //env.element.style.fontFamily = 'system-ui';
+
       if ('Background' in options) {
-          env.element.style.backgroundColor = options.Background;
-      }        
+        env.element.style.backgroundColor = options.Background;
+      } 
+
+      if ('FontSize' in options) {
+        env.element.style.fontSize = String(options.FontSize) + 'pt';
+      } 
+
+      if ('FontFamily' in options) {
+        env.element.style.fontFamily = options.FontFamily.toLowerCase();
+      }
+
+      const data = [];
+      for (let i=0; i<(args.length - Object.keys(options).length); ++i) {
+        let result = await interpretate(args[i], env);
+      
+        if (typeof result == 'string') {
+          result = result.toLocaleLowerCase();
+
+          if (result.slice(0,3) == 'rgb') {
+            //this is a color
+            env.element.style.color = result;
+          } else {
+            //this is a font-face
+            if (result == 'italic') {
+              env.element.style.fontStyle = result;
+            } else if (result == 'bold') {
+              env.element.style.fontWeight = result;
+            } else {
+              env.element.style.textDecoration = result;
+            }
+          }
+          continue;
+        }
+      
+
+        if (typeof result === 'number') {
+        
+          env.element.style.fontSize = String(result) + 'pt';
+          continue;
+        }
+      }      
   }
 
   boxes.DateObjectTemplate = async (args, env) => {
@@ -142,6 +571,8 @@
 
       return undefined;
   }
+
+  boxes.FontWeight = () => 'FontWeight'
 
   /*boxes.PaneSelectorBox = async (args, env) => {
       const list = await interpretate(args[0], {...env, hold:true});
@@ -254,6 +685,11 @@
       env.element.style.background = "#f0f0f0";
 
       env.element.appendChild(editor); 
+      if (options.Event) {
+        env.element.addEventListener('click', () => {
+          server.kernel.emitt(options.Event, 'True', 'Click')
+        })
+      }
     }
 
     boxes["Internal`RawText"] = async (args, env) => {
@@ -262,82 +698,174 @@
       env.element.style = "font-family: system-ui"
     }
 
-    //temporaly here
 
- core.Sound = async (args, env) => {
-  var ctx = new AudioContext();
+    boxes.SpanFromLeft = () => "SpanFromLeft"
 
-  const object = await interpretate(args[0], {
-      ...env,
-      ctx: ctx
-  });
+    boxes.None = () => "None"
+    
+    boxes["BoxForm`SummaryItemView"] = async (args, env) => {
+      const tr = document.createElement('tr');
+      const label = document.createElement('td');
+      const content = document.createElement('td');
 
+      content.style.maxWidth = "200px";
+    
+      label.innerText = await interpretate(args[0], env);
+    
+      await interpretate(args[1], {...env, context:boxes, element: content});
+    
+      tr.appendChild(label);
+      tr.appendChild(content);
+    
+      env.element.appendChild(tr);
+    
+      
+    }
 
-  env.element.classList.add(...('sm-controls cursor-default rounded-md 0 py-1 px-2 bg-gray-100 text-left text-gray-500 ring-1 ring-inset ring-gray-400 text-xs'.split(' ')));
+    const quantity = {};
 
-  env.element.innerHTML = `
-       <svg class="w-4 h-4 text-gray-500 inline-block mt-auto mb-auto" viewBox="0 0 24 24" fill="none">
-   <path class="group-hover:opacity-0" d="M3 11V13M6 10V14M9 11V13M12 9
-V15M15 6V18M18 10V14M21 11V13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-   <path d="M3 11V13M6 8V16M9 10V14M12 7V17M15 4V20M18 9V15M21 11V13" class="opacity-0 group-hover:opacity-100" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-   </svg> <span class="leading-normal pl-1">${object.length} sec</span>`;
+    function isDOM(Obj) { 
+              
+      // Function that checks whether  
+      // object is of type Element 
+     return Obj instanceof Element; 
+ } 
 
-  const targetRate = ctx.sampleRate;
+    boxes.MixedMagnitude = core.List
+    quantity.MixedUnit = core.List
 
-  env.element.addEventListener('click', () => {
+    quantity.Power = (args, env) => {
+      const string = interpretate(args[0], env);
+      const power = interpretate(args[1], env);
 
-
-      const ratio = Math.floor(targetRate / object.rate);
-
-      const myArrayBuffer = ctx.createBuffer(
-
-          2,
-          ratio * object.data.length,
-          ctx.sampleRate,
-      );
-
-      // Fill the buffer with white noise;
-      //just random values between -1.0 and 1.0
-      for (let channel = 0; channel < myArrayBuffer.numberOfChannels; channel++) {
-          // This gives us the actual ArrayBuffer that contains the data
-          const nowBuffering = myArrayBuffer.getChannelData(channel);
-          for (let i = 0; i < object.data.length; i++) {
-              // Math.random() is in [0; 1.0]
-              // audio needs to be in [-1.0; 1.0]
-              for (let k = 0; k < ratio; ++k)
-                  nowBuffering[i * ratio + k] = object.data[i];
-          }
+      const container = document.createElement('span');
+      const sup = document.createElement('sup');
+      if (isDOM(string)) {
+        container.appendChild(string);
+      } else {
+        container.innerText = string;
       }
 
-      // Get an AudioBufferSourceNode.
-      // This is the AudioNode to use when we want to play an AudioBuffer
-      const source = ctx.createBufferSource();
-      // set the buffer in the AudioBufferSourceNode
-      source.buffer = myArrayBuffer;
+      if (isDOM(string)) {
+        sup.appendChild(power);
+      } else {
+        sup.innerText = power;
+      }
 
-      source.connect(ctx.destination);
-      source.start();
-  })
-  // start the source playing
-  env.element.click();
-  //
-}
+      container.appendChild(sup);
+      
+      return container;
+    }
+
+    quantity.Times = (args, env) => {
+      const a = args.map((el) => interpretate(el, env));
+      const doc = document.createElement('span');
+
+      a.forEach((el, index) => {
+        if (isDOM(el)) {
+          doc.appendChild(el);
+        } else {
+          const item = document.createElement('text');
+          item.innerText = el;
+          doc.appendChild(item);
+        } 
+        if (index < a.length - 1) {
+          const sep = document.createElement('text');
+          sep.innerHTML = "&middot;";
+          doc.appendChild(sep);
+        }
+      });
+
+      return doc;
+    }
+
+    boxes.QuantityBox = async (args, env) => {
+      const n = await interpretate(args[0], env);
+      const units = await interpretate(args[1], {...env, context:quantity});
+
+      
+      env.element.classList.add(...('text-gray-500 ring-gray-300 ring-1 rounded-lg px-2 text-sm'.split(' ')));
+      env.element.style.verticalAlign = 'baseline';
+
+      const add = (nn, nunits, gap = false) => {
+        const text = document.createTextNode(nn);
+        const u = document.createElement('span');
+        u.classList.add('ml-1');
+        if (gap) u.classList.add('mr-1');
+
+        if (isDOM(nunits))
+          u.appendChild(nunits);
+        else
+          u.innerText = nunits;
+  
+        env.element.appendChild(text);
+        env.element.appendChild(u);
+      }
+
+      //console.error([n, units, args]);
+      
+      if (Array.isArray(n)) {
+        n[0].forEach((number, index) => {
+          //console.error({number, index});
+          if (index === n[0].length - 1) 
+            add(number, units[0][index], false);
+          else 
+            add(number, units[0][index], true);
+        });
+      } else {
+        add(n, units);
+      }
+
+
+    }
+
+    boxes.ShowStringCharacters = () => "ShowStringCharacters"
+    boxes.ShowSpecialCharacters = () => "ShowSpecialCharacters"
+    
+    boxes.Row = async (args, env) => {
+      console.warn('RowBox is not implemented properly for BoxForm`ArrangedSummaryBox!!!');
+      args.forEach((el) => {
+        interpretate(el, env);
+      });
+    }
+    
+    boxes["BoxForm`ArrangedSummaryBox"] = async (args, env) => {
+      env.element.style.verticalAlign = 'middle';
+      env.element.classList.add(...('sm-controls cursor-default rounded-md 0 py-1 px-2 bg-gray-100 text-left text-gray-500 ring-1 ring-inset ring-gray-400 text-xs flex flex-row'.split(' ')));
+    
+      let iconElement = document.createElement('span');
+      iconElement.classList.add(...('text-gray-500 inline-block mt-auto mb-auto pr-1'.split(' ')));
+    
+      env.element.appendChild(iconElement);
+    
+      const table = document.createElement('table');
+      table.classList.add(...('pl-1 table-auto'.split(' ')));
+      
+      let tbodyElement = document.createElement('tbody');
+      
+      table.appendChild(tbodyElement);
+    
+      env.element.appendChild(table);
+    
+      console.log(iconElement.getBoundingClientRect());
+    
+      const iconWidth = 35 * window.devicePixelRatio;
+    
+      
+    
+      interpretate(args[0], {...env, element: iconElement,  global: env.global, imageSize:[iconWidth, iconWidth]});
+      await interpretate(args[1], {...env, context: boxes, element: tbodyElement, static:true, local: false});
+
+      if (env.options.DataOnKernel) {
+        const warn = document.createElement('span');
+        warn.innerText = "Data is on Kernel";
+        warn.classList.add('text-gray-400');
+
+        tbodyElement.appendChild(warn);
+      }
+    }
 
 
 
-core.SampledSoundList = async (args, env) => {
-  const data = await interpretate(args[0], env);
-  const rate = await interpretate(args[1], env);
 
-  const targetRate = env.ctx.sampleRate;
-
-  // connect the AudioBufferSourceNode to the
-  // destination so we can hear the sound
-  const length = data.length / rate;
-
-  return {
-      data: data,
-      rate: rate,
-      length: length
-  };
-}
+    //temporaly here

@@ -56,7 +56,7 @@ import { defaultFunctions } from "../libs/priceless-mathematica/src/mathematica/
 
 import { DropPasteHandlers } from "../libs/priceless-mathematica/src/mathematica/dropevents";
 
-import { Arrowholder, Greekholder } from "../libs/priceless-mathematica/src/sugar/misc"
+import { Greekholder } from "../libs/priceless-mathematica/src/sugar/misc"
 
 import {FractionBoxWidget} from "../libs/priceless-mathematica/src/boxes/fractionbox"
 import {SqrtBoxWidget} from "../libs/priceless-mathematica/src/boxes/sqrtbox"
@@ -66,6 +66,7 @@ import {GridBoxWidget} from "../libs/priceless-mathematica/src/boxes/gridbox"
 
 import {ViewBoxWidget} from "../libs/priceless-mathematica/src/boxes/viewbox"
 import {BoxBoxWidget} from "../libs/priceless-mathematica/src/boxes/boxbox"
+import {TemplateBoxWidget} from "../libs/priceless-mathematica/src/boxes/templatebox"
 
 import { cellTypesHighlight } from "../libs/priceless-mathematica/src/sugar/cells"
 
@@ -323,10 +324,10 @@ compactWLEditor = (args) => {
     GridBoxWidget(compactWLEditor),
     ViewBoxWidget(compactWLEditor),
     BoxBoxWidget(compactWLEditor),
-    bracketMatching(),
-    rainbowBrackets(),
+    TemplateBoxWidget(compactWLEditor),
+    //bracketMatching(),
+    //rainbowBrackets(),
     Greekholder,
-    Arrowholder,
     extras,
     
     EditorView.updateListener.of((v) => {
@@ -393,10 +394,10 @@ const mathematicaPlugins = [
   GridBoxWidget(compactWLEditor),
   ViewBoxWidget(compactWLEditor),
   BoxBoxWidget(compactWLEditor),  
+  TemplateBoxWidget(compactWLEditor),
   bracketMatching(),
-  rainbowBrackets(),
+  //rainbowBrackets(),
   Greekholder,
-  Arrowholder,
   extras,
   DropPasteHandlers(wlDrop, wlPaste)
 ]
@@ -489,7 +490,7 @@ window.EditorExtensionsMinimal = [
   () => dropCursor(),
   () => indentOnInput(),
   () => bracketMatching(),
-  () => closeBrackets(),
+  //() => closeBrackets(),
   () => EditorView.lineWrapping,
   () => autocompletion(),
   () => syntaxHighlighting(defaultHighlightStyle, { fallback: false }),
@@ -513,7 +514,8 @@ window.EditorExtensions = [
     },
   () => indentOnInput(),
   () => bracketMatching(),
-  () => closeBrackets(),
+ // () => test(),
+  //() => closeBrackets(),
   () => EditorView.lineWrapping,
   () => autocompletion(),
   () => syntaxHighlighting(defaultHighlightStyle, { fallback: false }),
@@ -535,16 +537,16 @@ window.EditorExtensions = [
       editor.editorLastCursor = editor.state.selection.ranges[0].to;  
     } },                      
     { key: "ArrowUp", run: function (editor, key) {  
-      console.log('arrowup');
-      console.log(editor.state.selection.ranges[0]);
+      //console.log('arrowup');
+      //console.log(editor.state.selection.ranges[0]);
       if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
       self.origin.focusPrev(self.origin);
 
       editor.editorLastCursor = editor.state.selection.ranges[0].to;  
     } },
     { key: "ArrowDown", run: function (editor, key) { 
-      console.log('arrowdown');
-      console.log(editor.state.selection.ranges[0]);
+      //console.log('arrowdown');
+      //console.log(editor.state.selection.ranges[0]);
       if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
       self.origin.focusNext(self.origin);
 
@@ -586,6 +588,27 @@ class CodeMirrorCell {
 
     forceFocusNext() {
       globalCMFocus = true;
+    }
+
+    setContent (data) {
+      console.warn('content mutation!');
+      if (!this.editor.viewState) return;
+  //FIXME: NO CLEAN UP
+  const editor = this.editor;
+      console.log('result');
+      console.log(data);
+      this.editor.dispatch({
+        changes: {
+          from: 0,
+          to: editor.viewState.state.doc.length
+        , insert: ''}
+    });      
+      this.editor.dispatch({
+          changes: {
+            from: 0,
+            to: editor.viewState.state.doc.length
+          , insert: data}
+      });
     }
   
     addDisposable(el) {
@@ -630,10 +653,17 @@ class CodeMirrorCell {
 
   core.ReadOnly = () => "ReadOnly"
 
+  function unicodeToChar2(text) {
+    return text.replace(/\\\\:[\da-f]{4}/gi, 
+           function (match) {
+                return String.fromCharCode(parseInt(match.replace(/\\\\:/g, ''), 16));
+           });
+  }
+
   //for dynamics
   core.EditorView = async (args, env) => {
     //cm6 inline editor (editable or read-only)
-    const textData = await interpretate(args[0], env);
+    const textData = unicodeToChar2(await interpretate(args[0], env));
     const options = await core._getRules(args, env);
 
     let evalFunction = () => {};
@@ -644,6 +674,10 @@ class CodeMirrorCell {
     const ext = [];
     if (options.ReadOnly) {
       ext.push(EditorState.readOnly.of(true))
+    }
+
+    if (options.ForceUpdate) {
+      env.local.forceUpdate = options.ForceUpdate
     }
 
     if (options.Event) {
@@ -677,11 +711,21 @@ class CodeMirrorCell {
 
   core.EditorView.update = async (args, env) => {
     if (!env.local.editor) return;
-    const textData = await interpretate(args[0], env);
+    const textData = unicodeToChar2(await interpretate(args[0], env));
     console.log('editor view: dispatch');
-    env.local.editor.dispatch({
-      changes: {from: 0, to: env.local.editor.state.doc.length, insert: textData}
-    });
+    if (env.local.forceUpdate) {
+      env.local.editor.dispatch({
+        changes: {from: 0, to: env.local.editor.state.doc.length, insert: ''}
+      });
+      env.local.editor.dispatch({
+        changes: {from: 0, to: 0, insert: textData}
+      });
+    } else {
+      env.local.editor.dispatch({
+        changes: {from: 0, to: env.local.editor.state.doc.length, insert: textData}
+      });
+    }
+
   }
 
   core.EditorView.destroy = async (args, env) => {

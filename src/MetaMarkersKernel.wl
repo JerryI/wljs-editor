@@ -18,20 +18,44 @@ MetaMarker[s_?notString] := MetaMarker[s // ToString]
 
 End[]
 
-FrontSubmit[expr_, m_MetaMarker, OptionsPattern[] ] := With[{cli = OptionValue["Window"]},
+FrontSubmit[expr_, m_MetaMarker, OptionsPattern[] ] := With[{cli = OptionValue["Window"]["Socket"]},
     If[OptionValue["Tracking"],     
         With[{uid = CreateUUID[]}, 
-            If[WLJSTransportSend[MarkerContainer[FrontEndInstance[expr, uid], m], cli] < 0, $Failed,
-                FrontEndInstance[uid]
+            If[FailureQ[WLJSTransportSend[MarkerContainer[FrontEndInstanceGroup[expr, uid], m], cli] ], $Failed,
+                FrontEndInstanceGroup[uid, OptionValue["Window"] ]
             ] 
         ]
     ,
-        If[WLJSTransportSend[MarkerContainer[expr, m], cli] < 0, $Failed,
+        If[FailureQ[WLJSTransportSend[MarkerContainer[expr, m], cli] ], $Failed,
             Null
         ]          
     ]
     
 ]
 
+FrontFetchAsync[expr_, m_MetaMarker, OptionsPattern[] ] := With[{cli = OptionValue["Window"]["Socket"], format = OptionValue["Format"], event = CreateUUID[], promise = Promise[]},
+    EventHandler[event, Function[payload,
+        EventRemove[event];
+
+        With[{result = Switch[format,
+            "Raw",
+                URLDecode[payload],
+            "ExpressionJSON",
+                ImportString[URLDecode[payload], "ExpressionJSON"],
+            _,
+                ImportString[URLDecode[payload], "JSON"]
+        ]},
+            If[FailureQ[result],
+                EventFire[promise, Reject, result]
+            ,
+                EventFire[promise, Resolve, result]
+            ]
+        ]
+    ] ];
+
+    WLJSTransportSend[Global`FSAsk[MarkerContainer[expr,m], event], cli];
+
+    promise
+]
 
 EndPackage[]

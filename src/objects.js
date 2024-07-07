@@ -5,6 +5,7 @@ window.ObjectStorage = class {
     uid = ''
     cached = false
     cache = []
+    doNotCollect = false
   
     garbageCollect() {
       console.warn('garbage collector started...');
@@ -18,7 +19,7 @@ window.ObjectStorage = class {
         }
       });
 
-      if (toBeRemoved) {
+      if (toBeRemoved && !this.doNotCollect) {
         console.warn('No active refs. Removing...');
         delete ObjectHashMap[this.uid];
         delete this.cache;
@@ -104,6 +105,16 @@ function getObject(server, id) {
     return server.ask('Notebook`Editor`FrontendObject`GetObject["'+id+'"]'); 
 }
 
+core.FrontEndVirtual = async (args, env) => {
+  const copy = {...env};
+  const store = args[0];
+  const instance = new ExecutableObject('fevirtual-'+uuidv4(), copy, store);
+  instance.assignScope(copy);
+
+
+  return await instance.execute();
+}
+
 
 //element will be provided in 
 core.FrontEndExecutable = async (args, env) => {
@@ -157,4 +168,16 @@ core.UIObjects.GetAll = async (args, env) => {
   message.unshift('Association');
   console.log(message);
   return message;
+}
+
+core.UIObjects.Get = async (args, env) => {
+  //garbageCollect();
+  //const list = Object.values(ObjectHashMap);
+  const uid = await interpretate(args[0], env);
+  if (ObjectHashMap[uid]) { 
+    return ObjectHashMap[uid].cache;
+  } else {
+    console.error('UIObjects get could not find an object');
+    return ['$Failed'];
+  }
 }

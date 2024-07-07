@@ -26,7 +26,7 @@ const uuidv4 = () => {
   });
 }
 
-export function BoxBoxWidget(viewEditor) {
+export function TemplateBoxWidget(viewEditor) {
   compactCMEditor = viewEditor;
   return [
     //mathematicaMathDecoration,
@@ -40,100 +40,54 @@ class EditorWidget {
     this.view = view;
     this.visibleValue = visibleValue;
 
-    this.args = matchArguments(visibleValue.str, /\(\*,\*\)/gm);
+    this.args = matchArguments(visibleValue.str, /\(\*\|\*\)/gm);
 
     const self = this;
+    
+
     //ref.push(self);
     //console.log(visibleValue);
 
     
-    this.epilog = {
-        offset: 0,
-        string: ''
-      };
 
-    this.prolog = {
-        offset: 0,
-        string: ''          
-    };
+
+    const indexes = Array.from({ length: Math.ceil((self.args.length - 3)  / 2) }, (v, i) => i * 2 + 1)
+    self.indexes = indexes;
+
+    const spans = [];
+    for (let i=0; i<indexes.length; ++i) {
+      spans.push(document.createElement('span'));
+    }
   
-
-    const string = this.args[1].body.slice(3,-3);
-    //console.log(string);
+    
+    const string = this.args[this.args.length - 1].body.slice(2,-2);
+  
     const decoded = Mma.DecompressDecode(string);
     const json = Mma.toArray(decoded.parts[0]);
 
     this.data = json;
 
     const cuid = uuidv4();
-    let global = {call: cuid, element: span, origin: self};
-    let env = {global: global, element: span}; //Created in CM6
+    let global = {call: cuid, element: span, children: spans, origin: self};
+    let env = {global: global, element: span, children: spans}; //Created in CM6
     this.env = env;
 
+    
+
     interpretate(json, env).then(() => {
-      if (env.options?.Head) {
-        self.prolog.offset = env.options.Head.length + 1;
-        self.prolog.string = env.options.Head + "["
-        self.epilog.offset = 1;
-        self.epilog.string = "]"
-      }
+      
 
       if (env.options?.Event) {
         console.warn('Event listeners are enabled!');
         self.events = env.options.Event;
-      }
+      }      
 
-      if (env.options?.String) {
-        //just make a DOM element, if this is a string
-        self.prolog.offset = 1;
-        self.prolog.string = '"'
-        self.epilog.offset = 1;
-        self.epilog.string = '"';
 
-        if (env.options?.HeadString) {
-          self.prolog.string = env.options.HeadString;
-          self.prolog.offset = self.prolog.string.length;
-        }
 
-        if (env.options?.TailString) {
-          self.epilog.string = env.options.TailString;
-          self.epilog.offset = self.epilog.string.length;
-        }        
-
-        self.editor = {
-          destroy: () => {
-            console.log('Nothing to destroy, this is just a text field.');
-          }
-        };
-        const aa = document.createElement('span');
-        aa.onkeydown = function(e) {
-          // User hits enter key and is not holding shift
-          if (e.keyCode === 13) {
-               e.preventDefault()
-           }
-       };
-        aa.contentEditable = "plaintext-only";
-        aa.innerText = self.args[0].body.slice(1 + self.prolog.offset, -1 - self.epilog.offset);
-        aa.addEventListener('input', console.log);
-        aa.addEventListener("input", () => {
-          console.log('Update');
-          console.log(aa.innerText);
-          this.applyChanges(aa.innerText);
-        });  
-        
-        env.global.element.appendChild(aa);
-
-        if(self.events) server.kernel.emitt(self.events, 'Null', 'Mounted');
-
-        return;
-      }
-
-      
-
-      self.editor = compactCMEditor({
-        doc: self.args[0].body.slice(1 + self.prolog.offset, -1 - self.epilog.offset),
-        parent: env.global.element,
-        update: (upd) => this.applyChanges(upd),
+      self.editors = indexes.map((index, i) => compactCMEditor({
+        doc: self.args[index].body,
+        parent: spans[i],
+        update: (upd) => this.applyChanges(upd, index),
         eval: () => {
           view.viewState.state.config.eval();
         },
@@ -141,34 +95,35 @@ class EditorWidget {
           keymap.of([
             { key: "ArrowLeft", run: function (editor, key) {  
               if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
-
-                console.log(self.visibleValue.pos);
-                //if (self.visibleValue.pos == 0) return;
-  
-                view.dispatch({selection: {anchor: self.visibleValue.pos}});
-                view.focus();
-
+                if (i > 0) {
+                  self.editors[i - 1].focus();
+                } else {
+                  view.dispatch({selection: {anchor: self.visibleValue.pos}});
+                  view.focus();
+                }
+                editor.editorLastCursor = undefined;
+                return;
+              }
+          
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            } }, 
+            { key: "ArrowRight", run: function (editor, key) {  
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                if (i < indexes.length - 1) {
+                  self.editors[i + 1].focus();
+                } else {
+                  view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
+                  view.focus();
+                }
                 editor.editorLastCursor = undefined;
                 return;
               }
                 
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
-            } }, 
-            { key: "ArrowRight", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
-                console.log(self.visibleValue.pos);
-                //if (self.visibleValue.pos == 0) return;
-  
-                view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
-                view.focus();
-                editor.editorLastCursor = undefined;
-                return;
-              }
-              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
             } }
           ])
         ]
-      });
+      }));
 
       if(self.events) server.kernel.emitt(self.events, 'Null', 'Mounted');  
 
@@ -176,18 +131,20 @@ class EditorWidget {
 
   }
 
-  applyChanges(update, pos) {
+  applyChanges(update, index) {
       const args = this.args;
       const relative = this.visibleValue.argsPos;
   
-      const data = '('+this.prolog.string+update+this.epilog.string+')';
-      const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
+      console.log(args);
 
-      const delta = data.length - args[0].length
-      args[0].length = data.length;
-      this.visibleValue.length = this.visibleValue.length + delta;
+      const changes = {from: relative + args[index].from, to:relative + args[index].from + args[index].length, insert: update};
 
+      const delta = update.length - args[index].length;
+      args[index].length = update.length;
+      for (let i = index + 1; i < args.length; ++i)
+        args[i].from = args[i].from + delta
 
+      this.visibleValue.length += delta;
       this.view.dispatch({changes: changes});
   }    
 
@@ -205,7 +162,7 @@ class EditorWidget {
         obj.dispose();
       }
     }  
-    this.editor.destroy();
+    this.editors.forEach((i)=>i.destroy());
 
     if(this.events) server.kernel.emitt(this.events, 'Null', 'Destroy');
 
@@ -230,8 +187,8 @@ class Widget extends WidgetType {
   updateDOM(dom, view) {
     //console.log(this.visibleValue);
     //console.log(this);
-    console.log('update widget DOM');
     this.DOMElement = dom;
+    console.log('update widget DOM');
     dom.EditorWidget.update(this.visibleValue);
 
     return true
@@ -241,36 +198,35 @@ class Widget extends WidgetType {
     console.log('Create a new one!');
 
     let span = document.createElement("span");
-    span.classList.add("subscript-tail");
+    span.classList.add("inline-flex");
 
     span.EditorWidget = new EditorWidget(this.visibleValue, view, span, []);
 
     const self = this;
+
+    this.DOMElement = span;
     
     this.reference.push({destroy: () => {
       self.destroy(span);
     }});      
 
-    this.DOMElement = span;
 
     return span;
   }
 
   skipPosition(pos, oldPos, selected) {
     if (oldPos.from != oldPos.to || selected) return pos;
-    //this.DOMElement.EditorWidget.wantedPosition = pos;
-    if (pos.from - oldPos.from > 0) {
-      //this.DOMElement.EditorWidget.topEditor.dispatch()
-      this.DOMElement.EditorWidget.editor.dispatch({selection: {anchor: 0}});
-      this.DOMElement.EditorWidget.editor.focus();
-      //this.DOMElement.EditorWidget.topEditor.focus();
+
+    const editors = this.DOMElement.EditorWidget.editors;
+    if (pos.from - oldPos.from < 0) {
+      editors[editors.length - 1].dispatch({selection: {anchor: editors[editors.length - 1].state.doc.length}});
+      editors[editors.length - 1].focus();
     } else {
-      const editor = this.DOMElement.EditorWidget.editor;
-      editor.dispatch({selection: {anchor: editor.state.doc.length}});
-      editor.focus();
-      //this.DOMElement.EditorWidget.bottomEditor.focus();
+      editors[0].dispatch({selection: {anchor: 0}});
+      editors[0].focus();
     }    
-    
+
+
 
     return oldPos;
   }  
@@ -286,7 +242,7 @@ class Widget extends WidgetType {
 
 const matcher = (ref, view) => {
   return new BallancedMatchDecorator2({
-    tag: 'BB',
+    tag: 'TB',
     decoration: (match) => {
       
       return Decoration.replace({

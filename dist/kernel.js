@@ -4651,8 +4651,10 @@ class ContentView {
         this.markDirty();
         for (let i = from; i < to; i++) {
             let child = this.children[i];
-            if (child.parent == this)
+            if (child.parent == this) {
+                //console.log(child);
                 child.destroy();
+            }
         }
         this.children.splice(from, to - from, ...children);
         for (let i = 0; i < children.length; i++)
@@ -4999,6 +5001,7 @@ class WidgetView extends ContentView {
                 this.prevWidget.destroy(this.dom);
             this.prevWidget = null;
             this.setDOM(this.widget.toDOM(view));
+            //console.error('Sync');
             this.dom.contentEditable = "false";
         }
     }
@@ -5011,8 +5014,14 @@ class WidgetView extends ContentView {
         return true;
     }
     become(other) {
+        //console.warn('Become');
+        //console.warn([other instanceof WidgetView && other.side == this.side &&
+            //this.widget.constructor == other.widget.constructor]);
+           // console.warn(other);
+            //console.warn(this);
         if (other instanceof WidgetView && other.side == this.side &&
             this.widget.constructor == other.widget.constructor) {
+                
             if (!this.widget.compare(other.widget))
                 this.markDirty(true);
             if (this.dom && !this.prevWidget)
@@ -5055,6 +5064,7 @@ class WidgetView extends ContentView {
     get isWidget() { return true; }
     get isHidden() { return this.widget.isHidden; }
     destroy() {
+        //console.warn('DESTORYYYFDF')
         super.destroy();
         if (this.dom)
             this.widget.destroy(this.dom);
@@ -5823,6 +5833,7 @@ class BlockWidgetView extends ContentView {
     become(other) {
         if (other instanceof BlockWidgetView && other.type == this.type &&
             other.widget.constructor == this.widget.constructor) {
+           // console.warn('Become');
             if (!other.widget.compare(this.widget))
                 this.markDirty(true);
             if (this.dom && !this.prevWidget)
@@ -6020,7 +6031,7 @@ const dragMovesSelection$1 = /*@__PURE__*/Facet.define();
 const mouseSelectionStyle = /*@__PURE__*/Facet.define();
 const exceptionSink = /*@__PURE__*/Facet.define();
 const updateListener = /*@__PURE__*/Facet.define();
-const inputHandler$1 = /*@__PURE__*/Facet.define();
+const inputHandler = /*@__PURE__*/Facet.define();
 const focusChangeEffect = /*@__PURE__*/Facet.define();
 const perLineTextDirection = /*@__PURE__*/Facet.define({
     combine: values => values.some(x => x)
@@ -7614,7 +7625,8 @@ function moveVertically(view, start, forward, distance) {
             return EditorSelection.cursor(pos, start.assoc, undefined, goal);
     }
 }
-function skipAtoms(view, oldPos, pos) {
+function skipAtoms(view, oldPos, pos, selected) {
+    //console.log(view);
     let atoms = view.state.facet(atomicRanges).map(f => f(view));
     for (;;) {
         let moved = false;
@@ -7623,9 +7635,14 @@ function skipAtoms(view, oldPos, pos) {
                 if (pos.from > from && pos.from < to) {
                     pos = oldPos.head > pos.from ? EditorSelection.cursor(from, 1) : EditorSelection.cursor(to, -1);
                     moved = true;
+
+                    if (value.widget.skipPosition) {
+                        pos = value.widget.skipPosition(pos, oldPos, selected);
+                    }                    
                 }
             });
         }
+
         if (!moved)
             return pos;
     }
@@ -10006,7 +10023,7 @@ function applyDOMChange(view, domChange) {
                     dispatchKey(view.contentDOM, "Delete", 46))))
             return true;
         let text = change.insert.toString();
-        if (view.state.facet(inputHandler$1).some(h => h(view, change.from, change.to, text)))
+        if (view.state.facet(inputHandler).some(h => h(view, change.from, change.to, text)))
             return true;
         if (view.inputState.composing >= 0)
             view.inputState.composing++;
@@ -11137,7 +11154,13 @@ class EditorView {
     whether it should also be moved over.
     */
     moveByChar(start, forward, by) {
+        //console.log('Normal move');
         return skipAtoms(this, start, moveByChar(this, start, forward, by));
+    }
+
+    moveByCharSelected(start, forward, by) {
+        //console.log('Select move');
+        return skipAtoms(this, start, moveByChar(this, start, forward, by), true);
     }
     /**
     Move a cursor position across the next group of either
@@ -11406,7 +11429,7 @@ positions between which the change was found, and the new
 content. When one returns true, no further input handlers are
 called and the default behavior is prevented.
 */
-EditorView.inputHandler = inputHandler$1;
+EditorView.inputHandler = inputHandler;
 /**
 This facet can be used to provide functions that create effects
 to be dispatched when the editor's focus state changes.
@@ -12457,7 +12480,7 @@ class Placeholder extends WidgetType {
 Extension that enables a placeholder—a piece of example content
 to show when the editor is empty.
 */
-function placeholder$7(content) {
+function placeholder$8(content) {
     return ViewPlugin.fromClass(class {
         constructor(view) {
             this.view = view;
@@ -18591,7 +18614,8 @@ function extendSel(view, how) {
     return true;
 }
 function selectByChar(view, forward) {
-    return extendSel(view, range => view.moveByChar(range, forward));
+    console.log('Select!');
+    return extendSel(view, range => view.moveByCharSelected(range, forward));
 }
 /**
 Move the selection head one character to the left, while leaving
@@ -20989,218 +21013,10 @@ const snippetPointerHandler = /*@__PURE__*/EditorView.domEventHandlers({
         return true;
     }
 });
-
-const defaults = {
-    brackets: ["(", "[", "{", "'", '"'],
-    before: ")]}:;>",
-    stringPrefixes: []
-};
-const closeBracketEffect = /*@__PURE__*/StateEffect.define({
-    map(value, mapping) {
-        let mapped = mapping.mapPos(value, -1, MapMode.TrackAfter);
-        return mapped == null ? undefined : mapped;
-    }
-});
 const closedBracket = /*@__PURE__*/new class extends RangeValue {
 };
 closedBracket.startSide = 1;
 closedBracket.endSide = -1;
-const bracketState = /*@__PURE__*/StateField.define({
-    create() { return RangeSet.empty; },
-    update(value, tr) {
-        if (tr.selection) {
-            let lineStart = tr.state.doc.lineAt(tr.selection.main.head).from;
-            let prevLineStart = tr.startState.doc.lineAt(tr.startState.selection.main.head).from;
-            if (lineStart != tr.changes.mapPos(prevLineStart, -1))
-                value = RangeSet.empty;
-        }
-        value = value.map(tr.changes);
-        for (let effect of tr.effects)
-            if (effect.is(closeBracketEffect))
-                value = value.update({ add: [closedBracket.range(effect.value, effect.value + 1)] });
-        return value;
-    }
-});
-/**
-Extension to enable bracket-closing behavior. When a closeable
-bracket is typed, its closing bracket is immediately inserted
-after the cursor. When closing a bracket directly in front of a
-closing bracket inserted by the extension, the cursor moves over
-that bracket.
-*/
-function closeBrackets() {
-    return [inputHandler, bracketState];
-}
-const definedClosing = "()[]{}<>";
-function closing(ch) {
-    for (let i = 0; i < definedClosing.length; i += 2)
-        if (definedClosing.charCodeAt(i) == ch)
-            return definedClosing.charAt(i + 1);
-    return fromCodePoint(ch < 128 ? ch : ch + 1);
-}
-function config(state, pos) {
-    return state.languageDataAt("closeBrackets", pos)[0] || defaults;
-}
-const android$1 = typeof navigator == "object" && /*@__PURE__*//Android\b/.test(navigator.userAgent);
-const inputHandler = /*@__PURE__*/EditorView.inputHandler.of((view, from, to, insert) => {
-    if ((android$1 ? view.composing : view.compositionStarted) || view.state.readOnly)
-        return false;
-    let sel = view.state.selection.main;
-    if (insert.length > 2 || insert.length == 2 && codePointSize(codePointAt(insert, 0)) == 1 ||
-        from != sel.from || to != sel.to)
-        return false;
-    let tr = insertBracket(view.state, insert);
-    if (!tr)
-        return false;
-    view.dispatch(tr);
-    return true;
-});
-/**
-Implements the extension's behavior on text insertion. If the
-given string counts as a bracket in the language around the
-selection, and replacing the selection with it requires custom
-behavior (inserting a closing version or skipping past a
-previously-closed bracket), this function returns a transaction
-representing that custom behavior. (You only need this if you want
-to programmatically insert brackets—the
-[`closeBrackets`](https://codemirror.net/6/docs/ref/#autocomplete.closeBrackets) extension will
-take care of running this for user input.)
-*/
-function insertBracket(state, bracket) {
-    let conf = config(state, state.selection.main.head);
-    let tokens = conf.brackets || defaults.brackets;
-    for (let tok of tokens) {
-        let closed = closing(codePointAt(tok, 0));
-        if (bracket == tok)
-            return closed == tok ? handleSame(state, tok, tokens.indexOf(tok + tok + tok) > -1, conf)
-                : handleOpen(state, tok, closed, conf.before || defaults.before);
-        if (bracket == closed && closedBracketAt(state, state.selection.main.from))
-            return handleClose(state, tok, closed);
-    }
-    return null;
-}
-function closedBracketAt(state, pos) {
-    let found = false;
-    state.field(bracketState).between(0, state.doc.length, from => {
-        if (from == pos)
-            found = true;
-    });
-    return found;
-}
-function nextChar(doc, pos) {
-    let next = doc.sliceString(pos, pos + 2);
-    return next.slice(0, codePointSize(codePointAt(next, 0)));
-}
-function handleOpen(state, open, close, closeBefore) {
-    let dont = null, changes = state.changeByRange(range => {
-        if (!range.empty)
-            return { changes: [{ insert: open, from: range.from }, { insert: close, from: range.to }],
-                effects: closeBracketEffect.of(range.to + open.length),
-                range: EditorSelection.range(range.anchor + open.length, range.head + open.length) };
-        let next = nextChar(state.doc, range.head);
-        if (!next || /\s/.test(next) || closeBefore.indexOf(next) > -1)
-            return { changes: { insert: open + close, from: range.head },
-                effects: closeBracketEffect.of(range.head + open.length),
-                range: EditorSelection.cursor(range.head + open.length) };
-        return { range: dont = range };
-    });
-    return dont ? null : state.update(changes, {
-        scrollIntoView: true,
-        userEvent: "input.type"
-    });
-}
-function handleClose(state, _open, close) {
-    let dont = null, changes = state.changeByRange(range => {
-        if (range.empty && nextChar(state.doc, range.head) == close)
-            return { changes: { from: range.head, to: range.head + close.length, insert: close },
-                range: EditorSelection.cursor(range.head + close.length) };
-        return dont = { range };
-    });
-    return dont ? null : state.update(changes, {
-        scrollIntoView: true,
-        userEvent: "input.type"
-    });
-}
-// Handles cases where the open and close token are the same, and
-// possibly triple quotes (as in `"""abc"""`-style quoting).
-function handleSame(state, token, allowTriple, config) {
-    let stringPrefixes = config.stringPrefixes || defaults.stringPrefixes;
-    let dont = null, changes = state.changeByRange(range => {
-        if (!range.empty)
-            return { changes: [{ insert: token, from: range.from }, { insert: token, from: range.to }],
-                effects: closeBracketEffect.of(range.to + token.length),
-                range: EditorSelection.range(range.anchor + token.length, range.head + token.length) };
-        let pos = range.head, next = nextChar(state.doc, pos), start;
-        if (next == token) {
-            if (nodeStart(state, pos)) {
-                return { changes: { insert: token + token, from: pos },
-                    effects: closeBracketEffect.of(pos + token.length),
-                    range: EditorSelection.cursor(pos + token.length) };
-            }
-            else if (closedBracketAt(state, pos)) {
-                let isTriple = allowTriple && state.sliceDoc(pos, pos + token.length * 3) == token + token + token;
-                let content = isTriple ? token + token + token : token;
-                return { changes: { from: pos, to: pos + content.length, insert: content },
-                    range: EditorSelection.cursor(pos + content.length) };
-            }
-        }
-        else if (allowTriple && state.sliceDoc(pos - 2 * token.length, pos) == token + token &&
-            (start = canStartStringAt(state, pos - 2 * token.length, stringPrefixes)) > -1 &&
-            nodeStart(state, start)) {
-            return { changes: { insert: token + token + token + token, from: pos },
-                effects: closeBracketEffect.of(pos + token.length),
-                range: EditorSelection.cursor(pos + token.length) };
-        }
-        else if (state.charCategorizer(pos)(next) != CharCategory.Word) {
-            if (canStartStringAt(state, pos, stringPrefixes) > -1 && !probablyInString(state, pos, token, stringPrefixes))
-                return { changes: { insert: token + token, from: pos },
-                    effects: closeBracketEffect.of(pos + token.length),
-                    range: EditorSelection.cursor(pos + token.length) };
-        }
-        return { range: dont = range };
-    });
-    return dont ? null : state.update(changes, {
-        scrollIntoView: true,
-        userEvent: "input.type"
-    });
-}
-function nodeStart(state, pos) {
-    let tree = syntaxTree(state).resolveInner(pos + 1);
-    return tree.parent && tree.from == pos;
-}
-function probablyInString(state, pos, quoteToken, prefixes) {
-    let node = syntaxTree(state).resolveInner(pos, -1);
-    let maxPrefix = prefixes.reduce((m, p) => Math.max(m, p.length), 0);
-    for (let i = 0; i < 5; i++) {
-        let start = state.sliceDoc(node.from, Math.min(node.to, node.from + quoteToken.length + maxPrefix));
-        let quotePos = start.indexOf(quoteToken);
-        if (!quotePos || quotePos > -1 && prefixes.indexOf(start.slice(0, quotePos)) > -1) {
-            let first = node.firstChild;
-            while (first && first.from == node.from && first.to - first.from > quoteToken.length + quotePos) {
-                if (state.sliceDoc(first.to - quoteToken.length, first.to) == quoteToken)
-                    return false;
-                first = first.firstChild;
-            }
-            return true;
-        }
-        let parent = node.to == pos && node.parent;
-        if (!parent)
-            break;
-        node = parent;
-    }
-    return false;
-}
-function canStartStringAt(state, pos, prefixes) {
-    let charCat = state.charCategorizer(pos);
-    if (charCat(state.sliceDoc(pos - 1, pos)) != CharCategory.Word)
-        return pos;
-    for (let prefix of prefixes) {
-        let start = pos - prefix.length;
-        if (state.sliceDoc(start, pos) == prefix && charCat(state.sliceDoc(start - 1, start)) != CharCategory.Word)
-            return start;
-    }
-    return -1;
-}
 
 /**
 Returns an extension that enables autocompletion.
@@ -27067,7 +26883,7 @@ function generateColors() {
   ];
 }
 
-const rainbowBracketsPlugin = ViewPlugin.fromClass(class {
+ViewPlugin.fromClass(class {
   decorations;
 
   constructor(view) {
@@ -27119,28 +26935,6 @@ const rainbowBracketsPlugin = ViewPlugin.fromClass(class {
 }, {
   decorations: (v) => v.decorations,
 });
-
-function rainbowBrackets() {
-  return [
-    rainbowBracketsPlugin,
-    EditorView.baseTheme({
-      '.rainbow-bracket-red': { color: 'red' },
-      '.rainbow-bracket-red > span': { color: 'red' },
-      '.rainbow-bracket-orange': { color: 'orange' },
-      '.rainbow-bracket-orange > span': { color: 'orange' },
-      '.rainbow-bracket-yellow': { color: 'yellow' },
-      '.rainbow-bracket-yellow > span': { color: 'yellow' },
-      '.rainbow-bracket-green': { color: 'green' },
-      '.rainbow-bracket-green > span': { color: 'green' },
-      '.rainbow-bracket-blue': { color: 'blue' },
-      '.rainbow-bracket-blue > span': { color: 'blue' },
-      '.rainbow-bracket-indigo': { color: 'indigo' },
-      '.rainbow-bracket-indigo > span': { color: 'indigo' },
-      '.rainbow-bracket-violet': { color: 'violet' },
-      '.rainbow-bracket-violet > span': { color: 'violet' },
-    }),
-  ];
-}
 
 const spreadsheet = {
   name: "spreadsheet",
@@ -62146,6 +61940,11 @@ class GreekWidget extends WidgetType {
       this.name
         .toLowerCase()
         .replace("sqrt", "radic")
+        .replace("undirectededge", 'harr')
+        .replace('directededge', 'rarr')
+        .replace('curlyepsilon', 'epsilon')
+        .replace('curlytheta', 'theta')
+        .replace('transpose', '#7488')
         .replace("degree", "deg") +
       ";";
 
@@ -62163,7 +61962,7 @@ const ArrowMatcher = new MatchDecorator({
       widget: new ArrowWidget(match[1])
     })
 });
-const Arrowholder = ViewPlugin.fromClass(
+ViewPlugin.fromClass(
   class {
     constructor(view) {
       this.Arrowholder = ArrowMatcher.createDeco(view);
@@ -62833,13 +62632,33 @@ var BallancedMatchDecorator2 = /** @class */ (function () {
     return BallancedMatchDecorator2;
 }());
 
-var compactCMEditor$5; 
+var compactCMEditor$6; 
 
 function FractionBoxWidget(viewEditor) {
-  compactCMEditor$5 = viewEditor;
+  compactCMEditor$6 = viewEditor;
+  const ref = {};
   return [
     //mathematicaMathDecoration,
-    placeholder$6,
+
+
+    /*EditorState.transactionFilter.of((tr) => {
+      console.log(tr);
+      console.log(ref.placeholder);//.placeholder.chunk[0]);
+      if (tr.selection && ref.placeholder) {
+        if (tr.selection.ranges[0].from == tr.selection.ranges[0].to && ref.placeholder.placeholder.chunk[0]) {
+          console.log(tr.changes.sections[0]);
+          console.log({pos: ref.placeholder.placeholder.chunk[0].from, chunk: ref.placeholder.placeholder.chunk[0].to});
+          
+          if (findRegion(ref.placeholder.placeholder.chunkPos[0], ref.placeholder.placeholder.chunk[0].from, ref.placeholder.placeholder.chunk[0].to, tr.selection.ranges[0].from) > -1) {
+            return false;
+          }
+        }
+      }
+      // return false;
+      return tr
+    }),*/
+
+    placeholder$7(ref),
     keymap.of([{ key: "Ctrl-/", run: snippet$3() }])
   ];
 }
@@ -62870,11 +62689,13 @@ function snippet$3() {
   };
 }
 
-let EditorWidget$6 = class EditorWidget {
+let EditorWidget$7 = class EditorWidget {
 
-  constructor(visibleValue, view, enumenator, denumenator, ref) {
+  constructor(visibleValue, view, enumenator, denumenator, ref, placeholder) {
     this.view = view;
     this.visibleValue = visibleValue;
+    this.placeholder = placeholder;
+    console.log(placeholder);
 
     this.args = matchArguments(visibleValue.str, /\(\*,\*\)/gm);
 
@@ -62886,7 +62707,7 @@ let EditorWidget$6 = class EditorWidget {
 
     let topEditor, bottomEditor;
 
-    topEditor = compactCMEditor$5({
+    topEditor = compactCMEditor$6({
       doc: self.args[0].body.slice(2,-1),
       parent: enumenator,
       update: (upd) => this.applyChanges(upd, 0),
@@ -62896,25 +62717,38 @@ let EditorWidget$6 = class EditorWidget {
       extensions: [
         keymap.of([
           { key: "ArrowLeft", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              //const range = self.placeholder.placeholder.placeholder;
+              console.log(self.visibleValue.pos);
+              //if (self.visibleValue.pos == 0) return;
+
+              view.dispatch({selection: {anchor: self.visibleValue.pos}});
               view.focus();
-            editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+              editor.editorLastCursor = undefined;
+              return;
+            } else {
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            }
+            
           } }, 
           { key: "ArrowRight", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-              view.focus();
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              bottomEditor.dispatch({selection: {anchor: 0}});
+              bottomEditor.focus();
+              editor.editorLastCursor = undefined;
+              return;
+            }
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
           } },             
           { key: "ArrowDown", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-              bottomEditor.focus();
-            editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            bottomEditor.focus();
+            editor.editorLastCursor = undefined; 
           } }
         ])
       ]
     });
 
-    bottomEditor = compactCMEditor$5({
+    bottomEditor = compactCMEditor$6({
       doc: self.args[2].body.slice(1,-2),
       parent: denumenator,
       update: (upd) => this.applyChanges(upd, 2),
@@ -62924,21 +62758,34 @@ let EditorWidget$6 = class EditorWidget {
       extensions: [
         keymap.of([
           { key: "ArrowLeft", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-              view.focus();
-            editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              //const range = self.placeholder.placeholder.placeholder;
+              topEditor.dispatch({selection: {anchor: topEditor.state.doc.length}});
+              topEditor.focus();
+              editor.editorLastCursor = undefined;
+              return;
+            } else {
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            }
+            
           } }, 
           { key: "ArrowRight", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              
+              view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
               view.focus();
+            
+
+              editor.editorLastCursor = undefined;
+              return;
+            }
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
           } },             
           { key: "ArrowUp", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-              topEditor.focus();
-            editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            topEditor.focus();
+            editor.editorLastCursor = undefined;
           } }
-        ])
+        ])        
       ]  
     });  
 
@@ -62968,10 +62815,14 @@ let EditorWidget$6 = class EditorWidget {
       const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
 
       //shift other positions
-      args[0].to = args[0].to + (data.length - args[0].length);
-      args[2].from = args[2].from + (data.length - args[0].length);
+      const delta = data.length - args[0].length;
+
+      args[0].to = args[0].to + delta;
+      args[2].from = args[2].from + delta;
 
       args[0].length = data.length;
+
+      this.visibleValue.length = this.visibleValue.length + delta;
 
       //console.log(changes);
 
@@ -62982,8 +62833,11 @@ let EditorWidget$6 = class EditorWidget {
       const changes = {from: relative + args[2].from, to: relative + args[2].from + args[2].length, insert: data};
 
       //shift other positions
-      args[2].to = args[2].to + (data.length - args[2].length);
+      const delta = (data.length - args[2].length);
+      args[2].to = args[2].to + delta;
       args[2].length = data.length;
+
+      this.visibleValue.length = this.visibleValue.length + delta;
 
       //console.log(changes);
 
@@ -62993,25 +62847,28 @@ let EditorWidget$6 = class EditorWidget {
   }
 
 
-  update(visibleValue) {
+  update(visibleValue, placeholder) {
     //console.log('Update instance: new ranges & arguments');
     this.visibleValue.pos = visibleValue.pos;
+    this.placeholder = placeholder;
     this.visibleValue.argsPos = visibleValue.argsPos;
   }
 
   destroy() {
-    console.warn('destroy Instance of Widget!');
+    //console.warn('destroy Instance of Widget!');
     this.topEditor.destroy();
     this.bottomEditor.destroy();
   }
 };
 
-let Widget$6 = class Widget extends WidgetType {
-  constructor(visibleValue, ref, view) {
+let Widget$7 = class Widget extends WidgetType {
+  constructor(visibleValue, ref, view, placeholder) {
     super();
     this.view = view;
     this.visibleValue = visibleValue;
     this.reference = ref;
+    this.placeholder = placeholder;
+    //console.log(atomicInstance);
     //console.log('construct');
   }
 
@@ -63022,10 +62879,30 @@ let Widget$6 = class Widget extends WidgetType {
   updateDOM(dom, view) {
     //console.log(this.visibleValue);
     //console.log(this);
-    console.log('update widget DOM');
-    dom.EditorWidget.update(this.visibleValue);
+    //console.log('update widget DOM');
+    this.DOMElement = dom;
+
+    dom.EditorWidget.update(this.visibleValue, this);
 
     return true
+  }
+
+  skipPosition(pos, oldPos, selected) {
+    if (oldPos.from != oldPos.to || selected) return pos;
+    //this.DOMElement.EditorWidget.wantedPosition = pos;
+    if (pos.from - oldPos.from > 0) {
+      //this.DOMElement.EditorWidget.topEditor.dispatch()
+      this.DOMElement.EditorWidget.topEditor.dispatch({selection: {anchor: 0}});
+      this.DOMElement.EditorWidget.topEditor.focus();
+      //this.DOMElement.EditorWidget.topEditor.focus();
+    } else {
+      const editor = this.DOMElement.EditorWidget.bottomEditor;
+      editor.dispatch({selection: {anchor: editor.state.doc.length}});
+      editor.focus();
+      //this.DOMElement.EditorWidget.bottomEditor.focus();
+    }
+
+    return oldPos;
   }
 
   toDOM(view) {
@@ -63055,8 +62932,12 @@ let Widget$6 = class Widget extends WidgetType {
     const denumenator = document.createElement("td");
     trd.appendChild(denumenator);
 
-    span.EditorWidget = new EditorWidget$6(this.visibleValue, view, enumenator, denumenator, []);
     const self = this;
+
+    span.EditorWidget = new EditorWidget$7(this.visibleValue, view, enumenator, denumenator, [], this);
+    
+
+    this.DOMElement = span;
       
     this.reference.push({destroy: () => {
       self.destroy(span);
@@ -63070,32 +62951,35 @@ let Widget$6 = class Widget extends WidgetType {
   }
 
   destroy(dom) {
+    //console.warn('destroy WindgetType')
     dom.EditorWidget.destroy();
   }
 };
 
-const matcher$6 = (ref, view) => {
+const matcher$7 = (ref, view, placeholder) => {
   return new BallancedMatchDecorator2({
     tag: 'FB',
     decoration: (match) => {
-      
+      //console.log(match);
       return Decoration.replace({
-        widget: new Widget$6(match, ref, view)
+        widget: new Widget$7(match, ref, view, placeholder)
       });
     }
   });
 };
 
-const placeholder$6 = ViewPlugin.fromClass(
+const placeholder$7 = (ref) => ViewPlugin.fromClass(
   class {
     constructor(view) {
       this.disposable = [];
-      this.placeholder = matcher$6(this.disposable, view).createDeco(view);
+      this.placeholder = matcher$7(this.disposable, view, this).createDeco(view);
+      ref.placeholder = this;
+      //ref.view = view});
     }
     update(update) {
       //console.log('update Deco');
       //console.log(this.disposable );
-      this.placeholder = matcher$6(this.disposable, update).updateDeco(
+      this.placeholder = matcher$7(this.disposable, update, this).updateDeco(
         update,
         this.placeholder
       );
@@ -63114,6 +62998,7 @@ const placeholder$6 = ViewPlugin.fromClass(
     provide: (plugin) =>
       EditorView.atomicRanges.of((view) => {
         var _a;
+        //console.warn(view);
       
         return (
           ((_a = view.plugin(plugin)) === null || _a === void 0
@@ -63124,13 +63009,13 @@ const placeholder$6 = ViewPlugin.fromClass(
   }
 );
 
-var compactCMEditor$4; 
+var compactCMEditor$5; 
   
   function SqrtBoxWidget(viewEditor) {
-    compactCMEditor$4 = viewEditor;
+    compactCMEditor$5 = viewEditor;
     return [
       //mathematicaMathDecoration,
-      placeholder$5,
+      placeholder$6,
       keymap.of([{ key: "Ctrl-2", run: snippet$2() }])
     ];
   }
@@ -63161,7 +63046,7 @@ var compactCMEditor$4;
     };
   }
 
-  let EditorWidget$5 = class EditorWidget {
+  let EditorWidget$6 = class EditorWidget {
 
     constructor(visibleValue, view, dom, sliceRanges, ref) {
       this.view = view;
@@ -63174,7 +63059,7 @@ var compactCMEditor$4;
 
       //(self);
 
-      this.editor = compactCMEditor$4({
+      this.editor = compactCMEditor$5({
         //slice SqB[...]
         doc: visibleValue.str.slice(...sliceRanges),
         parent: dom,
@@ -63185,13 +63070,22 @@ var compactCMEditor$4;
         extensions: [
           keymap.of([
             { key: "ArrowRight", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
                 view.focus();
+
+                editor.editorLastCursor = undefined;
+                return;
+              }
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
             } },   
             { key: "ArrowLeft", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                view.dispatch({selection: {anchor: self.visibleValue.pos}});
                 view.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              }
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
             } }
           ])
@@ -63219,7 +63113,9 @@ var compactCMEditor$4;
 
       //console.log('insert change');
       //console.log(changes);
-      this.length = data.length;
+      const delta = this.length - data.length;
+      this.length = this.length + delta;
+      this.visibleValue.length = this.visibleValue.length + delta;
       
       this.view.dispatch({changes: changes});
     }
@@ -63238,7 +63134,7 @@ var compactCMEditor$4;
     }
   };
   
-  let Widget$5 = class Widget extends WidgetType {
+  let Widget$6 = class Widget extends WidgetType {
     constructor(visibleValue, ref, view) {
       super();
       this.view = view;
@@ -63255,6 +63151,7 @@ var compactCMEditor$4;
       //console.log(this.visibleValue);
       //console.log(this);
       //console.log('update widget DOM');
+      this.DOMElement = dom;
       dom.EditorWidget.update(this.visibleValue);
 
       return true
@@ -63274,7 +63171,7 @@ var compactCMEditor$4;
       const head = document.createElement("span");
       head.classList.add("radicand");
       
-      span.EditorWidget = new EditorWidget$5(this.visibleValue, view, head, [5,-1], []);
+      span.EditorWidget = new EditorWidget$6(this.visibleValue, view, head, [5,-1], []);
 
       span.appendChild(head);
 
@@ -63284,7 +63181,26 @@ var compactCMEditor$4;
         self.destroy(span);
       }});      
 
+      this.DOMElement = span;
+
       return span;
+    }
+
+    skipPosition(pos, oldPos, selected) {
+      if (oldPos.from != oldPos.to || selected) return pos;
+
+      if (pos.from - oldPos.from > 0) {
+        this.DOMElement.EditorWidget.editor.dispatch({selection: {anchor: 0}});
+        this.DOMElement.EditorWidget.editor.focus();
+      } else {
+        const editor = this.DOMElement.EditorWidget.editor;
+        editor.dispatch({selection: {anchor: editor.state.doc.length}});
+        editor.focus();
+      }
+      //this.DOMElement.EditorWidget.wantedPosition = pos;
+      
+  
+      return oldPos;
     }
   
     ignoreEvent() {
@@ -63296,28 +63212,28 @@ var compactCMEditor$4;
     }
   };
   
-  const matcher$5 = (ref, view) => {
+  const matcher$6 = (ref, view) => {
     return new BallancedMatchDecorator2({
       tag: 'SqB',
       decoration: (match) => {
         
         return Decoration.replace({
-          widget: new Widget$5(match, ref, view)
+          widget: new Widget$6(match, ref, view)
         });
       }
     });
   };
   
-  const placeholder$5 = ViewPlugin.fromClass(
+  const placeholder$6 = ViewPlugin.fromClass(
     class {
       constructor(view) {
         this.disposable = [];
-        this.placeholder = matcher$5(this.disposable, view).createDeco(view);
+        this.placeholder = matcher$6(this.disposable, view).createDeco(view);
       }
       update(update) {
         //console.log('update Deco');
         //console.log(this.disposable );
-        this.placeholder = matcher$5(this.disposable, update).updateDeco(
+        this.placeholder = matcher$6(this.disposable, update).updateDeco(
           update,
           this.placeholder
         );
@@ -63346,13 +63262,13 @@ var compactCMEditor$4;
     }
   );
 
-var compactCMEditor$3; 
+var compactCMEditor$4; 
 
 function SubscriptBoxWidget(viewEditor) {
-  compactCMEditor$3 = viewEditor;
+  compactCMEditor$4 = viewEditor;
   return [
     //mathematicaMathDecoration,
-    placeholder$4,
+    placeholder$5,
     keymap.of([{ key: "Ctrl--", run: snippet$1() }])
   ];
 }
@@ -63383,7 +63299,7 @@ function snippet$1() {
   };
 }
 
-let EditorWidget$4 = class EditorWidget {
+let EditorWidget$5 = class EditorWidget {
 
   constructor(visibleValue, view, head, sub, ref) {
     this.view = view;
@@ -63400,41 +63316,67 @@ let EditorWidget$4 = class EditorWidget {
 
     console.log(self.visibleValue);
 
-    topEditor = compactCMEditor$3({
+    topEditor = compactCMEditor$4({
       doc: self.args[0].body.slice(10),
       parent: head,
       update: (upd) => this.applyChanges(upd, 0),
       extensions: [
         keymap.of([
           { key: "ArrowLeft", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              view.dispatch({selection: {anchor: self.visibleValue.pos }});
               view.focus();
+              editor.editorLastCursor = undefined;
+              return;
+            }
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
           } },   
           { key: "ArrowRight", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              bottomEditor.dispatch({selection:{anchor: 0}});
               bottomEditor.focus();
+              editor.editorLastCursor = undefined;
+            
+              return;
+            }
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+          } },
+
+          { key: "ArrowDown", run: function (editor, key) {  
+            bottomEditor.focus();
           } }
         ])
       ]
     });
 
-    bottomEditor = compactCMEditor$3({
+    bottomEditor = compactCMEditor$4({
       doc: self.args[2].body.slice(0, -1),
       parent: sub,
       update: (upd) => this.applyChanges(upd, 2),
       extensions: [
         keymap.of([
           { key: "ArrowRight", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
               view.focus();
+              editor.editorLastCursor = undefined;
+              return;
+            }
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
           } },   
           { key: "ArrowLeft", run: function (editor, key) {  
-            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+            if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+              topEditor.dispatch({selection:{anchor: topEditor.state.doc.length}});
               topEditor.focus();
+              editor.editorLastCursor = undefined;
+              return;
+            }
+              
             editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+          } },
+
+          { key: "ArrowUp", run: function (editor, key) {  
+            topEditor.focus();
           } }
         ])
       ]            
@@ -63470,7 +63412,10 @@ let EditorWidget$4 = class EditorWidget {
       args[0].to = args[0].to + (data.length - args[0].length);
       args[2].from = args[2].from + (data.length - args[0].length);
 
+      const delta = data.length - args[0].length;
       args[0].length = data.length;
+
+      this.visibleValue.length = this.visibleValue.length + delta;
 
       //console.log(changes);
 
@@ -63482,9 +63427,11 @@ let EditorWidget$4 = class EditorWidget {
 
       //shift other positions
       args[2].to = args[2].to + (data.length - args[2].length);
+      const delta = data.length - args[2].length;
       args[2].length = data.length;
 
       //console.log(changes);
+      this.visibleValue.length = this.visibleValue.length + delta;
 
       this.view.dispatch({changes: changes});
       //lower one
@@ -63506,7 +63453,7 @@ let EditorWidget$4 = class EditorWidget {
   }
 };
 
-let Widget$4 = class Widget extends WidgetType {
+let Widget$5 = class Widget extends WidgetType {
   constructor(visibleValue, ref, view) {
     super();
     this.view = view;
@@ -63520,10 +63467,29 @@ let Widget$4 = class Widget extends WidgetType {
     return false;
   }
 
+  skipPosition(pos, oldPos, selected) {
+    if (oldPos.from != oldPos.to || selected) return pos;
+
+    if (pos.from - oldPos.from > 0) {
+      //this.DOMElement.EditorWidget.topEditor.dispatch()
+      this.DOMElement.EditorWidget.topEditor.dispatch({selection: {anchor: 0}});
+      this.DOMElement.EditorWidget.topEditor.focus();
+      //this.DOMElement.EditorWidget.topEditor.focus();
+    } else {
+      const editor = this.DOMElement.EditorWidget.bottomEditor;
+      editor.dispatch({selection: {anchor: editor.state.doc.length}});
+      editor.focus();
+      //this.DOMElement.EditorWidget.bottomEditor.focus();
+    }  
+
+    return oldPos;
+  }
+
   updateDOM(dom, view) {
     //console.log(this.visibleValue);
     //console.log(this);
     console.log('update widget DOM');
+    this.DOMElement = dom;
     dom.EditorWidget.update(this.visibleValue);
 
     return true
@@ -63542,13 +63508,15 @@ let Widget$4 = class Widget extends WidgetType {
     span.appendChild(head);
     span.appendChild(sub);
 
-    span.EditorWidget = new EditorWidget$4(this.visibleValue, view, head, sub, []);
+    span.EditorWidget = new EditorWidget$5(this.visibleValue, view, head, sub, []);
 
     const self = this;
       
     this.reference.push({destroy: () => {
       self.destroy(span);
     }});
+
+    this.DOMElement = span;
 
     return span;
   }
@@ -63562,28 +63530,28 @@ let Widget$4 = class Widget extends WidgetType {
   }
 };
 
-const matcher$4 = (ref, view) => {
+const matcher$5 = (ref, view) => {
   return new BallancedMatchDecorator2({
     tag: 'SbB',
     decoration: (match) => {
       
       return Decoration.replace({
-        widget: new Widget$4(match, ref, view)
+        widget: new Widget$5(match, ref, view)
       });
     }
   });
 };
 
-const placeholder$4 = ViewPlugin.fromClass(
+const placeholder$5 = ViewPlugin.fromClass(
   class {
     constructor(view) {
       this.disposable = [];
-      this.placeholder = matcher$4(this.disposable, view).createDeco(view);
+      this.placeholder = matcher$5(this.disposable, view).createDeco(view);
     }
     update(update) {
       //console.log('update Deco');
       //console.log(this.disposable );
-      this.placeholder = matcher$4(this.disposable, update).updateDeco(
+      this.placeholder = matcher$5(this.disposable, update).updateDeco(
         update,
         this.placeholder
       );
@@ -63612,13 +63580,13 @@ const placeholder$4 = ViewPlugin.fromClass(
   }
 );
 
-var compactCMEditor$2; 
+var compactCMEditor$3; 
   
   function SupscriptBoxWidget(viewEditor) {
-    compactCMEditor$2 = viewEditor;
+    compactCMEditor$3 = viewEditor;
     return [
       //mathematicaMathDecoration,
-      placeholder$3,
+      placeholder$4,
       keymap.of([{ key: "Ctrl-6", run: snippet() }])
     ];
   }
@@ -63649,7 +63617,7 @@ var compactCMEditor$2;
     };
   }
   
-  let EditorWidget$3 = class EditorWidget {
+  let EditorWidget$4 = class EditorWidget {
   
     constructor(visibleValue, view, head, sub, ref) {
       this.view = view;
@@ -63666,41 +63634,66 @@ var compactCMEditor$2;
   
       //console.log(self.visibleValue);
   
-      topEditor = compactCMEditor$2({
+      topEditor = compactCMEditor$3({
         doc: self.args[0].body.slice(6),
         parent: head,
         update: (upd) => this.applyChanges(upd, 0),
         extensions: [
           keymap.of([
             { key: "ArrowLeft", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                
+                view.dispatch({selection: {anchor: self.visibleValue.pos}});
                 view.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              }
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
             } },   
             { key: "ArrowRight", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                bottomEditor.dispatch({selection: {anchor: 0}});
                 bottomEditor.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              }
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            } },
+
+            { key: "ArrowUp", run: function (editor, key) {  
+              bottomEditor.focus();
             } }
           ])
         ]
       });
   
-      bottomEditor = compactCMEditor$2({
+      bottomEditor = compactCMEditor$3({
         doc: self.args[2].body.slice(0, -1),
         parent: sub,
         update: (upd) => this.applyChanges(upd, 2),
         extensions: [
           keymap.of([
             { key: "ArrowRight", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
                 view.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              }
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
             } },   
             { key: "ArrowLeft", run: function (editor, key) {  
-              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                topEditor.dispatch({selection: {anchor: topEditor.state.doc.length}});
                 topEditor.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              }
               editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            } },
+
+            { key: "ArrowDown", run: function (editor, key) {  
+              topEditor.focus();
             } }
           ])
         ]            
@@ -63736,8 +63729,10 @@ var compactCMEditor$2;
         //shift other positions
         args[0].to = args[0].to + (data.length - args[0].length);
         args[2].from = args[2].from + (data.length - args[0].length);
-  
+        const delta = data.length - args[0].length;
         args[0].length = data.length;
+
+        this.visibleValue.length = this.visibleValue.length + delta;
   
         //console.log(changes);
   
@@ -63749,7 +63744,10 @@ var compactCMEditor$2;
   
         //shift other positions
         args[2].to = args[2].to + (data.length - args[2].length);
+        const delta = data.length - args[2].length;
         args[2].length = data.length;
+
+        this.visibleValue.length = this.visibleValue.length + delta;
   
         //console.log(changes);
   
@@ -63772,7 +63770,7 @@ var compactCMEditor$2;
     }
   };
   
-  let Widget$3 = class Widget extends WidgetType {
+  let Widget$4 = class Widget extends WidgetType {
     constructor(visibleValue, ref, view) {
       super();
       this.view = view;
@@ -63789,6 +63787,7 @@ var compactCMEditor$2;
       //console.log(this.visibleValue);
       //console.log(this);
       console.log('update widget DOM');
+      this.DOMElement = dom;
       dom.EditorWidget.update(this.visibleValue);
   
       return true
@@ -63807,12 +63806,13 @@ var compactCMEditor$2;
       span.appendChild(head);
       span.appendChild(sub);
   
-      span.EditorWidget = new EditorWidget$3(this.visibleValue, view, head, sub, []);
+      span.EditorWidget = new EditorWidget$4(this.visibleValue, view, head, sub, []);
       const self = this;
 
       this.reference.push({destroy: () => {
         self.destroy(span);
       }});
+      this.DOMElement = span;
   
       return span;
     }
@@ -63820,34 +63820,53 @@ var compactCMEditor$2;
     ignoreEvent() {
       return true;
     }
+
+    skipPosition(pos, oldPos, selected) {
+      if (oldPos.from != oldPos.to || selected) return pos;
+
+
+      if (pos.from - oldPos.from > 0) {
+        //this.DOMElement.EditorWidget.topEditor.dispatch()
+        this.DOMElement.EditorWidget.topEditor.dispatch({selection: {anchor: 0}});
+        this.DOMElement.EditorWidget.topEditor.focus();
+        //this.DOMElement.EditorWidget.topEditor.focus();
+      } else {
+        const editor = this.DOMElement.EditorWidget.bottomEditor;
+        editor.dispatch({selection: {anchor: editor.state.doc.length}});
+        editor.focus();
+        //this.DOMElement.EditorWidget.bottomEditor.focus();
+      }   
+  
+      return oldPos;
+    }
   
     destroy(dom) {
       dom.EditorWidget.destroy();
     }
   };
   
-  const matcher$3 = (ref, view) => {
+  const matcher$4 = (ref, view) => {
     return new BallancedMatchDecorator2({
       tag: 'SpB',
       decoration: (match) => {
         
         return Decoration.replace({
-          widget: new Widget$3(match, ref, view)
+          widget: new Widget$4(match, ref, view)
         });
       }
     });
   };
   
-  const placeholder$3 = ViewPlugin.fromClass(
+  const placeholder$4 = ViewPlugin.fromClass(
     class {
       constructor(view) {
         this.disposable = [];
-        this.placeholder = matcher$3(this.disposable, view).createDeco(view);
+        this.placeholder = matcher$4(this.disposable, view).createDeco(view);
       }
       update(update) {
         //console.log('update Deco');
         //console.log(this.disposable );
-        this.placeholder = matcher$3(this.disposable, update).updateDeco(
+        this.placeholder = matcher$4(this.disposable, update).updateDeco(
           update,
           this.placeholder
         );
@@ -63876,22 +63895,25 @@ var compactCMEditor$2;
     }
   );
 
-var compactCMEditor$1; 
+var compactCMEditor$2; 
   
   function GridBoxWidget(viewEditor) {
-    compactCMEditor$1 = viewEditor;
+    compactCMEditor$2 = viewEditor;
     return [
       //mathematicaMathDecoration,
-      placeholder$2,
+      placeholder$3,
       //keymap.of([{ key: "Ctrl-m", run: snippet() }])
     ];
   }
   
-  let EditorWidget$2 = class EditorWidget {
+  
+  
+  let EditorWidget$3 = class EditorWidget {
   
     constructor(visibleValue, view, tbody, ref) {
       this.view = view;
       this.visibleValue = visibleValue;
+      const self = this;
 
       //ref.push(self);
 
@@ -63923,47 +63945,69 @@ var compactCMEditor$1;
           if (j == cols.length-1 && i == this.args.length-1) text = text.slice(0,-2);
           if (j == cols.length-1 && i != this.args.length-1) text = text.slice(0,-1);
 
-          cols[j].editor = compactCMEditor$1({
+          cols[j].editor = compactCMEditor$2({
             doc: text,
             parent: td,
+            eval: () => {
+              view.viewState.state.config.eval();
+            },
             update: (upd) => this.applyChanges(upd, i,j),
             extensions: [
               keymap.of([
                 { key: "ArrowLeft", run: function (editor, key) {  
                   if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                    if (j - 2 >= 0)
+                    if (j - 2 >= 0) {
+                      cols[j-2].editor.dispatch({selection:{anchor:cols[j-2].editor.state.doc.length}});
                       cols[j-2].editor.focus();
-                    else
+                      editor.editorLastCursor = undefined;
+                      return;
+                    } else {
+                      view.dispatch({selection: {anchor: self.visibleValue.pos}});
                       view.focus();
+
+                      editor.editorLastCursor = undefined;
+                      return;
+                    }
   
                   editor.editorLastCursor = editor.state.selection.ranges[0].to;  
                 } }, 
                 { key: "ArrowRight", run: function (editor, key) {  
                   if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                    if (j + 2 < cols.length)
+                    if (j + 2 < cols.length) {
+                      cols[j+2].editor.dispatch({selection:{anchor:0}});
                       cols[j+2].editor.focus();
-                    else
+                      editor.editorLastCursor = undefined;
+                      return;
+                    } else {
+                      //view.focus();
+                      view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
                       view.focus();
+
+                      editor.editorLastCursor = undefined;
+                      return;
+                    }
   
                   editor.editorLastCursor = editor.state.selection.ranges[0].to;  
                 } },             
                 { key: "ArrowUp", run: function (editor, key) {  
-                  if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                    if (i - 2 >= 0)
+                  //if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+                    if (i - 2 >= 0) {
                       args[i-2].body[j].editor.focus();
-                    else
-                      view.focus();
+                      editor.editorLastCursor = undefined;
+                      return;
+                    }
   
-                  editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+                  //editor.editorLastCursor = editor.state.selection.ranges[0].to;  
                 } },             
                 { key: "ArrowDown", run: function (editor, key) {  
-                  if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                    if (i + 2 < args.length)
+                  //if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+                    if (i + 2 < args.length) {
                       args[i+2].body[j].editor.focus();
-                    else
-                      view.focus();
+                      editor.editorLastCursor = undefined;
+                      return;
+                    }
   
-                  editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+                  //editor.editorLastCursor = editor.state.selection.ranges[0].to;  
                 } }
               ])
             ] 
@@ -64002,18 +64046,20 @@ var compactCMEditor$1;
       const oldLength = parent[j].length;
       const changes = {from: relative1 + relative2 + parent[j].from, to: relative1 + relative2 + parent[j].from + oldLength, insert: text};
    
+      const delta = text.length - oldLength;
       //shift the next in a row
       for (let jj=j+1; jj<parent.length; jj+=1) {
-        parent[jj].from += (text.length - oldLength);
+        parent[jj].from += delta;
       }
 
       //shift the next in the col
       for (let ii=i+1; ii<args.length; ii+=1) {
-        args[ii].from += (text.length - oldLength);
+        args[ii].from += delta;
       }
 
-      this.args[i].length += (text.length - oldLength);
+      this.args[i].length += delta;
 
+      this.visibleValue.length = this.visibleValue.length + delta;
 
       //apply 
       parent[j].length = text.length;
@@ -64045,7 +64091,7 @@ var compactCMEditor$1;
     }
   };
   
-  let Widget$2 = class Widget extends WidgetType {
+  let Widget$3 = class Widget extends WidgetType {
     constructor(visibleValue, ref, view) {
       super();
       this.view = view;
@@ -64062,6 +64108,7 @@ var compactCMEditor$1;
       //console.log(this.visibleValue);
       //console.log(this);
       console.log('update widget DOM');
+      this.DOMElement = dom;
       dom.EditorWidget.update(this.visibleValue);
   
       return true
@@ -64080,15 +64127,34 @@ var compactCMEditor$1;
       const tbody      = document.createElement("tbody");
       table.appendChild(tbody);
   
-      span.EditorWidget = new EditorWidget$2(this.visibleValue, view, tbody, []);
+      span.EditorWidget = new EditorWidget$3(this.visibleValue, view, tbody, []);
       const self = this;
       
       this.reference.push({destroy: () => {
         self.destroy(span);
       }});  
+
+      this.DOMElement = span;
   
       return span;
     }
+
+    skipPosition(pos, oldPos, selected) {
+      if (oldPos.from != oldPos.to || selected) return pos;
+
+      if (pos.from - oldPos.from > 0) {
+        this.DOMElement.EditorWidget.args[0].body[0].editor.dispatch({selection: {anchor: 0}});
+        this.DOMElement.EditorWidget.args[0].body[0].editor.focus();
+      } else {
+        const args = this.DOMElement.EditorWidget.args;
+        //console.log(this.DOMElement.EditorWidget);
+        const editor = args[args.length - 1].body[args[args.length - 1].body.length - 1].editor;
+        editor.dispatch({selection: {anchor: editor.state.doc.length}});
+        editor.focus();
+      }
+  
+      return oldPos;
+    }    
   
     ignoreEvent() {
       return true;
@@ -64099,28 +64165,28 @@ var compactCMEditor$1;
     }
   };
   
-  const matcher$2 = (ref, view) => {
+  const matcher$3 = (ref, view) => {
     return new BallancedMatchDecorator2({
       tag: 'GB',
       decoration: (match) => {
         
         return Decoration.replace({
-          widget: new Widget$2(match, ref, view)
+          widget: new Widget$3(match, ref, view)
         });
       }
     });
   };
   
-  const placeholder$2 = ViewPlugin.fromClass(
+  const placeholder$3 = ViewPlugin.fromClass(
     class {
       constructor(view) {
         this.disposable = [];
-        this.placeholder = matcher$2(this.disposable, view).createDeco(view);
+        this.placeholder = matcher$3(this.disposable, view).createDeco(view);
       }
       update(update) {
         //console.log('update Deco');
         //console.log(this.disposable );
-        this.placeholder = matcher$2(this.disposable, update).updateDeco(
+        this.placeholder = matcher$3(this.disposable, update).updateDeco(
           update,
           this.placeholder
         );
@@ -71379,7 +71445,7 @@ Mma.toArray = function (obj) {
     return text;
 };
 
-const uuidv4$2 = () => { 
+const uuidv4$3 = () => { 
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
       var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
       return v.toString(16);
@@ -71389,11 +71455,11 @@ const uuidv4$2 = () => {
   function ViewBoxWidget(viewEditor) {
     return [
       //mathematicaMathDecoration,
-      placeholder$1
+      placeholder$2
     ];
   }
   
-  let EditorWidget$1 = class EditorWidget {
+  let EditorWidget$2 = class EditorWidget {
   
     constructor(visibleValue, view, span, ref) {
       this.view = view;
@@ -71411,12 +71477,33 @@ const uuidv4$2 = () => {
 
       this.data = json;
   
-      const cuid = uuidv4$2();
+      const cuid = uuidv4$3();
+      this.cuid = cuid;
+
       let global = {call: cuid, EditorWidget: self};
       let env = {global: global, element: span}; //Created in CM6
       this.expression = json;
       this.env = env;
       this.interpretated = interpretate(json, env);
+      this.interpretated.then(() => {
+        //console.error(env);
+        if (env.options?.Event) {
+          console.warn('Event listeners are enabled!');
+          self.events = env.options.Event;
+          let firstInstanceEnv = env;
+          if (global.stack) {
+            const objs = Object.values(global.stack);
+            if (objs.length > 0) {
+              console.log('Attaching first found instance...');
+              firstInstanceEnv = objs[0].env;
+            }
+          }
+          //providing metamarker so that later you can work with it
+          interpretate(['MetaMarker', "'" + cuid + "'"], firstInstanceEnv).then(() => {
+            server.kernel.emitt(self.events, '"' + cuid + '"', 'Mounted');
+          });
+        }
+      });
 
       //ref.push(self);  
       //console.error(this.visibleValue)
@@ -71473,11 +71560,14 @@ const uuidv4$2 = () => {
       }
       //interpretate(this.expression, {...this.env, method: 'destroy'});
       //this.view.destroy();
+      if (this.events) {
+        server.kernel.emitt(this.events, '"' + this.cuid + '"', 'Destroy');
+      }
       delete this.data;
     }
   };
   
-  let Widget$1 = class Widget extends WidgetType {
+  let Widget$2 = class Widget extends WidgetType {
     constructor(visibleValue, ref, view) {
       super();
       this.view = view;
@@ -71507,7 +71597,7 @@ const uuidv4$2 = () => {
       let span = document.createElement("span");
       span.classList.add("frontend-view");
   
-      span.EditorWidget = new EditorWidget$1(this.visibleValue, view, span);
+      span.EditorWidget = new EditorWidget$2(this.visibleValue, view, span);
   
       this.reference.push({destroy: () => {
         self.destroy(span);
@@ -71526,28 +71616,28 @@ const uuidv4$2 = () => {
     }
   };
   
-  const matcher$1 = (ref, view) => {
+  const matcher$2 = (ref, view) => {
     return new BallancedMatchDecorator2({
       tag: 'VB',
       decoration: (match) => {
         
         return Decoration.replace({
-          widget: new Widget$1(match, ref, view)
+          widget: new Widget$2(match, ref, view)
         });
       }
     });
   };
   
-  const placeholder$1 = ViewPlugin.fromClass(
+  const placeholder$2 = ViewPlugin.fromClass(
     class {
       constructor(view) {
         this.disposable = [];
-        this.placeholder = matcher$1(this.disposable, view).createDeco(view);
+        this.placeholder = matcher$2(this.disposable, view).createDeco(view);
       }
       update(update) {
         //console.log('update Deco');
         //console.log(this.disposable );
-        this.placeholder = matcher$1(this.disposable, update).updateDeco(
+        this.placeholder = matcher$2(this.disposable, update).updateDeco(
           update,
           this.placeholder
         );
@@ -71575,225 +71665,594 @@ const uuidv4$2 = () => {
         })
     }
   );
+
+var compactCMEditor$1; 
+
+const uuidv4$2 = () => { 
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
+
+function BoxBoxWidget(viewEditor) {
+  compactCMEditor$1 = viewEditor;
+  return [
+    //mathematicaMathDecoration,
+    placeholder$1
+  ];
+}
+
+let EditorWidget$1 = class EditorWidget {
+
+  constructor(visibleValue, view, span, ref) {
+    this.view = view;
+    this.visibleValue = visibleValue;
+
+    this.args = matchArguments(visibleValue.str, /\(\*,\*\)/gm);
+
+    const self = this;
+    //ref.push(self);
+    //console.log(visibleValue);
+
+    
+    this.epilog = {
+        offset: 0,
+        string: ''
+      };
+
+    this.prolog = {
+        offset: 0,
+        string: ''          
+    };
+  
+
+    const string = this.args[1].body.slice(3,-3);
+    //console.log(string);
+    const decoded = Mma.DecompressDecode(string);
+    const json = Mma.toArray(decoded.parts[0]);
+
+    this.data = json;
+
+    const cuid = uuidv4$2();
+    let global = {call: cuid, element: span, origin: self};
+    let env = {global: global, element: span}; //Created in CM6
+    this.env = env;
+
+    interpretate(json, env).then(() => {
+      if (env.options?.Head) {
+        self.prolog.offset = env.options.Head.length + 1;
+        self.prolog.string = env.options.Head + "[";
+        self.epilog.offset = 1;
+        self.epilog.string = "]";
+      }
+
+      if (env.options?.Event) {
+        console.warn('Event listeners are enabled!');
+        self.events = env.options.Event;
+      }
+
+      if (env.options?.String) {
+        //just make a DOM element, if this is a string
+        self.prolog.offset = 1;
+        self.prolog.string = '"';
+        self.epilog.offset = 1;
+        self.epilog.string = '"';
+
+        if (env.options?.HeadString) {
+          self.prolog.string = env.options.HeadString;
+          self.prolog.offset = self.prolog.string.length;
+        }
+
+        if (env.options?.TailString) {
+          self.epilog.string = env.options.TailString;
+          self.epilog.offset = self.epilog.string.length;
+        }        
+
+        self.editor = {
+          destroy: () => {
+            console.log('Nothing to destroy, this is just a text field.');
+          }
+        };
+        const aa = document.createElement('span');
+        aa.onkeydown = function(e) {
+          // User hits enter key and is not holding shift
+          if (e.keyCode === 13) {
+               e.preventDefault();
+           }
+       };
+        aa.contentEditable = "plaintext-only";
+        aa.innerText = self.args[0].body.slice(1 + self.prolog.offset, -1 - self.epilog.offset);
+        aa.addEventListener('input', console.log);
+        aa.addEventListener("input", () => {
+          console.log('Update');
+          console.log(aa.innerText);
+          this.applyChanges(aa.innerText);
+        });  
+        
+        env.global.element.appendChild(aa);
+
+        if(self.events) server.kernel.emitt(self.events, 'Null', 'Mounted');
+
+        return;
+      }
+
+      
+
+      self.editor = compactCMEditor$1({
+        doc: self.args[0].body.slice(1 + self.prolog.offset, -1 - self.epilog.offset),
+        parent: env.global.element,
+        update: (upd) => this.applyChanges(upd),
+        eval: () => {
+          view.viewState.state.config.eval();
+        },
+        extensions: [
+          keymap.of([
+            { key: "ArrowLeft", run: function (editor, key) {  
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+
+                console.log(self.visibleValue.pos);
+                //if (self.visibleValue.pos == 0) return;
+  
+                view.dispatch({selection: {anchor: self.visibleValue.pos}});
+                view.focus();
+
+                editor.editorLastCursor = undefined;
+                return;
+              }
+                
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            } }, 
+            { key: "ArrowRight", run: function (editor, key) {  
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                console.log(self.visibleValue.pos);
+                //if (self.visibleValue.pos == 0) return;
+  
+                view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
+                view.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              }
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            } }
+          ])
+        ]
+      });
+
+      if(self.events) server.kernel.emitt(self.events, 'Null', 'Mounted');  
+
+    });
+
+  }
+
+  applyChanges(update, pos) {
+      const args = this.args;
+      const relative = this.visibleValue.argsPos;
+  
+      const data = '('+this.prolog.string+update+this.epilog.string+')';
+      const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
+
+      const delta = data.length - args[0].length;
+      args[0].length = data.length;
+      this.visibleValue.length = this.visibleValue.length + delta;
+
+
+      this.view.dispatch({changes: changes});
+  }    
+
+  update(visibleValue) {
+    //console.log('Update instance: new ranges & arguments');
+    this.visibleValue.pos = visibleValue.pos;
+    this.visibleValue.argsPos = visibleValue.argsPos;
+  }
+
+  destroy() {
+    console.warn('destroy Instance of Widget');
+    console.log(this);
+    if (this.env.global.stack) {
+      for (const obj of Object.values(this.env.global.stack))  {
+        obj.dispose();
+      }
+    }  
+    this.editor.destroy();
+
+    if(this.events) server.kernel.emitt(this.events, 'Null', 'Destroy');
+
+    delete this.data;
+  }
+};
+
+let Widget$1 = class Widget extends WidgetType {
+  constructor(visibleValue, ref, view) {
+    super();
+    this.view = view;
+    this.visibleValue = visibleValue;
+    this.reference = ref;
+    //console.log('construct');
+  }
+
+  eq(other) {
+    return false;
+  }
+
+  updateDOM(dom, view) {
+    //console.log(this.visibleValue);
+    //console.log(this);
+    console.log('update widget DOM');
+    this.DOMElement = dom;
+    dom.EditorWidget.update(this.visibleValue);
+
+    return true
+  }
+
+  toDOM(view) {
+    console.log('Create a new one!');
+
+    let span = document.createElement("span");
+    span.classList.add("subscript-tail");
+
+    span.EditorWidget = new EditorWidget$1(this.visibleValue, view, span, []);
+
+    const self = this;
+    
+    this.reference.push({destroy: () => {
+      self.destroy(span);
+    }});      
+
+    this.DOMElement = span;
+
+    return span;
+  }
+
+  skipPosition(pos, oldPos, selected) {
+    if (oldPos.from != oldPos.to || selected) return pos;
+    //this.DOMElement.EditorWidget.wantedPosition = pos;
+    if (pos.from - oldPos.from > 0) {
+      //this.DOMElement.EditorWidget.topEditor.dispatch()
+      this.DOMElement.EditorWidget.editor.dispatch({selection: {anchor: 0}});
+      this.DOMElement.EditorWidget.editor.focus();
+      //this.DOMElement.EditorWidget.topEditor.focus();
+    } else {
+      const editor = this.DOMElement.EditorWidget.editor;
+      editor.dispatch({selection: {anchor: editor.state.doc.length}});
+      editor.focus();
+      //this.DOMElement.EditorWidget.bottomEditor.focus();
+    }    
+    
+
+    return oldPos;
+  }  
+
+  ignoreEvent() {
+    return true;
+  }
+
+  destroy(dom) {
+    dom.EditorWidget.destroy();
+  }
+};
+
+const matcher$1 = (ref, view) => {
+  return new BallancedMatchDecorator2({
+    tag: 'BB',
+    decoration: (match) => {
+      
+      return Decoration.replace({
+        widget: new Widget$1(match, ref, view)
+      });
+    }
+  });
+};
+
+const placeholder$1 = ViewPlugin.fromClass(
+  class {
+    constructor(view) {
+      this.disposable = [];
+      this.placeholder = matcher$1(this.disposable, view).createDeco(view);
+    }
+    update(update) {
+      //console.log('update Deco');
+      //console.log(this.disposable );
+      this.placeholder = matcher$1(this.disposable, update).updateDeco(
+        update,
+        this.placeholder
+      );
+    }
+    destroy() {
+      //console.log("removed holder");
+      //console.log("disposable");
+      //console.log(this.disposable);
+      this.disposable.forEach((el) => {
+        el.destroy();
+      });
+    }
+  },
+  {
+    decorations: (instance) => instance.placeholder,
+    provide: (plugin) =>
+      EditorView.atomicRanges.of((view) => {
+        var _a;
+      
+        return (
+          ((_a = view.plugin(plugin)) === null || _a === void 0
+            ? void 0
+            : _a.placeholder) || Decoration.none
+        );
+      })
+  }
+);
 
 var compactCMEditor; 
 
-  const uuidv4$1 = () => { 
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
-  };
+const uuidv4$1 = () => { 
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
 
-  function BoxBoxWidget(viewEditor) {
-    compactCMEditor = viewEditor;
-    return [
-      //mathematicaMathDecoration,
-      placeholder
-    ];
-  }
-  
-  class EditorWidget {
-  
-    constructor(visibleValue, view, span, ref) {
-      this.view = view;
-      this.visibleValue = visibleValue;
-  
-      this.args = matchArguments(visibleValue.str, /\(\*,\*\)/gm);
-  
-      const self = this;
-      //ref.push(self);
-      //console.log(visibleValue);
+function TemplateBoxWidget(viewEditor) {
+  compactCMEditor = viewEditor;
+  return [
+    //mathematicaMathDecoration,
+    placeholder
+  ];
+}
 
-      
-      this.epilog = {
-          offset: 0,
-          string: ''
-        };
+class EditorWidget {
 
-      this.prolog = {
-          offset: 0,
-          string: ''          
-      };
+  constructor(visibleValue, view, span, ref) {
+    this.view = view;
+    this.visibleValue = visibleValue;
+
+    this.args = matchArguments(visibleValue.str, /\(\*\|\*\)/gm);
+
+    const self = this;
     
 
-      const string = this.args[1].body.slice(3,-3);
-      //console.log(string);
-      const decoded = Mma.DecompressDecode(string);
-      const json = Mma.toArray(decoded.parts[0]);
+    //ref.push(self);
+    //console.log(visibleValue);
 
-      this.data = json;
-  
-      const cuid = uuidv4$1();
-      let global = {call: cuid, element: span, origin: self};
-      let env = {global: global, element: span}; //Created in CM6
-      this.env = env;
+    
 
-      interpretate(json, env).then(() => {
-        if (env.options?.Head) {
-          self.prolog.offset = env.options.Head.length + 1;
-          self.prolog.string = env.options.Head + "[";
-          self.epilog.offset = 1;
-          self.epilog.string = "]";
-        }
 
-        self.editor = compactCMEditor({
-          doc: self.args[0].body.slice(1 + self.prolog.offset, -1 - self.epilog.offset),
-          parent: env.global.element,
-          update: (upd) => this.applyChanges(upd),
-          eval: () => {
-            view.viewState.state.config.eval();
-          },
-          extensions: [
-            keymap.of([
-              { key: "ArrowLeft", run: function (editor, key) {  
-                if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                  view.focus();
-                editor.editorLastCursor = editor.state.selection.ranges[0].to;  
-              } }, 
-              { key: "ArrowRight", run: function (editor, key) {  
-                if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                  view.focus();
-                editor.editorLastCursor = editor.state.selection.ranges[0].to;  
-              } }
-            ])
-          ]
-        });  
-      });
+    const indexes = Array.from({ length: Math.ceil((self.args.length - 3)  / 2) }, (v, i) => i * 2 + 1);
+    self.indexes = indexes;
 
+    const spans = [];
+    for (let i=0; i<indexes.length; ++i) {
+      spans.push(document.createElement('span'));
     }
+  
+    
+    const string = this.args[this.args.length - 1].body.slice(2,-2);
+  
+    const decoded = Mma.DecompressDecode(string);
+    const json = Mma.toArray(decoded.parts[0]);
 
-    applyChanges(update, pos) {
-        const args = this.args;
-        const relative = this.visibleValue.argsPos;
+    this.data = json;
+
+    const cuid = uuidv4$1();
+    let global = {call: cuid, element: span, children: spans, origin: self};
+    let env = {global: global, element: span, children: spans}; //Created in CM6
+    this.env = env;
+
     
-        const data = '('+this.prolog.string+update+this.epilog.string+')';
-        const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
+
+    interpretate(json, env).then(() => {
+      
+
+      if (env.options?.Event) {
+        console.warn('Event listeners are enabled!');
+        self.events = env.options.Event;
+      }      
+
+
+
+      self.editors = indexes.map((index, i) => compactCMEditor({
+        doc: self.args[index].body,
+        parent: spans[i],
+        update: (upd) => this.applyChanges(upd, index),
+        eval: () => {
+          view.viewState.state.config.eval();
+        },
+        extensions: [
+          keymap.of([
+            { key: "ArrowLeft", run: function (editor, key) {  
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                if (i > 0) {
+                  self.editors[i - 1].focus();
+                } else {
+                  view.dispatch({selection: {anchor: self.visibleValue.pos}});
+                  view.focus();
+                }
+                editor.editorLastCursor = undefined;
+                return;
+              }
+          
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            } }, 
+            { key: "ArrowRight", run: function (editor, key) {  
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                if (i < indexes.length - 1) {
+                  self.editors[i + 1].focus();
+                } else {
+                  view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
+                  view.focus();
+                }
+                editor.editorLastCursor = undefined;
+                return;
+              }
+                
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            } }
+          ])
+        ]
+      }));
+
+      if(self.events) server.kernel.emitt(self.events, 'Null', 'Mounted');  
+
+    });
+
+  }
+
+  applyChanges(update, index) {
+      const args = this.args;
+      const relative = this.visibleValue.argsPos;
   
+      console.log(args);
+
+      const changes = {from: relative + args[index].from, to:relative + args[index].from + args[index].length, insert: update};
+
+      const delta = update.length - args[index].length;
+      args[index].length = update.length;
+      for (let i = index + 1; i < args.length; ++i)
+        args[i].from = args[i].from + delta;
+
+      this.visibleValue.length += delta;
+      this.view.dispatch({changes: changes});
+  }    
+
+  update(visibleValue) {
+    //console.log('Update instance: new ranges & arguments');
+    this.visibleValue.pos = visibleValue.pos;
+    this.visibleValue.argsPos = visibleValue.argsPos;
+  }
+
+  destroy() {
+    console.warn('destroy Instance of Widget');
+    console.log(this);
+    if (this.env.global.stack) {
+      for (const obj of Object.values(this.env.global.stack))  {
+        obj.dispose();
+      }
+    }  
+    this.editors.forEach((i)=>i.destroy());
+
+    if(this.events) server.kernel.emitt(this.events, 'Null', 'Destroy');
+
+    delete this.data;
+  }
+}
+
+class Widget extends WidgetType {
+  constructor(visibleValue, ref, view) {
+    super();
+    this.view = view;
+    this.visibleValue = visibleValue;
+    this.reference = ref;
+    //console.log('construct');
+  }
+
+  eq(other) {
+    return false;
+  }
+
+  updateDOM(dom, view) {
+    //console.log(this.visibleValue);
+    //console.log(this);
+    this.DOMElement = dom;
+    console.log('update widget DOM');
+    dom.EditorWidget.update(this.visibleValue);
+
+    return true
+  }
+
+  toDOM(view) {
+    console.log('Create a new one!');
+
+    let span = document.createElement("span");
+    span.classList.add("inline-flex");
+
+    span.EditorWidget = new EditorWidget(this.visibleValue, view, span, []);
+
+    const self = this;
+
+    this.DOMElement = span;
     
-        args[0].length = data.length;
-  
-  
-        this.view.dispatch({changes: changes});
+    this.reference.push({destroy: () => {
+      self.destroy(span);
+    }});      
+
+
+    return span;
+  }
+
+  skipPosition(pos, oldPos, selected) {
+    if (oldPos.from != oldPos.to || selected) return pos;
+
+    const editors = this.DOMElement.EditorWidget.editors;
+    if (pos.from - oldPos.from < 0) {
+      editors[editors.length - 1].dispatch({selection: {anchor: editors[editors.length - 1].state.doc.length}});
+      editors[editors.length - 1].focus();
+    } else {
+      editors[0].dispatch({selection: {anchor: 0}});
+      editors[0].focus();
     }    
-  
-    update(visibleValue) {
-      //console.log('Update instance: new ranges & arguments');
-      this.visibleValue.pos = visibleValue.pos;
-      this.visibleValue.argsPos = visibleValue.argsPos;
-    }
-  
-    destroy() {
-      console.warn('destroy Instance of Widget');
-      console.log(this);
-      if (this.env.global.stack) {
-        for (const obj of Object.values(this.env.global.stack))  {
-          obj.dispose();
-        }
-      }  
-      this.editor.destroy();
-      delete this.data;
-    }
-  }
-  
-  class Widget extends WidgetType {
-    constructor(visibleValue, ref, view) {
-      super();
-      this.view = view;
-      this.visibleValue = visibleValue;
-      this.reference = ref;
-      //console.log('construct');
-    }
-  
-    eq(other) {
-      return false;
-    }
-  
-    updateDOM(dom, view) {
-      //console.log(this.visibleValue);
-      //console.log(this);
-      console.log('update widget DOM');
-      dom.EditorWidget.update(this.visibleValue);
-  
-      return true
-    }
-  
-    toDOM(view) {
-      console.log('Create a new one!');
-  
-      let span = document.createElement("span");
-      span.classList.add("subscript-tail");
-  
-      span.EditorWidget = new EditorWidget(this.visibleValue, view, span, []);
 
-      const self = this;
-      
-      this.reference.push({destroy: () => {
-        self.destroy(span);
-      }});      
-  
-  
-      return span;
-    }
-  
-    ignoreEvent() {
-      return true;
-    }
-  
-    destroy(dom) {
-      dom.EditorWidget.destroy();
-    }
+
+
+    return oldPos;
+  }  
+
+  ignoreEvent() {
+    return true;
   }
-  
-  const matcher = (ref, view) => {
-    return new BallancedMatchDecorator2({
-      tag: 'BB',
-      decoration: (match) => {
-        
-        return Decoration.replace({
-          widget: new Widget(match, ref, view)
-        });
-      }
-    });
-  };
-  
-  const placeholder = ViewPlugin.fromClass(
-    class {
-      constructor(view) {
-        this.disposable = [];
-        this.placeholder = matcher(this.disposable, view).createDeco(view);
-      }
-      update(update) {
-        //console.log('update Deco');
-        //console.log(this.disposable );
-        this.placeholder = matcher(this.disposable, update).updateDeco(
-          update,
-          this.placeholder
-        );
-      }
-      destroy() {
-        //console.log("removed holder");
-        //console.log("disposable");
-        //console.log(this.disposable);
-        this.disposable.forEach((el) => {
-          el.destroy();
-        });
-      }
-    },
-    {
-      decorations: (instance) => instance.placeholder,
-      provide: (plugin) =>
-        EditorView.atomicRanges.of((view) => {
-          var _a;
-        
-          return (
-            ((_a = view.plugin(plugin)) === null || _a === void 0
-              ? void 0
-              : _a.placeholder) || Decoration.none
-          );
-        })
+
+  destroy(dom) {
+    dom.EditorWidget.destroy();
+  }
+}
+
+const matcher = (ref, view) => {
+  return new BallancedMatchDecorator2({
+    tag: 'TB',
+    decoration: (match) => {
+      
+      return Decoration.replace({
+        widget: new Widget(match, ref, view)
+      });
     }
-  );
+  });
+};
+
+const placeholder = ViewPlugin.fromClass(
+  class {
+    constructor(view) {
+      this.disposable = [];
+      this.placeholder = matcher(this.disposable, view).createDeco(view);
+    }
+    update(update) {
+      //console.log('update Deco');
+      //console.log(this.disposable );
+      this.placeholder = matcher(this.disposable, update).updateDeco(
+        update,
+        this.placeholder
+      );
+    }
+    destroy() {
+      //console.log("removed holder");
+      //console.log("disposable");
+      //console.log(this.disposable);
+      this.disposable.forEach((el) => {
+        el.destroy();
+      });
+    }
+  },
+  {
+    decorations: (instance) => instance.placeholder,
+    provide: (plugin) =>
+      EditorView.atomicRanges.of((view) => {
+        var _a;
+      
+        return (
+          ((_a = view.plugin(plugin)) === null || _a === void 0
+            ? void 0
+            : _a.placeholder) || Decoration.none
+        );
+      })
+  }
+);
 
 //credits https://github.com/fuermosi777
 
@@ -72168,10 +72627,10 @@ compactWLEditor = (args) => {
     GridBoxWidget(compactWLEditor),
     ViewBoxWidget(),
     BoxBoxWidget(compactWLEditor),
-    bracketMatching(),
-    rainbowBrackets(),
+    TemplateBoxWidget(compactWLEditor),
+    //bracketMatching(),
+    //rainbowBrackets(),
     Greekholder,
-    Arrowholder,
     extras,
     
     EditorView.updateListener.of((v) => {
@@ -72238,10 +72697,10 @@ const mathematicaPlugins = [
   GridBoxWidget(compactWLEditor),
   ViewBoxWidget(),
   BoxBoxWidget(compactWLEditor),  
+  TemplateBoxWidget(compactWLEditor),
   bracketMatching(),
-  rainbowBrackets(),
+  //rainbowBrackets(),
   Greekholder,
-  Arrowholder,
   extras,
   DropPasteHandlers(wlDrop, wlPaste)
 ];
@@ -72330,7 +72789,7 @@ window.EditorExtensionsMinimal = [
   () => dropCursor(),
   () => indentOnInput(),
   () => bracketMatching(),
-  () => closeBrackets(),
+  //() => closeBrackets(),
   () => EditorView.lineWrapping,
   () => autocompletion(),
   () => syntaxHighlighting(defaultHighlightStyle, { fallback: false }),
@@ -72354,13 +72813,14 @@ window.EditorExtensions = [
     },
   () => indentOnInput(),
   () => bracketMatching(),
-  () => closeBrackets(),
+ // () => test(),
+  //() => closeBrackets(),
   () => EditorView.lineWrapping,
   () => autocompletion(),
   () => syntaxHighlighting(defaultHighlightStyle, { fallback: false }),
   () => highlightSelectionMatches(),
   () => cellTypesHighlight,
-  () => placeholder$7('Type Wolfram Expression / .md / .html / .js'),
+  () => placeholder$8('Type Wolfram Expression / .md / .html / .js'),
   
   (self, initialLang) => languageConf.of(initialLang),
   () => autoLanguage, 
@@ -72376,16 +72836,16 @@ window.EditorExtensions = [
       editor.editorLastCursor = editor.state.selection.ranges[0].to;  
     } },                      
     { key: "ArrowUp", run: function (editor, key) {  
-      console.log('arrowup');
-      console.log(editor.state.selection.ranges[0]);
+      //console.log('arrowup');
+      //console.log(editor.state.selection.ranges[0]);
       if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
       self.origin.focusPrev(self.origin);
 
       editor.editorLastCursor = editor.state.selection.ranges[0].to;  
     } },
     { key: "ArrowDown", run: function (editor, key) { 
-      console.log('arrowdown');
-      console.log(editor.state.selection.ranges[0]);
+      //console.log('arrowdown');
+      //console.log(editor.state.selection.ranges[0]);
       if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
       self.origin.focusNext(self.origin);
 
@@ -72427,6 +72887,27 @@ class CodeMirrorCell {
 
     forceFocusNext() {
       globalCMFocus = true;
+    }
+
+    setContent (data) {
+      console.warn('content mutation!');
+      if (!this.editor.viewState) return;
+  //FIXME: NO CLEAN UP
+  const editor = this.editor;
+      console.log('result');
+      console.log(data);
+      this.editor.dispatch({
+        changes: {
+          from: 0,
+          to: editor.viewState.state.doc.length
+        , insert: ''}
+    });      
+      this.editor.dispatch({
+          changes: {
+            from: 0,
+            to: editor.viewState.state.doc.length
+          , insert: data}
+      });
     }
   
     addDisposable(el) {
@@ -72471,10 +72952,17 @@ class CodeMirrorCell {
 
   core.ReadOnly = () => "ReadOnly";
 
+  function unicodeToChar2(text) {
+    return text.replace(/\\\\:[\da-f]{4}/gi, 
+           function (match) {
+                return String.fromCharCode(parseInt(match.replace(/\\\\:/g, ''), 16));
+           });
+  }
+
   //for dynamics
   core.EditorView = async (args, env) => {
     //cm6 inline editor (editable or read-only)
-    const textData = await interpretate(args[0], env);
+    const textData = unicodeToChar2(await interpretate(args[0], env));
     const options = await core._getRules(args, env);
 
     let evalFunction = () => {};
@@ -72485,6 +72973,10 @@ class CodeMirrorCell {
     const ext = [];
     if (options.ReadOnly) {
       ext.push(EditorState.readOnly.of(true));
+    }
+
+    if (options.ForceUpdate) {
+      env.local.forceUpdate = options.ForceUpdate;
     }
 
     if (options.Event) {
@@ -72518,11 +73010,21 @@ class CodeMirrorCell {
 
   core.EditorView.update = async (args, env) => {
     if (!env.local.editor) return;
-    const textData = await interpretate(args[0], env);
+    const textData = unicodeToChar2(await interpretate(args[0], env));
     console.log('editor view: dispatch');
-    env.local.editor.dispatch({
-      changes: {from: 0, to: env.local.editor.state.doc.length, insert: textData}
-    });
+    if (env.local.forceUpdate) {
+      env.local.editor.dispatch({
+        changes: {from: 0, to: env.local.editor.state.doc.length, insert: ''}
+      });
+      env.local.editor.dispatch({
+        changes: {from: 0, to: 0, insert: textData}
+      });
+    } else {
+      env.local.editor.dispatch({
+        changes: {from: 0, to: env.local.editor.state.doc.length, insert: textData}
+      });
+    }
+
   };
 
   core.EditorView.destroy = async (args, env) => {

@@ -1,13 +1,28 @@
+System`RowBoxFlatten;
 RowBoxFlatten[x_List, y___] := StringJoin @@ (ToString[#] & /@ x)
+
 
 Begin["Notebook`Editor`StandardForm`"]
 
+System`DatasetWrapper;
+System`AudioWrapper;
+System`VideoWrapper;
+System`ByteArrayWrapper;
+System`QuantityWrapper;
+
 (* Being unable to change Boxes of Graphics, Graphics3D and Image, we have to use this *)
+(* I HATE YOU WOLFRAM!!!!!!!!!!!! *)
+(* FIXME *)
 ExpressionReplacements = {
-    Graphics[opts__] :> CreateFrontEndObject[Graphics[opts] ], 
-    Graphics3D[opts__] :> CreateFrontEndObject[Graphics3D[opts] ], 
-    Image[opts__] :> CreateFrontEndObject[Image[opts] ],
-    Sound[opts__] :> CreateFrontEndObject[Sound[opts] ]
+    g2d_Graphics :> CreateFrontEndObject[g2d ], 
+    g3d_Graphics3D :> CreateFrontEndObject[g3d ], 
+    i_Image :> CreateFrontEndObject[i ],
+    s_Sound :> CreateFrontEndObject[s ],
+    a_Audio :> AudioWrapper[a],
+    b_ByteArray :> ByteArrayWrapper[b],
+    d_Dataset :> DatasetWrapper[d],
+    u_Quantity :> QuantityWrapper[u],
+    v_Video :> VideoWrapper[v]
 } // Quiet
 
 Unprotect[ToString]
@@ -16,7 +31,6 @@ ToString[expr_, StandardForm] := ExportString[
         (expr /. ExpressionReplacements // ToBoxes) /. {RowBox->RowBoxFlatten} // ToString
     , {"\[NoBreak]"->""}]
 , "String"]
-
 
 
 End[]

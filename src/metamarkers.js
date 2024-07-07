@@ -8,6 +8,21 @@ core.MetaMarker = async (args, env) => {
   }
 
   const marker = await interpretate(args[0], env);
+
+  //an exception if no instance provided
+  if (!env.root) {
+    console.log('NO instance provided!!!');
+    console.log('Attaching env only');
+
+    MetaMarkers[marker] = {
+      noInstanceQ: true,
+      env: env
+    };
+
+    return null;
+  }
+
+
   const inst = env.root.instance;
 
   console.log('instance '+inst+'is marked as '+marker);
@@ -17,6 +32,7 @@ core.MetaMarker = async (args, env) => {
     MetaMarkers[marker] = {};
     MetaMarkers[marker][inst] = env;
   }
+
 
   return null;
 }
@@ -54,6 +70,32 @@ core.FindMetaMarker = async (args, env) => {
   return null;
 }
 
+const instancesGroups = {};
+
+core.FrontEndInstanceGroup = async (args, env) => {
+  const before = Object.keys(env.global.stack);
+
+  const uid = await interpretate(args[1], env);
+  const result = await interpretate(args[0], env);
+
+  const after = Object.keys(env.global.stack);
+
+  instancesGroups[uid] = after.filter(x => !before.includes(x)).map((e)=>env.global.stack[e]);
+  
+
+  return result;
+}
+
+core.FrontEndInstanceGroupDestroy = async (args, env) => {
+  const uid = await interpretate(args[0], env); 
+  instancesGroups[uid].forEach((el) => {
+    el.dispose();
+  });
+
+  delete instancesGroups[uid];
+}
+
+
 core.MarkerContainer = async (args, env) => {
     const expr = args[0];
     const marker = await interpretate(args[1], {...env, hold:true});
@@ -66,6 +108,23 @@ core.MarkerContainer = async (args, env) => {
 
     if (uid in MetaMarkers) {
       console.log('found Marker');
+
+      if (MetaMarkers[uid].noInstanceQ) {
+        console.log('plain env. No instance specified');
+        //execute inside given env
+        console.log('try!');
+
+        const copy = {...MetaMarkers[uid].env};
+  
+        //merge the scope
+        copy.scope = {...copy.scope, ...env.scope};
+
+        const result = await interpretate(expr, copy);
+        results.push(result);
+
+        return results;
+      }
+
       const arr =  Object.values(MetaMarkers[uid]);
       
       for (const instance of arr) {

@@ -8,19 +8,27 @@ BeginPackage["Notebook`Editor`Kernel`FrontSubmitService`", {
 
 (*Offload::usage = "Offload[exp] to keep it from evaluation on Kernel"*)
 
-FrontSubmit::usage = "FrontSubmit[expr] _FrontEndInstance (taken from global stack) to evaluation on frontend"
+FrontSubmit::usage = "FrontSubmit[expr] _FrontEndInstanceGroup (taken from global stack) to evaluation on frontend"
 CurrentWindow::usage = "Gets current window representation"
 
 FrontFetch::usage = "FrontFetch[expr] fetches an expression from frontend"
 FrontFetchAsync::usage = "FrontFetchAsync[expr] fetches an expression from frontend and returns Promise"
 
-FrontEndInstance::usage = "FrontEndInstance[uid_String] an identifier object of an executed expression on the frontend"
+FrontEndInstanceGroup::usage = "FrontEndInstanceGroup[uid_String] an identifier object of an executed expression on the frontend"
+
+FrontEndInstanceGroupDestroy;
+
+
+WindowObj;
+WindowObj::usage = "Internal represenation of a current window"
 
 Begin["`Private`"]
 
-CurrentWindow[] := Global`$EvaluationContext["KernelWebSocket"]
+CurrentWindow[] := WindowObj[<|"Socket" -> Global`$EvaluationContext["KernelWebSocket"]|>]
 
-FrontFetchAsync[expr_, OptionsPattern[] ] := With[{cli = OptionValue["Window"], format = OptionValue["Format"], event = CreateUUID[], promise = Promise[]},
+WindowObj[data_][key_String] := data[key]
+
+FrontFetchAsync[expr_, OptionsPattern[] ] := With[{cli = OptionValue["Window"]["Socket"], format = OptionValue["Format"], event = CreateUUID[], promise = Promise[]},
     EventHandler[event, Function[payload,
         EventRemove[event];
 
@@ -50,22 +58,22 @@ FrontFetch[expr_, opts___] := FrontFetchAsync[expr, opts] // WaitAll
 Options[FrontFetch] = {"Format"->"JSON", "Window" :> CurrentWindow[]};
 Options[FrontFetchAsync] = {"Format"->"JSON", "Window" :> CurrentWindow[]};
 
-FrontSubmit[expr_, OptionsPattern[] ] := With[{cli = OptionValue["Window"]},
+FrontSubmit[expr_, OptionsPattern[] ] := With[{cli = OptionValue["Window"]["Socket"]},
     If[OptionValue["Tracking"],     
         With[{uid = CreateUUID[]}, 
-            If[WLJSTransportSend[FrontEndInstance[expr, uid], cli] < 0, $Failed,
-                FrontEndInstance[uid]
+            If[FailureQ[WLJSTransportSend[FrontEndInstanceGroup[expr, uid], cli] ], $Failed,
+                FrontEndInstanceGroup[uid, OptionValue["Window"] ]
             ] 
         ]
     ,
-        If[WLJSTransportSend[expr, cli] < 0, $Failed,
+        If[FailureQ[WLJSTransportSend[expr, cli] ], $Failed,
             Null
         ]          
     ]
 ]
 
-FrontEndInstance /: Delete[FrontEndInstance[uid_String], OptionsPattern[{"Window" :> CurrentWindow[]}] ] := With[{win = OptionValue["WIndow"]},
-    If[WLJSTransportSend[FrontEndInstanceDelete[uid], win] < 0, $Failed,
+FrontEndInstanceGroup /: Delete[FrontEndInstanceGroup[uid_String, win_WindowObj], OptionsPattern[{"Window" :> CurrentWindow[]}] ] := With[{},
+    If[FailureQ[WLJSTransportSend[FrontEndInstanceGroupDestroy[uid], win["Socket"] ] ], $Failed,
         Null
     ]
 ]

@@ -92,7 +92,7 @@ compactWLEditor = (p) => {
       SubscriptBoxWidget(compactWLEditor),
       SupscriptBoxWidget(compactWLEditor),
       GridBoxWidget(compactWLEditor),
-      bracketMatching(),
+     // bracketMatching(),
       rainbowBrackets(),
       Greekholder,
       Arrowholder,
@@ -123,10 +123,10 @@ let mainEditor = new EditorView({
     SubscriptBoxWidget(compactWLEditor),
     SupscriptBoxWidget(compactWLEditor),
     GridBoxWidget(compactWLEditor),
-    bracketMatching(),
+   // bracketMatching(),
     rainbowBrackets(),
     Greekholder,
-    Arrowholder,
+    Arrowholder
   ],
   parent: document.querySelector("#editor")
 });

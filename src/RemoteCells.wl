@@ -17,12 +17,23 @@ EventHandler[NotebookEditorChannel // EventClone,
             Delete[ CellObj`HashMap[uid] ]
         ],
 
+        "SetCellData" -> Function[assoc,
+         
+            With[{cell = CellObj`HashMap[assoc["Hash"] ]},
+                Print["Updating the content: "];
+                Print[cell];
+
+                EventFire[cell, "ChangeContent", assoc["Data"] ];
+                (*no need in setting also in an object, it will be done for the feedback from CM6 editor*)
+            ]
+        ],
+
         "AskNotebookDirectory" -> Function[data,
            With[{promise = data["Promise"], kernel = Kernel`HashMap[ data["Kernel"] ]},
             
                 With[{ref = data["Ref"]},
                         If[ !MissingQ[CellObj`HashMap[ref] ] ,
-                            With[{dir = CellObj`HashMap[ref]["Notebook"]["Path"]},
+                            With[{dir = If[DirectoryQ[#], #, DirectoryName[#] ] &@ (CellObj`HashMap[ref]["Notebook"]["Path"])},
                                 If[StringQ[dir],
                                     Kernel`Async[kernel, EventFire[promise, Resolve, dir] ];
                                 ,
@@ -86,7 +97,27 @@ EventHandler[NotebookEditorChannel // EventClone,
                     ]
                 }]
             ]
-        ]
+        ],
+        
+        (* FIXME!!! NOT EFFICIENT!*)
+        (* DO NOT USE BLANK PATTERN !!! *)
+        "NotebookSubscribe" -> Function[assoc,
+            Print["NotebookSubscribe!!!!!!"];
+            With[{hash = assoc["NotebookHash"], callback = assoc["Callback"], kernel = Kernel`HashMap[ assoc["Kernel"] ]},
+                EventHandler[EventClone[hash], {
+                    any_String :> Function[data,
+                        Kernel`Async[kernel, EventFire[callback, any, data] ];
+                    ]
+                }]
+            ]
+        ],
+
+
+        "NotebookFieldSet" -> Function[assoc,
+            With[{notebook = Notebook`HashMap[ assoc["NotebookHash"] ], field = assoc["Field"], value = assoc["Value"]},
+                notebook[field] = value
+            ]
+        ]      
     }
 ]
 
