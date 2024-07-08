@@ -19,6 +19,7 @@ $MissingHandler[_, _] := $Failed
 System`WLXForm;
 
 Notebook`Editor`FrontendObject`Objects = <||>
+Notebook`Editor`FrontendObject`Symbols = <||>
 
 CreateFrontEndObject[expr_, uid_String, OptionsPattern[] ] := With[{},
     With[{

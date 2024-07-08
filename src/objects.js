@@ -170,6 +170,19 @@ core.UIObjects.GetAll = async (args, env) => {
   return message;
 }
 
+
+core.UIObjects.GetAllSymbols = async (args, env) => {
+  //garbageCollect();
+  const list = Object.keys(server.kernel.trackedSymbols);
+  const message = [];
+  for (let i=0; i<list.length; i++) {
+    message.push(['Rule', "'"+list[i]+"'", core[list[i]].data]);
+  }
+  message.unshift('Association');
+  console.log(message);
+  return message;
+}
+
 core.UIObjects.Get = async (args, env) => {
   //garbageCollect();
   //const list = Object.values(ObjectHashMap);
