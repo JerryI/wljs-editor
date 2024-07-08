@@ -77,6 +77,8 @@ import { cellTypesHighlight } from "../libs/priceless-mathematica/src/sugar/cell
 
 const languageConf = new Compartment
 
+const readWriteCompartment = new Compartment
+
 const extras = []
 
 if (!window.EditorGlobalExtensions) window.EditorGlobalExtensions = [];
@@ -524,6 +526,7 @@ window.EditorExtensions = [
   () => placeholder('Type Wolfram Expression / .md / .html / .js'),
   
   (self, initialLang) => languageConf.of(initialLang),
+  () => readWriteCompartment.of(EditorState.readOnly.of(false)),
   () => autoLanguage, 
   
   (self, initialLang) => keymap.of([indentWithTab,
@@ -617,6 +620,12 @@ class CodeMirrorCell {
     
     dispose() {
       this.editor.destroy();
+    }
+
+    readOnly(state) {
+      this.editor.dispatch({
+        effects: readWriteCompartment.reconfigure(EditorState.readOnly.of(state))
+      })
     }
     
     constructor(parent, data) {
