@@ -491,3 +491,36 @@ Pane /: EventHandler[p_Pane, list_List] := With[{
 ]
 
 
+Unprotect[BoundaryMeshRegion]
+BoundaryMeshRegion /: MakeBoxes[b_BoundaryMeshRegion, StandardForm] := With[{r = If[RegionDimension[b] == 3, RegionPlot3D[b, ImageSize->200], Insert[RegionPlot[b, ImageSize->200, Axes->False, Frame->False, ImagePadding->10], JerryI`Notebook`Graphics2D`Controls->False, {2,-1}]] // CreateFrontEndObject},
+  If[ByteCount[b] > 5250,
+    LeakyModule[{temporal},
+      With[{v = ViewBox[temporal, r]},
+        AppendTo[Kernel`Internal`garbage, Hold[temporal]];
+        temporal = b;
+        v
+      ]
+    ]
+    
+  ,
+    ViewBox[b, r]
+  ]
+  
+]
+
+Unprotect[MeshRegion]
+MeshRegion /: MakeBoxes[b_MeshRegion, StandardForm] := With[{r = If[RegionDimension[b] == 3, RegionPlot3D[b, ImageSize->200], Insert[RegionPlot[b, ImageSize->200, Axes->False, Frame->False, ImagePadding->10], JerryI`Notebook`Graphics2D`Controls->False, {2,-1}]] // CreateFrontEndObject},
+  If[ByteCount[b] > 5250,
+    LeakyModule[{temporal},
+      With[{v = ViewBox[temporal, r]},
+        AppendTo[Kernel`Internal`garbage, Hold[temporal]];
+        temporal = b;
+        v
+      ]
+    ]
+    
+  ,
+    ViewBox[b, r]
+  ]
+]
+
