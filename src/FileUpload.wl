@@ -51,7 +51,7 @@ pasteFileNames["wl", cli_, files_] := With[{},
 
 pasteFileNames["md", cli_, files_] := With[{},
     WLJSTransportSend[
-        FrontEditorSelected["Set", "\n"<>StringRiffle[StringJoin["![](attachments/", URLEncode[#], ")"] &/@ Keys[files], "\n"]<>"\n" ]
+        FrontEditorSelected["Set", "\n"<>StringRiffle[StringJoin["![](/attachments/", URLEncode[#], ")"] &/@ Keys[files], "\n"]<>"\n" ]
     , cli]
 ]
 
