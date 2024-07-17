@@ -12,7 +12,7 @@ npm run demo
 
 It does not need to have Wolfram Kernel.
 
-Check out **[live demo](https://jerryi.github.io/cm6/)** on github pages
+Check out **[live demo](https://jerryi.github.io/wljs-editor/)** on github pages
 
 ## License
 
