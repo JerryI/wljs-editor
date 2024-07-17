@@ -5,7 +5,7 @@
   "scripts": {
     "build": "node --max-old-space-size=8192 ./node_modules/.bin/rollup --config rollup.config.mjs",
     "demo": "parcel ./playground/index.html",
-    "demo-dist": "parcel build ./playground/index.html --out-dir ./github-pages/ --public-url https://jerryi.github.io/cm6/",
+    "demo-dist": "parcel build ./playground/index.html --out-dir ./github-pages/ --public-url https://jerryi.github.io/wljs-editor/",
     "restore": "mkdir _temp && cd _temp && git clone --branch dev https://github.com/JerryI/wljs-editor && mv wljs-editor/.git ../.git && cd .. && rm -rf _temp"
   },
   "defaultPackage": true,
