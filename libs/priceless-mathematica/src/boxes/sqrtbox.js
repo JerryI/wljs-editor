@@ -102,13 +102,13 @@ import {
     applyChanges(update) {
 
       //const args = this.visibleValue.args;
-      const data = "Sqrt[" + update + "]";
+      const data = update;
 
       //const old = this.visibleValue.str;
       
       //console.log(this.visibleValue.pos);
-      const changes = {from: this.visibleValue.argsPos, to: this.visibleValue.argsPos + this.length, insert: data};
-      //console.log(args);
+      const changes = {from: this.visibleValue.argsPos + 5, to: this.visibleValue.argsPos + this.length - 1, insert: data};
+      console.log(this.visibleValue);
       //const changes = {from: this.visibleValue.argsPos + args[0], to: this.visibleValue.argsPos + args[0].from + args[0].body.length - 1, insert: data};
       //console.warn('changes will be applied to...');
       //console.log(this.view.viewState.state.doc.toString().slice(changes.from, changes.to));
@@ -119,7 +119,8 @@ import {
 
       //console.log('insert change');
       //console.log(changes);
-      const delta = this.length - data.length;
+      //console.log({oldLength: this.length, newLength: (data.length + 6)});
+      const delta = (data.length + 6) - this.length;
       this.length = this.length + delta;
       this.visibleValue.length = this.visibleValue.length + delta;
       

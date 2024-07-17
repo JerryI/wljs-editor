@@ -327,7 +327,7 @@ compactWLEditor = (args) => {
     ViewBoxWidget(compactWLEditor),
     BoxBoxWidget(compactWLEditor),
     TemplateBoxWidget(compactWLEditor),
-    //bracketMatching(),
+    bracketMatching(),
     //rainbowBrackets(),
     Greekholder,
     extras,
@@ -421,7 +421,7 @@ let editorCustomTheme = EditorView.theme({
   ".cm-activeLine": {
     'background-color': 'transparent'
   },
-
+/*
   ".rainbow-bracket-red": { color: 'var(--editor-bracket-1)' },
   ".rainbow-bracket-orange": { color: 'var(--editor-bracket-2)' },
   ".rainbow-bracket-yellow": { color: 'var(--editor-bracket-3)' },
@@ -437,7 +437,7 @@ let editorCustomTheme = EditorView.theme({
   ".rainbow-bracket-blue > span": { color: 'var(--editor-bracket-5-a)' },
   ".rainbow-bracket-indigo > span": { color: 'var(--editor-bracket-6-a)' },
   ".rainbow-bracket-violet > span": { color: 'var(--editor-bracket-7-a)' }
-
+*/
 });
 
 let editorCustomThemeCompact = EditorView.theme({
