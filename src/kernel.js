@@ -37,8 +37,8 @@ import {
 
 import {tags} from "@lezer/highlight"
 
-import { EditorState, Compartment } from "@codemirror/state"
-import { syntaxHighlighting, indentOnInput, bracketMatching, HighlightStyle} from "@codemirror/language"
+import { EditorState, Compartment, Facet, StateField } from "@codemirror/state"
+import { syntaxHighlighting, indentOnInput, bracketMatching, HighlightStyle, foldGutter} from "@codemirror/language"
 import { history, historyKeymap } from "@codemirror/commands"
 import { highlightSelectionMatches } from "@codemirror/search"
 import { autocompletion, closeBrackets } from "@codemirror/autocomplete"
@@ -71,17 +71,11 @@ import {TemplateBoxWidget} from "../libs/priceless-mathematica/src/boxes/templat
 import { cellTypesHighlight } from "../libs/priceless-mathematica/src/sugar/cells"
 
 
-
-
-
-
 const languageConf = new Compartment
 
 const readWriteCompartment = new Compartment
 
 const extras = []
-
-if (!window.EditorGlobalExtensions) window.EditorGlobalExtensions = [];
 
 /// A default highlight style (works well with light themes).
 const defaultHighlightStyle = HighlightStyle.define([
@@ -128,10 +122,10 @@ const defaultHighlightStyle = HighlightStyle.define([
 
 
 
-window.EditorAutocomplete = defaultFunctions;
+const EditorAutocomplete = defaultFunctions;
 EditorAutocomplete.extend = (list) => {
-  window.EditorAutocomplete.push(...list);
-  wolframLanguage.reBuild(window.EditorAutocomplete);
+  EditorAutocomplete.push(...list);
+  wolframLanguage.reBuild(EditorAutocomplete);
 }
 
 const unknownLanguage = StreamLanguage.define(spreadsheet);
@@ -164,6 +158,9 @@ function checkDocType(str) {
   return {plugins: unknownLanguage, name: 'spreadsheet', legacy: true};
 }
 
+
+const legacyLangNameFacet = Facet.define();
+
 const autoLanguage = EditorState.transactionExtender.of(tr => {
   if (!tr.docChanged) return null
   let docType = checkDocType(tr.newDoc.line(1).text);
@@ -172,8 +169,15 @@ const autoLanguage = EditorState.transactionExtender.of(tr => {
     //hard to distinguish...
 
 
-    if (tr.startState.facet(language).name == docType.name) return null;
+    const la = tr.startState.facet(language);
+    if (!la) {
+      if (tr.startState.facet(legacyLangNameFacet) == docType.name) return null;
+    } else {
+      if (la.name == docType.name) return null;
+    }
+    
     console.log('switching... to '+docType.name);
+    //if (docType.prolog) docType.prolog(tr);
     return {
       effects: languageConf.reconfigure(docType.plugins)
     }
@@ -184,6 +188,7 @@ const autoLanguage = EditorState.transactionExtender.of(tr => {
     if (docType.name === tr.startState.facet(language).name) return null;
 
     console.log('switching... to '+docType.name);
+    //if (docType.prolog) docType.prolog(tr);
     return {
       effects: languageConf.reconfigure(docType.plugins)
     }
@@ -318,7 +323,7 @@ compactWLEditor = (args) => {
     args.extensions || [],   
     minimalSetup,
     editorCustomThemeCompact,      
-    wolframLanguage.of(window.EditorAutocomplete),
+    wolframLanguage.of(EditorAutocomplete),
     FractionBoxWidget(compactWLEditor),
     SqrtBoxWidget(compactWLEditor),
     SubscriptBoxWidget(compactWLEditor),
@@ -348,6 +353,56 @@ compactWLEditor = (args) => {
 
   editor.viewState.state.config.eval = args.eval;
   return editor;
+}
+
+compactWLEditor.state = (args) => {
+  let state = EditorState.create({
+    doc: args.doc,
+    extensions: [
+      keymap.of([
+        { key: "Enter", preventDefault: true, run: function (editor, key) { 
+          return true;
+        } }
+      ]),  
+      keymap.of([
+        { key: "Shift-Enter", preventDefault: true, run: function (editor, key) { 
+          args.eval();
+          return true;
+        } }
+      ]),    
+      args.extensions || [],   
+      minimalSetup,
+      editorCustomThemeCompact,      
+      wolframLanguage.of(EditorAutocomplete),
+      FractionBoxWidget(compactWLEditor),
+      SqrtBoxWidget(compactWLEditor),
+      SubscriptBoxWidget(compactWLEditor),
+      SupscriptBoxWidget(compactWLEditor),
+      GridBoxWidget(compactWLEditor),
+      ViewBoxWidget(compactWLEditor),
+      BoxBoxWidget(compactWLEditor),
+      TemplateBoxWidget(compactWLEditor),
+      bracketMatching(),
+      //rainbowBrackets(),
+      Greekholder,
+      extras,
+      
+      EditorView.updateListener.of((v) => {
+        if (v.docChanged) {
+          args.update(v.state.doc.toString());
+        }
+        if (v.selectionSet) {
+          //console.log('selected editor:');
+          //console.log(v.view);
+          selectedEditor = v.view;
+        }
+      })
+    ]
+    });
+  
+  
+    state.config.eval = args.eval;
+    return state;  
 }
 
 const wlDrop = {
@@ -384,11 +439,10 @@ const wlPaste = {
   }
 }
 
-window.DropPasteHandlers = DropPasteHandlers
 
 
 const mathematicaPlugins = [
-  wolframLanguage.of(window.EditorAutocomplete), 
+  wolframLanguage.of(EditorAutocomplete), 
   FractionBoxWidget(compactWLEditor),
   SqrtBoxWidget(compactWLEditor),
   SubscriptBoxWidget(compactWLEditor),
@@ -483,9 +537,7 @@ let editorCustomThemeCompact = EditorView.theme({
 
 let globalCMFocus = false;
 
-if (!window.EditorEpilog) window.EditorEpilog = [];
-
-window.EditorExtensionsMinimal = [
+const EditorExtensionsMinimal = [
   () => highlightSpecialChars(),
   () => history(),
   () => drawSelection(),
@@ -499,17 +551,18 @@ window.EditorExtensionsMinimal = [
   () => highlightSelectionMatches()
 ] 
 
-window.EditorParameters = {
+const EditorParameters = {
 
 };
 
-window.EditorExtensions = [
+const EditorExtensions = [
   () => highlightSpecialChars(),
   () => history(),
   () => drawSelection(),
   () => dropCursor(),
+  (self) => originFacet.of(self),
   () => {
-      if (window.EditorParameters["gutter"])
+      if (EditorParameters["gutter"])
         return lineNumbers();
 
       return [];
@@ -542,16 +595,24 @@ window.EditorExtensions = [
     { key: "ArrowUp", run: function (editor, key) {  
       //console.log('arrowup');
       //console.log(editor.state.selection.ranges[0]);
-      if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-      self.origin.focusPrev(self.origin);
+      if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+        console.log('focus prev');
+        self.origin.focusPrev();
+        editor.editorLastCursor = undefined;
+        return;
+      }
 
       editor.editorLastCursor = editor.state.selection.ranges[0].to;  
     } },
     { key: "ArrowDown", run: function (editor, key) { 
-      //console.log('arrowdown');
+
       //console.log(editor.state.selection.ranges[0]);
-      if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-      self.origin.focusNext(self.origin);
+      if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+        console.log('focus next');
+        self.origin.focusNext();
+        editor.editorLastCursor = undefined;
+        return;
+      }
 
       editor.editorLastCursor = editor.state.selection.ranges[0].to;  
     } },
@@ -584,6 +645,9 @@ function unicodeToChar(text) {
          });
 }
 
+const originFacet = Facet.define();
+
+
 class CodeMirrorCell {
     origin = {}
     editor = {}
@@ -593,19 +657,30 @@ class CodeMirrorCell {
       globalCMFocus = true;
     }
 
+    focus(dir) {
+      if (dir > 0) {
+        this.editor.dispatch({selection: {anchor: 0}});
+      } else if (dir < 0) {
+        this.editor.dispatch({selection: {anchor: this.editor.state.doc.length}});
+      }
+        
+      this.editor.focus();
+    }
+
     setContent (data) {
       console.warn('content mutation!');
       if (!this.editor.viewState) return;
-  //FIXME: NO CLEAN UP
+  
   const editor = this.editor;
       console.log('result');
       console.log(data);
-      this.editor.dispatch({
+      /*this.editor.dispatch({
         changes: {
           from: 0,
           to: editor.viewState.state.doc.length
         , insert: ''}
-    });      
+    });  */ //FIXED already
+
       this.editor.dispatch({
           changes: {
             from: 0,
@@ -636,9 +711,11 @@ class CodeMirrorCell {
 
       const self = this;
 
+      this.origin.element.ocellref = self;
+
       const editor = new EditorView({
         doc: unicodeToChar(data),
-        extensions: window.EditorExtensions.map((e) => e(self, initialLang)),
+        extensions: EditorExtensions.map((e) => e(self, initialLang)),
         parent: this.origin.element
       });
       
@@ -652,8 +729,6 @@ class CodeMirrorCell {
       if(globalCMFocus) editor.focus();
       globalCMFocus = false;  
 
-      window.EditorEpilog.forEach((e) => e(self, initialLang));
-      
       
       
       return this;
@@ -722,7 +797,7 @@ class CodeMirrorCell {
     if (!env.local.editor) return;
     const textData = unicodeToChar2(await interpretate(args[0], env));
     console.log('editor view: dispatch');
-    if (env.local.forceUpdate) {
+    if (env.local.forceUpdate && false) { //option was removed since we fixed it
       env.local.editor.dispatch({
         changes: {from: 0, to: env.local.editor.state.doc.length, insert: ''}
       });
@@ -764,31 +839,46 @@ class CodeMirrorCell {
     name: 'mathematica'
   });
 
-  window.EditorMathematicaPlugins = mathematicaPlugins
 
   window.SupportedCells['codemirror'] = {
-    view: CodeMirrorCell
+    view: CodeMirrorCell,
+    context: {
+      EditorAutocomplete: EditorAutocomplete,
+      javascriptLanguage: javascriptLanguage,
+      javascript: javascript,
+      markdownLanguage: markdownLanguage,
+      markdown: markdown,
+      htmlLanguage: htmlLanguage,
+      html: html,
+      cssLanguage: cssLanguage,
+      css: css,
+      EditorView: EditorView,
+      EditorState: EditorState,
+      highlightSpecialChars: highlightSpecialChars,
+      syntaxHighlighting: syntaxHighlighting,
+      defaultHighlightStyle: defaultHighlightStyle,
+      editorCustomTheme: editorCustomTheme,
+      foldGutter: foldGutter,
+      Facet: Facet,
+      Compartment: Compartment,
+      mathematicaPlugins: mathematicaPlugins,
+      legacyLangNameFacet: legacyLangNameFacet,
+      DropPasteHandlers: DropPasteHandlers,
+      EditorExtensionsMinimal: EditorExtensionsMinimal,
+      EditorParameters: EditorParameters,
+      EditorExtensions: EditorExtensions,
+      StateField: StateField,
+      Decoration: Decoration,
+      ViewPlugin: ViewPlugin,
+      WidgetType: WidgetType,
+      originFacet: originFacet,
+      MatchDecorator: MatchDecorator
+    }
   };
 
-  window.javascriptLanguage = javascriptLanguage
-  window.javascript = javascript
-  window.markdownLanguage = markdownLanguage
-  window.markdown = markdown
-  window.htmlLanguage = htmlLanguage
-  window.html = html
-
-  window.cssLanguage = cssLanguage
-  window.css = css
-
-  window.EditorView = EditorView
-  window.highlightSpecialChars = highlightSpecialChars
-  window.EditorState = EditorState
-  window.syntaxHighlighting = syntaxHighlighting
-  window.defaultHighlightStyle = defaultHighlightStyle
-  window.editorCustomTheme = editorCustomTheme
 
   if (window.OfflineMode)
-    extras.push(window.EditorState.readOnly.of(true))
+    extras.push(EditorState.readOnly.of(true))
 
 function uuidv4() {
       return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>

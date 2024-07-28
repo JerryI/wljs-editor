@@ -2,6 +2,8 @@ core.UIAutocompleteConnect = async (args, env) => {
     server.kernel.emitt('autocomplete', 'True', 'Connect');
 }
 
+const codemirror = window.SupportedCells['codemirror'].context;
+
 core.UIAutocompleteExtend = async (args, env) => {
     const data = await interpretate(args[0], env);
  
@@ -11,7 +13,7 @@ core.UIAutocompleteExtend = async (args, env) => {
       const usage = element[1];
   
       if (!(name in core.UIAutocompleteExtend.symbols)) {
-        window.EditorAutocomplete.extend([  
+        codemirror.EditorAutocomplete.extend([  
           {
               "label": name,
               "type": "keyword",

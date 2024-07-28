@@ -4996,12 +4996,13 @@ class WidgetView extends ContentView {
         return result;
     }
     sync(view) {
+       //ADDED EXTRA ARGUMENT TO PROVIDE PREVIOUS VERSION 
         if (!this.dom || !this.widget.updateDOM(this.dom, view)) {
             if (this.dom && this.prevWidget)
                 this.prevWidget.destroy(this.dom);
             this.prevWidget = null;
             this.setDOM(this.widget.toDOM(view));
-            //console.error('Sync');
+            
             this.dom.contentEditable = "false";
         }
     }
@@ -5818,6 +5819,7 @@ class BlockWidgetView extends ContentView {
     }
     get children() { return noChildren; }
     sync(view) {
+        console.error('Sync');
         if (!this.dom || !this.widget.updateDOM(this.dom, view)) {
             if (this.dom && this.prevWidget)
                 this.prevWidget.destroy(this.dom);
@@ -7635,7 +7637,7 @@ function skipAtoms(view, oldPos, pos, selected) {
                 if (pos.from > from && pos.from < to) {
                     pos = oldPos.head > pos.from ? EditorSelection.cursor(from, 1) : EditorSelection.cursor(to, -1);
                     moved = true;
-
+                    //ADDED if skipped though selection or a cursor move
                     if (value.widget.skipPosition) {
                         pos = value.widget.skipPosition(pos, oldPos, selected);
                     }                    
@@ -12749,7 +12751,7 @@ const tooltipPlugin = /*@__PURE__*/ViewPlugin.fromClass(class {
         scroll() { this.maybeMeasure(); }
     }
 });
-const baseTheme$2 = /*@__PURE__*/EditorView.baseTheme({
+const baseTheme$3 = /*@__PURE__*/EditorView.baseTheme({
     ".cm-tooltip": {
         zIndex: 100,
         boxSizing: "border-box"
@@ -12816,7 +12818,7 @@ const noOffset = { x: 0, y: 0 };
 Facet to which an extension can add a value to show a tooltip.
 */
 const showTooltip = /*@__PURE__*/Facet.define({
-    enables: [tooltipPlugin, baseTheme$2]
+    enables: [tooltipPlugin, baseTheme$3]
 });
 /**
 Get the active tooltip view for a given tooltip, if available.
@@ -12864,7 +12866,25 @@ Markers given to this facet should _only_ define an
 in all gutters for the line).
 */
 const gutterLineClass = /*@__PURE__*/Facet.define();
+const defaults = {
+    class: "",
+    renderEmptyElements: false,
+    elementStyle: "",
+    markers: () => RangeSet.empty,
+    lineMarker: () => null,
+    lineMarkerChange: null,
+    initialSpacer: null,
+    updateSpacer: null,
+    domEventHandlers: {}
+};
 const activeGutters = /*@__PURE__*/Facet.define();
+/**
+Define an editor gutter. The order in which the gutters appear is
+determined by their extension priority.
+*/
+function gutter(config) {
+    return [gutters(), activeGutters.of(Object.assign(Object.assign({}, defaults), config))];
+}
 const unfixGutters = /*@__PURE__*/Facet.define({
     combine: values => values.some(x => x)
 });
@@ -17032,6 +17052,265 @@ function foldInside(node) {
     let first = node.firstChild, last = node.lastChild;
     return first && first.to < last.from ? { from: first.to, to: last.type.isError ? node.to : last.from } : null;
 }
+function syntaxFolding(state, start, end) {
+    let tree = syntaxTree(state);
+    if (tree.length < end)
+        return null;
+    let inner = tree.resolveInner(end, 1);
+    let found = null;
+    for (let cur = inner; cur; cur = cur.parent) {
+        if (cur.to <= end || cur.from > end)
+            continue;
+        if (found && cur.from < start)
+            break;
+        let prop = cur.type.prop(foldNodeProp);
+        if (prop && (cur.to < tree.length - 50 || tree.length == state.doc.length || !isUnfinished(cur))) {
+            let value = prop(cur, state);
+            if (value && value.from <= end && value.from >= start && value.to > end)
+                found = value;
+        }
+    }
+    return found;
+}
+function isUnfinished(node) {
+    let ch = node.lastChild;
+    return ch && ch.to == node.to && ch.type.isError;
+}
+/**
+Check whether the given line is foldable. First asks any fold
+services registered through
+[`foldService`](https://codemirror.net/6/docs/ref/#language.foldService), and if none of them return
+a result, tries to query the [fold node
+prop](https://codemirror.net/6/docs/ref/#language.foldNodeProp) of syntax nodes that cover the end
+of the line.
+*/
+function foldable(state, lineStart, lineEnd) {
+    for (let service of state.facet(foldService)) {
+        let result = service(state, lineStart, lineEnd);
+        if (result)
+            return result;
+    }
+    return syntaxFolding(state, lineStart, lineEnd);
+}
+function mapRange(range, mapping) {
+    let from = mapping.mapPos(range.from, 1), to = mapping.mapPos(range.to, -1);
+    return from >= to ? undefined : { from, to };
+}
+/**
+State effect that can be attached to a transaction to fold the
+given range. (You probably only need this in exceptional
+circumstances—usually you'll just want to let
+[`foldCode`](https://codemirror.net/6/docs/ref/#language.foldCode) and the [fold
+gutter](https://codemirror.net/6/docs/ref/#language.foldGutter) create the transactions.)
+*/
+const foldEffect = /*@__PURE__*/StateEffect.define({ map: mapRange });
+/**
+State effect that unfolds the given range (if it was folded).
+*/
+const unfoldEffect = /*@__PURE__*/StateEffect.define({ map: mapRange });
+/**
+The state field that stores the folded ranges (as a [decoration
+set](https://codemirror.net/6/docs/ref/#view.DecorationSet)). Can be passed to
+[`EditorState.toJSON`](https://codemirror.net/6/docs/ref/#state.EditorState.toJSON) and
+[`fromJSON`](https://codemirror.net/6/docs/ref/#state.EditorState^fromJSON) to serialize the fold
+state.
+*/
+const foldState = /*@__PURE__*/StateField.define({
+    create() {
+        return Decoration.none;
+    },
+    update(folded, tr) {
+        folded = folded.map(tr.changes);
+        for (let e of tr.effects) {
+            if (e.is(foldEffect) && !foldExists(folded, e.value.from, e.value.to))
+                folded = folded.update({ add: [foldWidget.range(e.value.from, e.value.to)] });
+            else if (e.is(unfoldEffect))
+                folded = folded.update({ filter: (from, to) => e.value.from != from || e.value.to != to,
+                    filterFrom: e.value.from, filterTo: e.value.to });
+        }
+        // Clear folded ranges that cover the selection head
+        if (tr.selection) {
+            let onSelection = false, { head } = tr.selection.main;
+            folded.between(head, head, (a, b) => { if (a < head && b > head)
+                onSelection = true; });
+            if (onSelection)
+                folded = folded.update({
+                    filterFrom: head,
+                    filterTo: head,
+                    filter: (a, b) => b <= head || a >= head
+                });
+        }
+        return folded;
+    },
+    provide: f => EditorView.decorations.from(f),
+    toJSON(folded, state) {
+        let ranges = [];
+        folded.between(0, state.doc.length, (from, to) => { ranges.push(from, to); });
+        return ranges;
+    },
+    fromJSON(value) {
+        if (!Array.isArray(value) || value.length % 2)
+            throw new RangeError("Invalid JSON for fold state");
+        let ranges = [];
+        for (let i = 0; i < value.length;) {
+            let from = value[i++], to = value[i++];
+            if (typeof from != "number" || typeof to != "number")
+                throw new RangeError("Invalid JSON for fold state");
+            ranges.push(foldWidget.range(from, to));
+        }
+        return Decoration.set(ranges, true);
+    }
+});
+function findFold(state, from, to) {
+    var _a;
+    let found = null;
+    (_a = state.field(foldState, false)) === null || _a === void 0 ? void 0 : _a.between(from, to, (from, to) => {
+        if (!found || found.from > from)
+            found = { from, to };
+    });
+    return found;
+}
+function foldExists(folded, from, to) {
+    let found = false;
+    folded.between(from, from, (a, b) => { if (a == from && b == to)
+        found = true; });
+    return found;
+}
+const defaultConfig = {
+    placeholderDOM: null,
+    placeholderText: "…"
+};
+const foldConfig = /*@__PURE__*/Facet.define({
+    combine(values) { return combineConfig(values, defaultConfig); }
+});
+/**
+Create an extension that configures code folding.
+*/
+function codeFolding(config) {
+    let result = [foldState, baseTheme$1];
+    if (config)
+        result.push(foldConfig.of(config));
+    return result;
+}
+const foldWidget = /*@__PURE__*/Decoration.replace({ widget: /*@__PURE__*/new class extends WidgetType {
+        toDOM(view) {
+            let { state } = view, conf = state.facet(foldConfig);
+            let onclick = (event) => {
+                let line = view.lineBlockAt(view.posAtDOM(event.target));
+                let folded = findFold(view.state, line.from, line.to);
+                if (folded)
+                    view.dispatch({ effects: unfoldEffect.of(folded) });
+                event.preventDefault();
+            };
+            if (conf.placeholderDOM)
+                return conf.placeholderDOM(view, onclick);
+            let element = document.createElement("span");
+            element.textContent = conf.placeholderText;
+            element.setAttribute("aria-label", state.phrase("folded code"));
+            element.title = state.phrase("unfold");
+            element.className = "cm-foldPlaceholder";
+            element.onclick = onclick;
+            return element;
+        }
+    } });
+const foldGutterDefaults = {
+    openText: "⌄",
+    closedText: "›",
+    markerDOM: null,
+    domEventHandlers: {},
+    foldingChanged: () => false
+};
+class FoldMarker extends GutterMarker {
+    constructor(config, open) {
+        super();
+        this.config = config;
+        this.open = open;
+    }
+    eq(other) { return this.config == other.config && this.open == other.open; }
+    toDOM(view) {
+        if (this.config.markerDOM)
+            return this.config.markerDOM(this.open);
+        let span = document.createElement("span");
+        span.textContent = this.open ? this.config.openText : this.config.closedText;
+        span.title = view.state.phrase(this.open ? "Fold line" : "Unfold line");
+        return span;
+    }
+}
+/**
+Create an extension that registers a fold gutter, which shows a
+fold status indicator before foldable lines (which can be clicked
+to fold or unfold the line).
+*/
+function foldGutter(config = {}) {
+    let fullConfig = Object.assign(Object.assign({}, foldGutterDefaults), config);
+    let canFold = new FoldMarker(fullConfig, true), canUnfold = new FoldMarker(fullConfig, false);
+    let markers = ViewPlugin.fromClass(class {
+        constructor(view) {
+            this.from = view.viewport.from;
+            this.markers = this.buildMarkers(view);
+        }
+        update(update) {
+            if (update.docChanged || update.viewportChanged ||
+                update.startState.facet(language) != update.state.facet(language) ||
+                update.startState.field(foldState, false) != update.state.field(foldState, false) ||
+                syntaxTree(update.startState) != syntaxTree(update.state) ||
+                fullConfig.foldingChanged(update))
+                this.markers = this.buildMarkers(update.view);
+        }
+        buildMarkers(view) {
+            let builder = new RangeSetBuilder();
+            for (let line of view.viewportLineBlocks) {
+                let mark = findFold(view.state, line.from, line.to) ? canUnfold
+                    : foldable(view.state, line.from, line.to) ? canFold : null;
+                if (mark)
+                    builder.add(line.from, line.from, mark);
+            }
+            return builder.finish();
+        }
+    });
+    let { domEventHandlers } = fullConfig;
+    return [
+        markers,
+        gutter({
+            class: "cm-foldGutter",
+            markers(view) { var _a; return ((_a = view.plugin(markers)) === null || _a === void 0 ? void 0 : _a.markers) || RangeSet.empty; },
+            initialSpacer() {
+                return new FoldMarker(fullConfig, false);
+            },
+            domEventHandlers: Object.assign(Object.assign({}, domEventHandlers), { click: (view, line, event) => {
+                    if (domEventHandlers.click && domEventHandlers.click(view, line, event))
+                        return true;
+                    let folded = findFold(view.state, line.from, line.to);
+                    if (folded) {
+                        view.dispatch({ effects: unfoldEffect.of(folded) });
+                        return true;
+                    }
+                    let range = foldable(view.state, line.from, line.to);
+                    if (range) {
+                        view.dispatch({ effects: foldEffect.of(range) });
+                        return true;
+                    }
+                    return false;
+                } })
+        }),
+        codeFolding()
+    ];
+}
+const baseTheme$1 = /*@__PURE__*/EditorView.baseTheme({
+    ".cm-foldPlaceholder": {
+        backgroundColor: "#eee",
+        border: "1px solid #ddd",
+        color: "#888",
+        borderRadius: ".2em",
+        margin: "0 1px",
+        padding: "0 1px",
+        cursor: "pointer"
+    },
+    ".cm-foldGutter span": {
+        padding: "0 1px",
+        cursor: "pointer"
+    }
+});
 
 /**
 A highlight style associates CSS styles with higlighting
@@ -17191,7 +17470,7 @@ const defaultHighlightStyle$1 = /*@__PURE__*/HighlightStyle.define([
         color: "#f00" }
 ]);
 
-const baseTheme$1 = /*@__PURE__*/EditorView.baseTheme({
+const baseTheme$2 = /*@__PURE__*/EditorView.baseTheme({
     "&.cm-focused .cm-matchingBracket": { backgroundColor: "#328c8252" },
     "&.cm-focused .cm-nonmatchingBracket": { backgroundColor: "#bb555544" }
 });
@@ -17239,7 +17518,7 @@ const bracketMatchingState = /*@__PURE__*/StateField.define({
 });
 const bracketMatchingUnique = [
     bracketMatchingState,
-    baseTheme$1
+    baseTheme$2
 ];
 /**
 Create an extension that enables bracket matching. Whenever the
@@ -62557,10 +62836,14 @@ var BallancedMatchDecorator2 = /** @class */ (function () {
                     changeTo = Math.max(to, changeTo);
                 }
             });
-        if (update.viewportChanged || changeTo - changeFrom > 1000)
+        if (update.viewportChanged || changeTo - changeFrom > 1000) {
+            //console.log('createDeco');
             return this.createDeco(update.view);
-        if (changeTo > -1)
+        }
+        if (changeTo > -1) {
+            //console.log('updatRanges');
             return this.updateRange(update.view, deco.map(update.changes), changeFrom, changeTo);
+        }
         return deco;
     };
     BallancedMatchDecorator2.prototype.updateRange = function (view, deco, updateFrom, updateTo) {
@@ -62814,6 +63097,9 @@ let EditorWidget$7 = class EditorWidget {
       const data = '(('+update+')';
       const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
 
+      //update an imprint
+      this.visibleValue.str = this.visibleValue.str.substring(0, args[0].from).concat(data, this.visibleValue.str.substring(args[0].from + args[0].length));
+
       //shift other positions
       const delta = data.length - args[0].length;
 
@@ -62831,6 +63117,9 @@ let EditorWidget$7 = class EditorWidget {
       const data = '('+update+'))';
 
       const changes = {from: relative + args[2].from, to: relative + args[2].from + args[2].length, insert: data};
+      //update an imprint
+      this.visibleValue.str = this.visibleValue.str.substring(0, args[2].from).concat(data, this.visibleValue.str.substring(args[2].from + args[2].length));
+
 
       //shift other positions
       const delta = (data.length - args[2].length);
@@ -62849,6 +63138,115 @@ let EditorWidget$7 = class EditorWidget {
 
   update(visibleValue, placeholder) {
     //console.log('Update instance: new ranges & arguments');
+    
+    if (this.visibleValue.str != visibleValue.str) {
+      console.warn('Out of sync');
+      const self = this;
+      const view = this.view;
+      this.visibleValue = visibleValue;
+
+      //rematch all
+      this.args = matchArguments(visibleValue.str, /\(\*,\*\)/gm);
+
+      //console.log(visibleValue);
+  
+      console.log('recreating InstanceWidget');
+
+      let topState, bottomState;
+
+      topState = compactCMEditor$6.state({
+        doc: self.args[0].body.slice(2,-1),
+        update: (upd) => self.applyChanges(upd, 0),
+        eval: () => {
+          view.viewState.state.config.eval();
+        },
+        extensions: [
+          keymap.of([
+            { key: "ArrowLeft", run: function (editor, key) {  
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                //const range = self.placeholder.placeholder.placeholder;
+                console.log(self.visibleValue.pos);
+                //if (self.visibleValue.pos == 0) return;
+  
+                view.dispatch({selection: {anchor: self.visibleValue.pos}});
+                view.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              } else {
+                editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+              }
+              
+            } }, 
+            { key: "ArrowRight", run: function (editor, key) {  
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                self.bottomEditor.dispatch({selection: {anchor: 0}});
+                self.bottomEditor.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              }
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            } },             
+            { key: "ArrowDown", run: function (editor, key) {  
+              self.bottomEditor.focus();
+              editor.editorLastCursor = undefined; 
+            } }
+          ])
+        ]
+      });
+  
+      bottomState = compactCMEditor$6.state({
+        doc: self.args[2].body.slice(1,-2),
+
+        update: (upd) => self.applyChanges(upd, 2),
+        eval: () => {
+          self.view.viewState.state.config.eval();
+        },
+        extensions: [
+          keymap.of([
+            { key: "ArrowLeft", run: function (editor, key) {  
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                //const range = self.placeholder.placeholder.placeholder;
+                self.topEditor.dispatch({selection: {anchor: self.topEditor.state.doc.length}});
+                self.topEditor.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              } else {
+                editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+              }
+              
+            } }, 
+            { key: "ArrowRight", run: function (editor, key) {  
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                
+                view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
+                view.focus();
+              
+  
+                editor.editorLastCursor = undefined;
+                return;
+              }
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            } },             
+            { key: "ArrowUp", run: function (editor, key) {  
+              self.topEditor.focus();
+              editor.editorLastCursor = undefined;
+            } }
+          ])        
+        ]  
+      });  
+
+      this.topEditor.setState(topState);
+      this.bottomEditor.setState(bottomState);
+
+      console.log(self);
+  
+      self.args[0].length = self.args[0].body.length;
+      self.args[2].length = self.args[2].body.length;
+
+      return;
+    }
+
+
     this.visibleValue.pos = visibleValue.pos;
     this.placeholder = placeholder;
     this.visibleValue.argsPos = visibleValue.argsPos;
@@ -63052,6 +63450,7 @@ var compactCMEditor$5;
       this.view = view;
       this.visibleValue = visibleValue;
       const self = this;
+      this.sliceRanges = sliceRanges;
 
       this.length = visibleValue.str.length;
 
@@ -63117,6 +63516,7 @@ var compactCMEditor$5;
       const delta = (data.length + 6) - this.length;
       this.length = this.length + delta;
       this.visibleValue.length = this.visibleValue.length + delta;
+      this.visibleValue.str = "Sqrt["+data+"]"; //save internally
       
       this.view.dispatch({changes: changes});
     }
@@ -63124,6 +63524,56 @@ var compactCMEditor$5;
 
     update(visibleValue) {
       //console.log('Update instance: new ranges & arguments');
+      if (this.visibleValue.str != visibleValue.str) {
+        console.warn('Out of sync');
+
+        //if changes occured outside the widget
+        //rebuild an entire thing
+
+        this.visibleValue = visibleValue;
+        const sliceRanges = this.sliceRanges;
+        const editor = this.editor;
+        const self = this;
+        const view = this.view;
+
+  
+        this.length = visibleValue.str.length;
+
+        const newState = compactCMEditor$5.state({
+          doc: visibleValue.str.slice(...sliceRanges),
+          update: (upd) => self.applyChanges(upd),
+          eval: () => {
+            view.viewState.state.config.eval();
+          },
+          extensions: [
+            keymap.of([
+              { key: "ArrowRight", run: function (editor, key) {  
+                if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                  view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
+                  view.focus();
+  
+                  editor.editorLastCursor = undefined;
+                  return;
+                }
+                editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+              } },   
+              { key: "ArrowLeft", run: function (editor, key) {  
+                if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                  view.dispatch({selection: {anchor: self.visibleValue.pos}});
+                  view.focus();
+                  editor.editorLastCursor = undefined;
+                  return;
+                }
+                editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+              } }
+            ])
+          ]             
+        });
+        
+        editor.setState(newState);
+        return;
+      }
+      
       this.visibleValue.pos = visibleValue.pos;
       this.visibleValue.argsPos = visibleValue.argsPos;
       //this.visibleValue.args = visibleValue.args;
@@ -63234,6 +63684,7 @@ var compactCMEditor$5;
       update(update) {
         //console.log('update Deco');
         //console.log(this.disposable );
+        //console.warn(update);
         this.placeholder = matcher$6(this.disposable, update).updateDeco(
           update,
           this.placeholder
@@ -63409,6 +63860,16 @@ let EditorWidget$5 = class EditorWidget {
       const data = 'Subscript['+update;
       const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
 
+      //console.error('Before');
+      //console.warn(this.visibleValue.str);
+      //console.warn(changes);
+      
+
+      //update imprint string
+      this.visibleValue.str = this.visibleValue.str.substring(0, args[0].from).concat(data, this.visibleValue.str.substring(args[0].from + args[0].length));
+
+      //console.warn(this.visibleValue.str)
+
       //shift other positions
       args[0].to = args[0].to + (data.length - args[0].length);
       args[2].from = args[2].from + (data.length - args[0].length);
@@ -63418,6 +63879,8 @@ let EditorWidget$5 = class EditorWidget {
 
       this.visibleValue.length = this.visibleValue.length + delta;
 
+      
+      
       //console.log(changes);
 
       this.view.dispatch({changes: changes});
@@ -63425,6 +63888,10 @@ let EditorWidget$5 = class EditorWidget {
       const data = update+']';
 
       const changes = {from: relative + args[2].from, to: relative + args[2].from + args[2].length, insert: data};
+
+      //update imprint string to compare later changes
+      this.visibleValue.str = this.visibleValue.str.substring(0, args[2].from).concat(data, this.visibleValue.str.substring(args[2].from + args[2].length));
+
 
       //shift other positions
       args[2].to = args[2].to + (data.length - args[2].length);
@@ -63442,6 +63909,101 @@ let EditorWidget$5 = class EditorWidget {
 
   update(visibleValue) {
     //console.log('Update instance: new ranges & arguments');
+    
+
+    if (this.visibleValue.str != visibleValue.str) {
+      console.warn('Out of sync');
+      const self = this;
+      const view = this.view;
+      this.visibleValue = visibleValue;
+
+      //rematch all
+      this.args = matchArguments(visibleValue.str, /\(\*\|\*\)/gm);
+  
+      //console.log(visibleValue);
+  
+      console.log('recreating InstanceWidget');
+  
+      let topState, bottomState;
+  
+      console.log(self.visibleValue);
+  
+      topState = compactCMEditor$4.state({
+        doc: self.args[0].body.slice(10),
+        update: (upd) => self.applyChanges(upd, 0),
+        extensions: [
+          keymap.of([
+            { key: "ArrowLeft", run: function (editor, key) {  
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                view.dispatch({selection: {anchor: self.visibleValue.pos }});
+                view.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              }
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            } },   
+            { key: "ArrowRight", run: function (editor, key) {  
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                self.bottomEditor.dispatch({selection:{anchor: 0}});
+                self.bottomEditor.focus();
+                editor.editorLastCursor = undefined;
+              
+                return;
+              }
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            } },
+  
+            { key: "ArrowDown", run: function (editor, key) {  
+              self.bottomEditor.focus();
+            } }
+          ])
+        ]
+      });
+  
+      bottomState = compactCMEditor$4.state({
+        doc: self.args[2].body.slice(0, -1),
+        update: (upd) => self.applyChanges(upd, 2),
+        extensions: [
+          keymap.of([
+            { key: "ArrowRight", run: function (editor, key) {  
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
+                view.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              }
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            } },   
+            { key: "ArrowLeft", run: function (editor, key) {  
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                self.topEditor.dispatch({selection:{anchor: self.topEditor.state.doc.length}});
+                self.topEditor.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              }
+                
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            } },
+  
+            { key: "ArrowUp", run: function (editor, key) {  
+              self.topEditor.focus();
+            } }
+          ])
+        ]            
+      });
+  
+      //if (focusNext) bottomEditor.focus();
+      //focusNext = false;    
+      
+      this.topEditor.setState(topState);
+      this.bottomEditor.setState(bottomState);
+  
+      self.args[0].length = self.args[0].body.length;
+      self.args[2].length = self.args[2].body.length;
+
+      return;
+    }
+
     this.visibleValue.pos = visibleValue.pos;
     this.visibleValue.argsPos = visibleValue.argsPos;
     //this.visibleValue.args = visibleValue.args;
@@ -63726,6 +64288,9 @@ var compactCMEditor$3;
         //uppder one
         const data = 'Power['+update;
         const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
+
+        //update imprint string
+        this.visibleValue.str = this.visibleValue.str.substring(0, args[0].from).concat(data, this.visibleValue.str.substring(args[0].from + args[0].length));
   
         //shift other positions
         args[0].to = args[0].to + (data.length - args[0].length);
@@ -63743,6 +64308,10 @@ var compactCMEditor$3;
   
         const changes = {from: relative + args[2].from, to: relative + args[2].from + args[2].length, insert: data};
   
+        //update imprint string to compare later changes
+        this.visibleValue.str = this.visibleValue.str.substring(0, args[2].from).concat(data, this.visibleValue.str.substring(args[2].from + args[2].length));
+
+
         //shift other positions
         args[2].to = args[2].to + (data.length - args[2].length);
         const delta = data.length - args[2].length;
@@ -63760,6 +64329,97 @@ var compactCMEditor$3;
   
     update(visibleValue) {
       //console.log('Update instance: new ranges & arguments');
+      if (this.visibleValue.str != visibleValue.str) {
+        console.warn('Out of sync');
+        const self = this;
+        const view = this.view;
+        this.visibleValue = visibleValue;
+  
+        //rematch all
+        this.args = matchArguments(visibleValue.str, /\(\*\|\*\)/gm);
+
+        console.log('recreating InstanceWidget');
+
+        let topState, bottomState;
+  
+        //console.log(self.visibleValue);
+    
+        topState = compactCMEditor$3.state({
+          doc: self.args[0].body.slice(6),
+          update: (upd) => self.applyChanges(upd, 0),
+          extensions: [
+            keymap.of([
+              { key: "ArrowLeft", run: function (editor, key) {  
+                if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                  
+                  view.dispatch({selection: {anchor: self.visibleValue.pos}});
+                  view.focus();
+                  editor.editorLastCursor = undefined;
+                  return;
+                }
+                editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+              } },   
+              { key: "ArrowRight", run: function (editor, key) {  
+                if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                  self.bottomEditor.dispatch({selection: {anchor: 0}});
+                  self.bottomEditor.focus();
+                  editor.editorLastCursor = undefined;
+                  return;
+                }
+                editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+              } },
+  
+              { key: "ArrowUp", run: function (editor, key) {  
+                self.bottomEditor.focus();
+              } }
+            ])
+          ]
+        });
+    
+        bottomState = compactCMEditor$3.state({
+          doc: self.args[2].body.slice(0, -1),
+          update: (upd) => self.applyChanges(upd, 2),
+          extensions: [
+            keymap.of([
+              { key: "ArrowRight", run: function (editor, key) {  
+                if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                  view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
+                  view.focus();
+                  editor.editorLastCursor = undefined;
+                  return;
+                }
+                editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+              } },   
+              { key: "ArrowLeft", run: function (editor, key) {  
+                if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                  self.topEditor.dispatch({selection: {anchor: self.topEditor.state.doc.length}});
+                  self.topEditor.focus();
+                  editor.editorLastCursor = undefined;
+                  return;
+                }
+                editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+              } },
+  
+              { key: "ArrowDown", run: function (editor, key) {  
+                self.topEditor.focus();
+              } }
+            ])
+          ]            
+        });
+    
+        //if (focusNext) bottomEditor.focus();
+        //focusNext = false;    
+        
+        this.topEditor.setState(topState);
+        this.bottomEditor.setState(bottomState);
+  
+        self.args[0].length = self.args[0].body.length;
+        self.args[2].length = self.args[2].body.length;
+
+        return;
+      }
+
+
       this.visibleValue.pos = visibleValue.pos;
       this.visibleValue.argsPos = visibleValue.argsPos;
     }
@@ -64066,7 +64726,7 @@ var compactCMEditor$2;
       parent[j].length = text.length;
 
 
-      console.log(changes);
+      //console.log(changes);
       //console.log(this.args);
   
       this.view.dispatch({changes: changes});      
@@ -64075,6 +64735,7 @@ var compactCMEditor$2;
   
     update(visibleValue) {
       //console.log('Update instance: new ranges & arguments');
+      console.log('We cant verify if changes were applied from the widget itself!');
       this.visibleValue.pos = visibleValue.pos;
       this.visibleValue.argsPos = visibleValue.argsPos;
       //this.visibleValue.args = visibleValue.args;
@@ -71461,10 +72122,15 @@ const uuidv4$3 = () => {
   }
   
   let EditorWidget$2 = class EditorWidget {
-  
+
     constructor(visibleValue, view, span, ref) {
+      return this._construct(visibleValue, view, span, ref);
+    }
+  
+    _construct(visibleValue, view, span, ref) {
       this.view = view;
       this.visibleValue = visibleValue;
+      this.span = span;
   
       this.args = matchArguments(visibleValue.str, /\(\*,\*\)/gm);
   
@@ -71521,6 +72187,7 @@ const uuidv4$3 = () => {
       const data = '('+update+')';
       const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
 
+      this.visibleValue.str = this.visibleValue.str.substring(0, args[0].from).concat(data, this.visibleValue.str.substring(args[0].from + args[0].length));
   
       args[0].length = data.length;
 
@@ -71546,6 +72213,22 @@ const uuidv4$3 = () => {
     update(visibleValue) {
       if (this.deactivated) return;
       //console.log('Update instance: new ranges & arguments');
+
+      if (visibleValue.str != this.visibleValue.str) {
+        console.warn('Out of sync');
+
+        console.log('recreate...');
+
+        this.destroy();
+        
+        const span = this.span;
+
+        span.replaceChildren();
+
+        this._construct(visibleValue, this.view, span);
+      
+        return;
+      }
       
       this.visibleValue.pos = visibleValue.pos;
       this.visibleValue.argsPos = visibleValue.argsPos;
@@ -71687,7 +72370,12 @@ function BoxBoxWidget(viewEditor) {
 let EditorWidget$1 = class EditorWidget {
 
   constructor(visibleValue, view, span, ref) {
+    return this._construct(visibleValue, view, span, ref);
+  }
+
+  _construct(visibleValue, view, span, ref) {
     this.view = view;
+    this.span = span;
     this.visibleValue = visibleValue;
 
     this.args = matchArguments(visibleValue.str, /\(\*,\*\)/gm);
@@ -71756,6 +72444,7 @@ let EditorWidget$1 = class EditorWidget {
           }
         };
         const aa = document.createElement('span');
+        this.aa;
         aa.onkeydown = function(e) {
           // User hits enter key and is not holding shift
           if (e.keyCode === 13) {
@@ -71833,16 +72522,34 @@ let EditorWidget$1 = class EditorWidget {
       const data = '('+this.prolog.string+update+this.epilog.string+')';
       const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
 
+      //update imprint
+      this.visibleValue.str = this.visibleValue.str.substring(0, args[0].from).concat(data, this.visibleValue.str.substring(args[0].from + args[0].length));
+
       const delta = data.length - args[0].length;
       args[0].length = data.length;
       this.visibleValue.length = this.visibleValue.length + delta;
-
 
       this.view.dispatch({changes: changes});
   }    
 
   update(visibleValue) {
     //console.log('Update instance: new ranges & arguments');
+
+    if (this.visibleValue.str != visibleValue.str) {
+      console.warn('Out of sync');
+      console.log('recreating InstanceWidget');
+
+      this.destroy();
+
+      //HARD RESET
+      this.span.replaceChildren();
+
+      this._construct(visibleValue, this.view, this.span);
+
+
+      return;
+    }
+
     this.visibleValue.pos = visibleValue.pos;
     this.visibleValue.argsPos = visibleValue.argsPos;
   }
@@ -72003,6 +72710,10 @@ function TemplateBoxWidget(viewEditor) {
 class EditorWidget {
 
   constructor(visibleValue, view, span, ref) {
+    return this._construct(visibleValue, view, span, ref)
+  }
+
+  _construct(visibleValue, view, span, ref) {
     this.view = view;
     this.visibleValue = visibleValue;
 
@@ -72021,6 +72732,10 @@ class EditorWidget {
     self.indexes = indexes;
 
     const spans = [];
+
+    this.span = span;
+    this.spans = spans;
+
     for (let i=0; i<indexes.length; ++i) {
       spans.push(document.createElement('span'));
     }
@@ -72047,8 +72762,6 @@ class EditorWidget {
         console.warn('Event listeners are enabled!');
         self.events = env.options.Event;
       }      
-
-
 
       self.editors = indexes.map((index, i) => compactCMEditor({
         doc: self.args[index].body,
@@ -72101,9 +72814,12 @@ class EditorWidget {
       const args = this.args;
       const relative = this.visibleValue.argsPos;
   
-      console.log(args);
+      //console.log(args);
 
       const changes = {from: relative + args[index].from, to:relative + args[index].from + args[index].length, insert: update};
+
+      //update imprint
+      this.visibleValue.str = this.visibleValue.str.substring(0, args[index].from).concat(update, this.visibleValue.str.substring(args[index].from + args[index].length));
 
       const delta = update.length - args[index].length;
       args[index].length = update.length;
@@ -72116,6 +72832,21 @@ class EditorWidget {
 
   update(visibleValue) {
     //console.log('Update instance: new ranges & arguments');
+
+    if (this.visibleValue.str != visibleValue.str) {
+      console.warn('Out of sync');
+      this.view;
+      this.visibleValue = visibleValue;
+
+      
+
+      this.destroy();
+
+      this.span.replaceChildren();
+
+      this._construct(visibleValue, this.view, this.span);
+    }
+
     this.visibleValue.pos = visibleValue.pos;
     this.visibleValue.argsPos = visibleValue.argsPos;
   }
@@ -72410,8 +73141,6 @@ const readWriteCompartment = new Compartment;
 
 const extras = [];
 
-if (!window.EditorGlobalExtensions) window.EditorGlobalExtensions = [];
-
 /// A default highlight style (works well with light themes).
 const defaultHighlightStyle = HighlightStyle.define([
   {tag: tags$1.meta,
@@ -72457,10 +73186,10 @@ const defaultHighlightStyle = HighlightStyle.define([
 
 
 
-window.EditorAutocomplete = defaultFunctions;
+const EditorAutocomplete = defaultFunctions;
 EditorAutocomplete.extend = (list) => {
-  window.EditorAutocomplete.push(...list);
-  wolframLanguage.reBuild(window.EditorAutocomplete);
+  EditorAutocomplete.push(...list);
+  wolframLanguage.reBuild(EditorAutocomplete);
 };
 
 const unknownLanguage = StreamLanguage.define(spreadsheet);
@@ -72493,6 +73222,9 @@ function checkDocType(str) {
   return {plugins: unknownLanguage, name: 'spreadsheet', legacy: true};
 }
 
+
+const legacyLangNameFacet = Facet.define();
+
 const autoLanguage = EditorState.transactionExtender.of(tr => {
   if (!tr.docChanged) return null
   let docType = checkDocType(tr.newDoc.line(1).text);
@@ -72501,8 +73233,15 @@ const autoLanguage = EditorState.transactionExtender.of(tr => {
     //hard to distinguish...
 
 
-    if (tr.startState.facet(language).name == docType.name) return null;
+    const la = tr.startState.facet(language);
+    if (!la) {
+      if (tr.startState.facet(legacyLangNameFacet) == docType.name) return null;
+    } else {
+      if (la.name == docType.name) return null;
+    }
+    
     console.log('switching... to '+docType.name);
+    //if (docType.prolog) docType.prolog(tr);
     return {
       effects: languageConf.reconfigure(docType.plugins)
     }
@@ -72513,6 +73252,7 @@ const autoLanguage = EditorState.transactionExtender.of(tr => {
     if (docType.name === tr.startState.facet(language).name) return null;
 
     console.log('switching... to '+docType.name);
+    //if (docType.prolog) docType.prolog(tr);
     return {
       effects: languageConf.reconfigure(docType.plugins)
     }
@@ -72622,7 +73362,7 @@ compactWLEditor = (args) => {
     args.extensions || [],   
     minimalSetup,
     editorCustomThemeCompact,      
-    wolframLanguage.of(window.EditorAutocomplete),
+    wolframLanguage.of(EditorAutocomplete),
     FractionBoxWidget(compactWLEditor),
     SqrtBoxWidget(compactWLEditor),
     SubscriptBoxWidget(compactWLEditor),
@@ -72652,6 +73392,56 @@ compactWLEditor = (args) => {
 
   editor.viewState.state.config.eval = args.eval;
   return editor;
+};
+
+compactWLEditor.state = (args) => {
+  let state = EditorState.create({
+    doc: args.doc,
+    extensions: [
+      keymap.of([
+        { key: "Enter", preventDefault: true, run: function (editor, key) { 
+          return true;
+        } }
+      ]),  
+      keymap.of([
+        { key: "Shift-Enter", preventDefault: true, run: function (editor, key) { 
+          args.eval();
+          return true;
+        } }
+      ]),    
+      args.extensions || [],   
+      minimalSetup,
+      editorCustomThemeCompact,      
+      wolframLanguage.of(EditorAutocomplete),
+      FractionBoxWidget(compactWLEditor),
+      SqrtBoxWidget(compactWLEditor),
+      SubscriptBoxWidget(compactWLEditor),
+      SupscriptBoxWidget(compactWLEditor),
+      GridBoxWidget(compactWLEditor),
+      ViewBoxWidget(),
+      BoxBoxWidget(compactWLEditor),
+      TemplateBoxWidget(compactWLEditor),
+      bracketMatching(),
+      //rainbowBrackets(),
+      Greekholder,
+      extras,
+      
+      EditorView.updateListener.of((v) => {
+        if (v.docChanged) {
+          args.update(v.state.doc.toString());
+        }
+        if (v.selectionSet) {
+          //console.log('selected editor:');
+          //console.log(v.view);
+          selectedEditor = v.view;
+        }
+      })
+    ]
+    });
+  
+  
+    state.config.eval = args.eval;
+    return state;  
 };
 
 const wlDrop = {
@@ -72688,11 +73478,10 @@ const wlPaste = {
   }
 };
 
-window.DropPasteHandlers = DropPasteHandlers;
 
 
 const mathematicaPlugins = [
-  wolframLanguage.of(window.EditorAutocomplete), 
+  wolframLanguage.of(EditorAutocomplete), 
   FractionBoxWidget(compactWLEditor),
   SqrtBoxWidget(compactWLEditor),
   SubscriptBoxWidget(compactWLEditor),
@@ -72783,9 +73572,7 @@ let editorCustomThemeCompact = EditorView.theme({
 
 let globalCMFocus = false;
 
-if (!window.EditorEpilog) window.EditorEpilog = [];
-
-window.EditorExtensionsMinimal = [
+const EditorExtensionsMinimal = [
   () => highlightSpecialChars(),
   () => history(),
   () => drawSelection(),
@@ -72799,17 +73586,18 @@ window.EditorExtensionsMinimal = [
   () => highlightSelectionMatches()
 ]; 
 
-window.EditorParameters = {
+const EditorParameters = {
 
 };
 
-window.EditorExtensions = [
+const EditorExtensions = [
   () => highlightSpecialChars(),
   () => history(),
   () => drawSelection(),
   () => dropCursor(),
+  (self) => originFacet.of(self),
   () => {
-      if (window.EditorParameters["gutter"])
+      if (EditorParameters["gutter"])
         return lineNumbers();
 
       return [];
@@ -72842,16 +73630,24 @@ window.EditorExtensions = [
     { key: "ArrowUp", run: function (editor, key) {  
       //console.log('arrowup');
       //console.log(editor.state.selection.ranges[0]);
-      if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-      self.origin.focusPrev(self.origin);
+      if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+        console.log('focus prev');
+        self.origin.focusPrev();
+        editor.editorLastCursor = undefined;
+        return;
+      }
 
       editor.editorLastCursor = editor.state.selection.ranges[0].to;  
     } },
     { key: "ArrowDown", run: function (editor, key) { 
-      //console.log('arrowdown');
+
       //console.log(editor.state.selection.ranges[0]);
-      if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-      self.origin.focusNext(self.origin);
+      if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+        console.log('focus next');
+        self.origin.focusNext();
+        editor.editorLastCursor = undefined;
+        return;
+      }
 
       editor.editorLastCursor = editor.state.selection.ranges[0].to;  
     } },
@@ -72884,6 +73680,9 @@ function unicodeToChar(text) {
          });
 }
 
+const originFacet = Facet.define();
+
+
 class CodeMirrorCell {
     origin = {}
     editor = {}
@@ -72893,19 +73692,30 @@ class CodeMirrorCell {
       globalCMFocus = true;
     }
 
+    focus(dir) {
+      if (dir > 0) {
+        this.editor.dispatch({selection: {anchor: 0}});
+      } else if (dir < 0) {
+        this.editor.dispatch({selection: {anchor: this.editor.state.doc.length}});
+      }
+        
+      this.editor.focus();
+    }
+
     setContent (data) {
       console.warn('content mutation!');
       if (!this.editor.viewState) return;
-  //FIXME: NO CLEAN UP
+  
   const editor = this.editor;
       console.log('result');
       console.log(data);
-      this.editor.dispatch({
+      /*this.editor.dispatch({
         changes: {
           from: 0,
           to: editor.viewState.state.doc.length
         , insert: ''}
-    });      
+    });  */ //FIXED already
+
       this.editor.dispatch({
           changes: {
             from: 0,
@@ -72936,9 +73746,11 @@ class CodeMirrorCell {
 
       const self = this;
 
+      this.origin.element.ocellref = self;
+
       const editor = new EditorView({
         doc: unicodeToChar(data),
-        extensions: window.EditorExtensions.map((e) => e(self, initialLang)),
+        extensions: EditorExtensions.map((e) => e(self, initialLang)),
         parent: this.origin.element
       });
       
@@ -72952,8 +73764,6 @@ class CodeMirrorCell {
       if(globalCMFocus) editor.focus();
       globalCMFocus = false;  
 
-      window.EditorEpilog.forEach((e) => e(self, initialLang));
-      
       
       
       return this;
@@ -73022,7 +73832,7 @@ class CodeMirrorCell {
     if (!env.local.editor) return;
     const textData = unicodeToChar2(await interpretate(args[0], env));
     console.log('editor view: dispatch');
-    if (env.local.forceUpdate) {
+    if (env.local.forceUpdate && false) { //option was removed since we fixed it
       env.local.editor.dispatch({
         changes: {from: 0, to: env.local.editor.state.doc.length, insert: ''}
       });
@@ -73064,31 +73874,46 @@ class CodeMirrorCell {
     name: 'mathematica'
   });
 
-  window.EditorMathematicaPlugins = mathematicaPlugins;
 
   window.SupportedCells['codemirror'] = {
-    view: CodeMirrorCell
+    view: CodeMirrorCell,
+    context: {
+      EditorAutocomplete: EditorAutocomplete,
+      javascriptLanguage: javascriptLanguage,
+      javascript: javascript,
+      markdownLanguage: markdownLanguage,
+      markdown: markdown,
+      htmlLanguage: htmlLanguage,
+      html: html,
+      cssLanguage: cssLanguage,
+      css: css,
+      EditorView: EditorView,
+      EditorState: EditorState,
+      highlightSpecialChars: highlightSpecialChars,
+      syntaxHighlighting: syntaxHighlighting,
+      defaultHighlightStyle: defaultHighlightStyle,
+      editorCustomTheme: editorCustomTheme,
+      foldGutter: foldGutter,
+      Facet: Facet,
+      Compartment: Compartment,
+      mathematicaPlugins: mathematicaPlugins,
+      legacyLangNameFacet: legacyLangNameFacet,
+      DropPasteHandlers: DropPasteHandlers,
+      EditorExtensionsMinimal: EditorExtensionsMinimal,
+      EditorParameters: EditorParameters,
+      EditorExtensions: EditorExtensions,
+      StateField: StateField,
+      Decoration: Decoration,
+      ViewPlugin: ViewPlugin,
+      WidgetType: WidgetType,
+      originFacet: originFacet,
+      MatchDecorator: MatchDecorator
+    }
   };
 
-  window.javascriptLanguage = javascriptLanguage;
-  window.javascript = javascript;
-  window.markdownLanguage = markdownLanguage;
-  window.markdown = markdown;
-  window.htmlLanguage = htmlLanguage;
-  window.html = html;
-
-  window.cssLanguage = cssLanguage;
-  window.css = css;
-
-  window.EditorView = EditorView;
-  window.highlightSpecialChars = highlightSpecialChars;
-  window.EditorState = EditorState;
-  window.syntaxHighlighting = syntaxHighlighting;
-  window.defaultHighlightStyle = defaultHighlightStyle;
-  window.editorCustomTheme = editorCustomTheme;
 
   if (window.OfflineMode)
-    extras.push(window.EditorState.readOnly.of(true));
+    extras.push(EditorState.readOnly.of(true));
 
 function uuidv4() {
       return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>

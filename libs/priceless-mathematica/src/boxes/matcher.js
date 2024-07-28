@@ -257,10 +257,14 @@ var BallancedMatchDecorator2 = /** @class */ (function () {
                     changeTo = Math.max(to, changeTo);
                 }
             });
-        if (update.viewportChanged || changeTo - changeFrom > 1000)
+        if (update.viewportChanged || changeTo - changeFrom > 1000) {
+            //console.log('createDeco');
             return this.createDeco(update.view);
-        if (changeTo > -1)
+        }
+        if (changeTo > -1) {
+            //console.log('updatRanges');
             return this.updateRange(update.view, deco.map(update.changes), changeFrom, changeTo);
+        }
         return deco;
     };
     BallancedMatchDecorator2.prototype.updateRange = function (view, deco, updateFrom, updateTo) {

@@ -34,11 +34,11 @@ FrontFetchAsync[expr_, OptionsPattern[] ] := With[{cli = OptionValue["Window"]["
 
         With[{result = Switch[format,
             "Raw",
-                URLDecode[payload],
+                FromCharacterCode@ToCharacterCode[URLDecode[payload], "UTF-8"],
             "ExpressionJSON",
-                ImportString[URLDecode[payload], "ExpressionJSON"],
+                ImportString[FromCharacterCode@ToCharacterCode[URLDecode[payload], "UTF-8"], "ExpressionJSON"],
             _,
-                ImportString[URLDecode[payload], "JSON"]
+                ImportString[FromCharacterCode@ToCharacterCode[URLDecode[payload], "UTF-8"], "JSON"]
         ]},
             If[FailureQ[result],
                 EventFire[promise, Reject, result]
