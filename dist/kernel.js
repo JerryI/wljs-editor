@@ -73781,17 +73781,20 @@ class CodeMirrorCell {
     return text.replace(/\\\\:[\da-f]{4}/gi, 
            function (match) {
                 return String.fromCharCode(parseInt(match.replace(/\\\\:/g, ''), 16));
-           }).replace(/\\:[\da-f]{4}/gi, 
+           }).replace('\\:F74E', 'I').replace(/\\:[\da-f]{4}/gi, 
             function (match) {
                  return String.fromCharCode(parseInt(match.replace(/\\:/g, ''), 16));
             });
   }
+
+  //I HATE YOU WOLFRAM!!!
 
   //for dynamics
   core.EditorView = async (args, env) => {
     //cm6 inline editor (editable or read-only)
     
     let textData = await interpretate(args[0], env);
+    console.warn(textData);
     textData = unicodeToChar2(textData);
     console.log('UNICODE Disaster');
     const options = await core._getRules(args, env);
