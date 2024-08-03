@@ -1,6 +1,6 @@
 {
   "name": "wljs-editor",
-  "version": "0.9.6",
+  "version": "0.9.7",
   "description": "WLJS Code editor",
   "scripts": {
     "build": "node --max-old-space-size=8192 ./node_modules/.bin/rollup --config rollup.config.mjs",
