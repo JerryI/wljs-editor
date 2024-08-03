@@ -73611,7 +73611,7 @@ const EditorExtensions = [
   () => syntaxHighlighting(defaultHighlightStyle, { fallback: false }),
   () => highlightSelectionMatches(),
   () => cellTypesHighlight,
-  () => placeholder$8('Type Wolfram Expression / .md / .html / .js'),
+  () => placeholder$8('Type WL Expression / .md / .js'),
   
   (self, initialLang) => languageConf.of(initialLang),
   () => readWriteCompartment.of(EditorState.readOnly.of(false)),
@@ -73772,17 +73772,28 @@ class CodeMirrorCell {
 
   core.ReadOnly = () => "ReadOnly";
 
+  /* FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME */
+  /* FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME */
+  /* FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME */
+  /* FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME */
+
   function unicodeToChar2(text) {
     return text.replace(/\\\\:[\da-f]{4}/gi, 
            function (match) {
                 return String.fromCharCode(parseInt(match.replace(/\\\\:/g, ''), 16));
-           });
+           }).replace(/\\:[\da-f]{4}/gi, 
+            function (match) {
+                 return String.fromCharCode(parseInt(match.replace(/\\:/g, ''), 16));
+            });
   }
 
   //for dynamics
   core.EditorView = async (args, env) => {
     //cm6 inline editor (editable or read-only)
-    const textData = unicodeToChar2(await interpretate(args[0], env));
+    
+    let textData = await interpretate(args[0], env);
+    textData = unicodeToChar2(textData);
+    console.log('UNICODE Disaster');
     const options = await core._getRules(args, env);
 
     let evalFunction = () => {};
