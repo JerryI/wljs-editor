@@ -759,7 +759,6 @@ class CodeMirrorCell {
     //cm6 inline editor (editable or read-only)
     
     let textData = await interpretate(args[0], env);
-    console.warn(textData);
     textData = unicodeToChar2(textData);
     console.log('UNICODE Disaster');
     const options = await core._getRules(args, env);
