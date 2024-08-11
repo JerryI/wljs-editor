@@ -36,4 +36,8 @@ ToString[expr_, StandardForm] := ExportString[
 , "String"]
 
 
+Unprotect[ClearAll]
+ClearAll["Global`*"] := Print["Cleaning global scope is not allowed!"]
+Protect[ClearAll]
+
 End[]
