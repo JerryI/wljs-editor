@@ -9,6 +9,7 @@ System`AudioWrapper;
 System`VideoWrapper;
 System`ByteArrayWrapper;
 System`QuantityWrapper;
+System`TreeWrapper;
 
 (* Being unable to change Boxes of Graphics, Graphics3D and Image, we have to use this *)
 (* I HATE YOU WOLFRAM!!!!!!!!!!!! *)
@@ -22,7 +23,9 @@ ExpressionReplacements = {
     b_ByteArray :> ByteArrayWrapper[b],
     d_Dataset :> DatasetWrapper[d],
     u_Quantity :> QuantityWrapper[u],
-    v_Video :> VideoWrapper[v]
+    v_Video :> VideoWrapper[v],
+    t_Tree :> TreeWrapper[t],
+    TreeForm[expr_] :> ExpressionGraph[Unevaluated[expr], VertexLabels->Automatic]
 } // Quiet
 
 Unprotect[ToString]

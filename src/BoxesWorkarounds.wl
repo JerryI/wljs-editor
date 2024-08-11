@@ -201,6 +201,13 @@ ByteArrayBox[b_ByteArray, form_] := With[{
   ]
 ] // Quiet
 
+System`TreeWrapper;
+TreeWrapper /: MakeBoxes[TreeWrapper[t_Tree], StandardForm] := With[{c = Insert[GraphPlot[t, VertexLabels->Automatic, ImageSize->180, ImagePadding->None] /. {
+  Text[{HoldComplete[text_], _}, rest__] :>  {Black, Text[ToString[text], rest]},
+  Text[{text_, _}, rest__] :>  {Black, Text[ToString[text], rest]},
+  Text[text_, rest__] :>  {Black, Text[ToString[text], rest]}
+}, JerryI`Notebook`Graphics2D`Controls->False, {2,-1}] /. Notebook`Editor`StandardForm`ExpressionReplacements}, ViewBox[t, c] ]
+
 
 TagBox["ByteArray", "SummaryHead"] = ""
 
@@ -475,7 +482,7 @@ Options[BoxForm`ArrangeSummaryBox] = Append[Options[BoxForm`ArrangeSummaryBox], 
 SetAttributes[BoxForm`ArrangeSummaryBox, HoldAll]
 
 Unprotect[Graph]
-Graph /: MakeBoxes[g_Graph, StandardForm] := With[{c = Insert[GraphPlot[g, ImageSize->120, ImagePadding->None], JerryI`Notebook`Graphics2D`Controls->False, {2,-1}] /. Notebook`Editor`StandardForm`ExpressionReplacements}, ViewBox[g, c] ]
+Graph /: MakeBoxes[g_Graph, StandardForm] := With[{c = Insert[GraphPlot[g, ImageSize->120, ImagePadding->None] /. {Text[text_, rest__] :>  {Black, Text[ToString[text], rest]}}, JerryI`Notebook`Graphics2D`Controls->False, {2,-1}] /. Notebook`Editor`StandardForm`ExpressionReplacements}, ViewBox[g, c] ]
 
 
 Unprotect[PaneBox]
