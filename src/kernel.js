@@ -9,6 +9,8 @@ import {markdownLanguage, markdown} from "@codemirror/lang-markdown"
 
 import {htmlLanguage, html} from "@codemirror/lang-html"
 
+import {search, searchKeymap} from "@codemirror/search"
+
 import {cssLanguage, css} from "@codemirror/lang-css"
 
 import {indentWithTab} from "@codemirror/commands" 
@@ -581,6 +583,8 @@ const EditorExtensions = [
   (self, initialLang) => languageConf.of(initialLang),
   () => readWriteCompartment.of(EditorState.readOnly.of(false)),
   () => autoLanguage, 
+
+  () => search(),
   
   (self, initialLang) => keymap.of([indentWithTab,
     { key: "Backspace", run: function (editor, key) { 
@@ -620,7 +624,7 @@ const EditorExtensions = [
       console.log(editor.state.doc.toString()); 
       self.origin.eval(editor.state.doc.toString()); 
     } }
-    , ...defaultKeymap, ...historyKeymap
+    , ...defaultKeymap, ...historyKeymap, ...searchKeymap
   ]),
   
   (self, initialLang) => EditorView.updateListener.of((v) => {

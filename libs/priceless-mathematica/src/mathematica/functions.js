@@ -80,11 +80,6 @@ export let defaultFunctions = [
     "info":"AbortScheduledTask[task] interrupts any currently evaluating instances of the cloud task task."
   },
   {
-    "label": "WLXEmbed",
-    "type":"keyword",
-    "info":"Renders an inline WLX or HTML strings into DOM"
-  },
-  {
     "label":"Above",
     "type":"keyword",
     "info":"Above is a symbol that represents the region above an object for purposes of placement."
@@ -108,11 +103,6 @@ export let defaultFunctions = [
     "label":"Absolute",
     "type":"keyword",
     "info":"System`Absolute"
-  },
-  {
-    "label":"AbsoluteCorrelation",
-    "type":"keyword",
-    "info":"                                                                                                    "
   },
   {
     "label":"AbsoluteCorrelationFunction",
@@ -185,74 +175,9 @@ export let defaultFunctions = [
     "info":"AccuracyGoal is an option for various numerical operations which specifies how many effective digits"
   },
   {
-    "label":"AcousticAbsorbingValue",
-    "type":"keyword",
-    "info":"AcousticAbsorbingValue[pred, vars, pars] represents a time or frequency domain absorbing boundary co"
-  },
-  {
-    "label":"AcousticImpedanceValue",
-    "type":"keyword",
-    "info":"AcousticImpedanceValue[pred, vars, pars] represents a time or frequency domain impedance boundary co"
-  },
-  {
-    "label":"AcousticNormalVelocityValue",
-    "type":"keyword",
-    "info":"AcousticNormalVelocityValue[pred, vars, pars] represents a time or frequency domain normal velocity "
-  },
-  {
-    "label":"AcousticPDEComponent",
-    "type":"keyword",
-    "info":"AcousticPDEComponent[vars, pars] yields an acoustic PDE term component with variables vars and param"
-  },
-  {
-    "label":"AcousticPressureCondition",
-    "type":"keyword",
-    "info":"AcousticPressureCondition[pred, vars, pars] represents a time or frequency domain pressure boundary "
-  },
-  {
-    "label":"AcousticRadiationValue",
-    "type":"keyword",
-    "info":"AcousticRadiationValue[pred, vars, pars] represents a time or frequency radiation boundary condition"
-  },
-  {
-    "label":"AcousticSoundHardValue",
-    "type":"keyword",
-    "info":"AcousticSoundHardValue[pred, vars, pars] represents a time or frequency domain sound hard boundary c"
-  },
-  {
-    "label":"AcousticSoundSoftCondition",
-    "type":"keyword",
-    "info":"AcousticSoundSoftCondition[pred, vars, pars] represents a time or frequency domain sound soft bounda"
-  },
-  {
-    "label":"ActionDelay",
-    "type":"keyword",
-    "info":"System`ActionDelay"
-  },
-  {
-    "label":"ActionMenu",
-    "type":"keyword",
-    "info":"ActionMenu[name, {lbl  :> act , lbl  :> act , â¦}] represents an action menu with label name and with"
-  },
-  {
-    "label":"ActionMenuBox",
-    "type":"keyword",
-    "info":"System`ActionMenuBox"
-  },
-  {
-    "label":"ActionMenuBoxOptions",
-    "type":"keyword",
-    "info":"ActionMenuBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Action"
-  },
-  {
     "label":"Activate",
     "type":"keyword",
     "info":"Activate[expr] replaces all instances of Inactive[f] in expr with f.Activate[expr, patt] replaces on"
-  },
-  {
-    "label":"Active",
-    "type":"keyword",
-    "info":"Active is an option for ButtonBox, Cell, and Notebook that specifies whether a button should be acti"
   },
   {
     "label":"ActiveClassification",
@@ -280,26 +205,6 @@ export let defaultFunctions = [
     "info":"ActivePredictionObject[â¦] represents the result of an ActivePrediction process."
   },
   {
-    "label":"ActiveStyle",
-    "type":"keyword",
-    "info":"ActiveStyle is an option for Hyperlink and related constructs that specifies styles to add when the "
-  },
-  {
-    "label":"AcyclicGraphQ",
-    "type":"keyword",
-    "info":"AcyclicGraphQ[g] yields True if the graph g is an acyclic graph and False otherwise."
-  },
-  {
-    "label":"AddOnHelpPath",
-    "type":"keyword",
-    "info":"AddOnHelpPath is a global option that specifies which directories are searched for additional help f"
-  },
-  {
-    "label":"AddSides",
-    "type":"keyword",
-    "info":"AddSides[rel, x] adds x to each side of the equation or inequality rel.AddSides[rel , rel ] adds the"
-  },
-  {
     "label":"AddTo",
     "type":"keyword",
     "info":"x += dx adds dx to x and returns the new value of x. "
@@ -308,11 +213,6 @@ export let defaultFunctions = [
     "label":"AddToSearchIndex",
     "type":"keyword",
     "info":"AddToSearchIndex[obj, content] adds the specified content to the existing search index object obj. A"
-  },
-  {
-    "label":"AddUsers",
-    "type":"keyword",
-    "info":"AddUsers[group, {user , â¦}] adds the users user  to the permissions group group. \n                  "
   },
   {
     "label":"AdjacencyGraph",
@@ -338,26 +238,6 @@ export let defaultFunctions = [
     "label":"Adjugate",
     "type":"keyword",
     "info":"Adjugate[m] gives the adjugate of a square matrix m."
-  },
-  {
-    "label":"AdjustmentBox",
-    "type":"keyword",
-    "info":"AdjustmentBox[box, opts] is a low-level box construct which displays with the placement of box adjus"
-  },
-  {
-    "label":"AdjustmentBoxOptions",
-    "type":"keyword",
-    "info":"AdjustmentBoxOptions is an option that specifies settings for AdjustmentBox objects."
-  },
-  {
-    "label":"AdjustTimeSeriesForecast",
-    "type":"keyword",
-    "info":"AdjustTimeSeriesForecast[tproc, forecast, newdata] adjusts forecast using new observations newdata a"
-  },
-  {
-    "label":"AdministrativeDivisionData",
-    "type":"keyword",
-    "info":"AdministrativeDivisionData[entity, property] gives the value of the specified property for the admin"
   },
   {
     "label":"AffineHalfSpace",
@@ -393,31 +273,6 @@ export let defaultFunctions = [
     "label":"AggregationLayer",
     "type":"keyword",
     "info":"AggregationLayer[f] represents a layer that aggregates an array of arbitrary rank into a vector, usi"
-  },
-  {
-    "label":"AircraftData",
-    "type":"keyword",
-    "info":"AircraftData[entity, property] gives the value of the specified property for the aircraft entity.Air"
-  },
-  {
-    "label":"AirportData",
-    "type":"keyword",
-    "info":"AirportData[entity, property] gives the value of the specified property for the airport entity.Airpo"
-  },
-  {
-    "label":"AirPressureData",
-    "type":"keyword",
-    "info":"AirPressureData[] gives the most recent measurement for air pressure near the current location.AirPr"
-  },
-  {
-    "label":"AirSoundAttenuation",
-    "type":"keyword",
-    "info":"AirSoundAttenuation[spec, frequency] returns the sound attenuation coefficient in moist air for the "
-  },
-  {
-    "label":"AirTemperatureData",
-    "type":"keyword",
-    "info":"AirTemperatureData[] gives the most recent measurement for air temperature near the current location"
   },
   {
     "label":"AiryAi",
@@ -500,16 +355,6 @@ export let defaultFunctions = [
     "info":"AlgebraicUnitQ[a] yields True if a is an algebraic unit, and yields False otherwise."
   },
   {
-    "label":"Alignment",
-    "type":"keyword",
-    "info":"Alignment is an option which specifies how the contents of a displayed object should be aligned with"
-  },
-  {
-    "label":"AlignmentMarker",
-    "type":"keyword",
-    "info":"System`AlignmentMarker"
-  },
-  {
     "label":"AlignmentPoint",
     "type":"keyword",
     "info":"AlignmentPoint is an option which specifies how objects should by default be aligned when they appea"
@@ -520,74 +365,14 @@ export let defaultFunctions = [
     "info":"All is a setting used for certain options. In Part and related functions, All specifies all parts at"
   },
   {
-    "label":"AllowAdultContent",
-    "type":"keyword",
-    "info":"System`AllowAdultContent"
-  },
-  {
-    "label":"AllowedCloudExtraParameters",
-    "type":"keyword",
-    "info":"AllowedCloudExtraParameters is an option for APIFunction and related functions that specifies whethe"
-  },
-  {
-    "label":"AllowedCloudParameterExtensions",
-    "type":"keyword",
-    "info":"AllowedCloudParameterExtensions is an option for APIFunction and related functions that specifies wh"
-  },
-  {
-    "label":"AllowedDimensions",
-    "type":"keyword",
-    "info":"AllowedDimensions is an option for Grid and related functions that specifies the allowed minimum and"
-  },
-  {
     "label":"AllowedFrequencyRange",
     "type":"keyword",
     "info":"AllowedFrequencyRange is an option for audio and signal processing functions that specifies the rang"
   },
   {
-    "label":"AllowedHeads",
-    "type":"keyword",
-    "info":"AllowedHeads is an option that specifies the heads of subexpressions into which a function may desce"
-  },
-  {
-    "label":"AllowGroupClose",
-    "type":"keyword",
-    "info":"AllowGroupClose is an option for Cell that specifies whether a cell group can be closed normally."
-  },
-  {
-    "label":"AllowIncomplete",
-    "type":"keyword",
-    "info":"System`AllowIncomplete"
-  },
-  {
-    "label":"AllowInlineCells",
-    "type":"keyword",
-    "info":"AllowInlineCells is an option for SelectedCells, Cell, and related constructs that specifies whether"
-  },
-  {
-    "label":"AllowKernelInitialization",
-    "type":"keyword",
-    "info":"System`AllowKernelInitialization"
-  },
-  {
     "label":"AllowLooseGrammar",
     "type":"keyword",
     "info":"AllowLooseGrammar is an option for GrammarRules and related functions that specifies whether grammat"
-  },
-  {
-    "label":"AllowReverseGroupClose",
-    "type":"keyword",
-    "info":"AllowReverseGroupClose is an option for Cell that specifies whether a cell group can be reverse clos"
-  },
-  {
-    "label":"AllowScriptLevelChange",
-    "type":"keyword",
-    "info":"AllowScriptLevelChange is an option for fractions and grids that controls whether certain operators,"
-  },
-  {
-    "label":"AllowVersionUpdate",
-    "type":"keyword",
-    "info":"AllowVersionUpdate is an option for PacletInstall and PacletInstallSubmit that specifies whether a n"
   },
   {
     "label":"AllTrue",
@@ -640,16 +425,6 @@ export let defaultFunctions = [
     "info":"p  | p  | â¦ is a pattern object that represents any of the patterns p . \n 1    2                    "
   },
   {
-    "label":"AltitudeMethod",
-    "type":"keyword",
-    "info":"AltitudeMethod is an option for SunPosition, MoonPosition, and related functions that determines whe"
-  },
-  {
-    "label":"AmbientLight",
-    "type":"keyword",
-    "info":"AmbientLight[col] is a three-dimensional graphics directive that specifies the uniform ambient light"
-  },
-  {
     "label":"AmbiguityFunction",
     "type":"keyword",
     "info":"AmbiguityFunction is an option for SemanticInterpretation, Interpreter, and related functions that s"
@@ -670,24 +445,9 @@ export let defaultFunctions = [
     "info":"AnatomyData[entity, property] gives the value of the specified property for the anatomical structure"
   },
   {
-    "label":"AnatomyForm",
-    "type":"keyword",
-    "info":"AnatomyForm[g] is a graphics directive used in AnatomyPlot3D that specifies how anatomy entityâbased"
-  },
-  {
     "label":"AnatomyPlot3D",
     "type":"keyword",
     "info":"AnatomyPlot3D[primitives, options] represents a three-dimensional graphical image that works with an"
-  },
-  {
-    "label":"AnatomySkinStyle",
-    "type":"keyword",
-    "info":"AnatomySkinStyle is an option of AnatomyPlot3D that specifies what style to use for automatically in"
-  },
-  {
-    "label":"AnatomyStyling",
-    "type":"keyword",
-    "info":"AnatomyStyling[g] is a graphics directive used in AnatomyPlot3D that specifies how anatomy entityâba"
   },
   {
     "label":"AnchoredSearch",
@@ -735,41 +495,6 @@ export let defaultFunctions = [
     "info":"AngleVector[Î¸] gives the list representing the 2D unit vector at angle Î¸ relative to the x axis.Angl"
   },
   {
-    "label":"AngularGauge",
-    "type":"keyword",
-    "info":"AngularGauge[value] draws a gauge showing value in the range 0 to 1.AngularGauge[value, {min, max}] "
-  },
-  {
-    "label":"Animate",
-    "type":"keyword",
-    "info":"Animate[expr, {u, u   , u   }] generates an animation of expr in which u varies continuously from u "
-  },
-  {
-    "label":"AnimatedImage",
-    "type":"keyword",
-    "info":"AnimatedImage[{image , image , â¦}] generates an animation whose frames are the successive image . An"
-  },
-  {
-    "label":"AnimationCycleOffset",
-    "type":"keyword",
-    "info":"AnimationCycleOffset is an option for cells that specifies the relative position of the next graphic"
-  },
-  {
-    "label":"AnimationCycleRepetitions",
-    "type":"keyword",
-    "info":"AnimationCycleRepetitions is an option for cells that specifies the number of times a given animatio"
-  },
-  {
-    "label":"AnimationDirection",
-    "type":"keyword",
-    "info":"AnimationDirection is an option which specifies the direction to run an animation. "
-  },
-  {
-    "label":"AnimationDisplayTime",
-    "type":"keyword",
-    "info":"AnimationDisplayTime is an option for Cell that specifies the minimum time in seconds for which a ce"
-  },
-  {
     "label":"AnimationRate",
     "type":"keyword",
     "info":"AnimationRate is an option for Animate and Animator that specifies at what rate an animation should "
@@ -778,76 +503,6 @@ export let defaultFunctions = [
     "label":"AnimationRepetitions",
     "type":"keyword",
     "info":"AnimationRepetitions is an option to Animate and related functions that specifies how many times the"
-  },
-  {
-    "label":"AnimationRunning",
-    "type":"keyword",
-    "info":"AnimationRunning is an option to Animate and related functions that specifies whether the animation "
-  },
-  {
-    "label":"AnimationRunTime",
-    "type":"keyword",
-    "info":"AnimationRunTime is an option to Animator and related functions that indicates how long the animatio"
-  },
-  {
-    "label":"AnimationTimeIndex",
-    "type":"keyword",
-    "info":"AnimationTimeIndex is an option to Animator and related functions that specifies the current time in"
-  },
-  {
-    "label":"AnimationVideo",
-    "type":"keyword",
-    "info":"AnimationVideo[fexpr, {u, u   , u   }] generates a video of fexpr in which u varies from u    to u  "
-  },
-  {
-    "label":"Animator",
-    "type":"keyword",
-    "info":"Animator[u] represents an object that displays with the value of u being continually increased from "
-  },
-  {
-    "label":"AnimatorBox",
-    "type":"keyword",
-    "info":"System`AnimatorBox"
-  },
-  {
-    "label":"AnimatorBoxOptions",
-    "type":"keyword",
-    "info":"AnimatorBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Animator"
-  },
-  {
-    "label":"AnimatorElements",
-    "type":"keyword",
-    "info":"System`AnimatorElements"
-  },
-  {
-    "label":"Annotate",
-    "type":"keyword",
-    "info":"Annotate[obj, key ï¢ value] sets the annotation key ï¢ value for the object obj.Annotate[{obj, itemspe"
-  },
-  {
-    "label":"Annotation",
-    "type":"keyword",
-    "info":"Annotation[expr, data] represents an expression expr, with annotation data.Annotation[expr, data, \"t"
-  },
-  {
-    "label":"AnnotationDelete",
-    "type":"keyword",
-    "info":"AnnotationDelete[obj] deletes all annotations of the object obj.AnnotationDelete[{obj, itemspec}] de"
-  },
-  {
-    "label":"AnnotationKeys",
-    "type":"keyword",
-    "info":"AnnotationKeys[obj] lists all annotation keys available for the object obj.AnnotationKeys[{obj, item"
-  },
-  {
-    "label":"AnnotationRules",
-    "type":"keyword",
-    "info":"AnnotationRules is an option that allows specification of annotations to objects and items in object"
-  },
-  {
-    "label":"AnnotationValue",
-    "type":"keyword",
-    "info":"AnnotationValue[obj, key] gives the annotation value associated with key for the object obj.Annotati"
   },
   {
     "label":"Annuity",
@@ -1000,11 +655,6 @@ export let defaultFunctions = [
     "info":"f @@ expr or Apply[f, expr] replaces the head of expr by f. f@@@expr or Apply[f, expr, {1}] replaces"
   },
   {
-    "label":"ApplySides",
-    "type":"keyword",
-    "info":"ApplySides[f, rel] applies f to each side of the equation or inequality rel."
-  },
-  {
     "label":"ApplyTo",
     "type":"keyword",
     "info":"ApplyTo[x, f] or x\/\/= f computes f[x] and resets x to the result."
@@ -1120,19 +770,9 @@ export let defaultFunctions = [
     "info":"ArgumentsOptions[f[args], n] tries to separate args into a list of n positional arguments followed b"
   },
   {
-    "label":"ARIMAProcess",
-    "type":"keyword",
-    "info":"                                                                                                    "
-  },
-  {
     "label":"ArithmeticGeometricMean",
     "type":"keyword",
     "info":"ArithmeticGeometricMean[a, b] gives the arithmeticâgeometric mean of a and b. "
-  },
-  {
-    "label":"ARMAProcess",
-    "type":"keyword",
-    "info":"ARMAProcess[{a , â¦, a }, {b , â¦, b }, v] represents a weakly stationary autoregressive moving-averag"
   },
   {
     "label":"Around",
@@ -1143,11 +783,6 @@ export let defaultFunctions = [
     "label":"AroundReplace",
     "type":"keyword",
     "info":"AroundReplace[expr, {s  ï¢ Around[x , Î\.b4 ], s  ï¢ Around[x , Î\.b4 ], â¦}] propagates uncertainty in expr by"
-  },
-  {
-    "label":"ARProcess",
-    "type":"keyword",
-    "info":"ARProcess[{a , â¦, a }, v] represents a weakly stationary autoregressive process of order p with norm"
   },
   {
     "label":"Array",
@@ -1230,16 +865,6 @@ export let defaultFunctions = [
     "info":"Arrow[{pt , pt }] is a graphics primitive that represents an arrow from pt  to pt .Arrow[{pt , pt },"
   },
   {
-    "label":"Arrow3DBox",
-    "type":"keyword",
-    "info":"System`Arrow3DBox"
-  },
-  {
-    "label":"ArrowBox",
-    "type":"keyword",
-    "info":"System`ArrowBox"
-  },
-  {
     "label":"Arrowheads",
     "type":"keyword",
     "info":"Arrowheads[spec] is a graphics directive specifying that arrows that follow should have arrowheads w"
@@ -1248,51 +873,6 @@ export let defaultFunctions = [
     "label":"ASATriangle",
     "type":"keyword",
     "info":"ASATriangle[Î\\[PlusMinus], c, Î\.b2] returns a filled triangle with angles Î\\[PlusMinus] and Î\.b2 and side length c, and c is adjac"
-  },
-  {
-    "label":"Ask",
-    "type":"keyword",
-    "info":"Ask[\"key\"] is a construct for use inside AskFunction that gives the value associated with key, or in"
-  },
-  {
-    "label":"AskAppend",
-    "type":"keyword",
-    "info":"AskAppend[\"key\"] is a construct for use inside AskFunction that asks for a new value, appends it to "
-  },
-  {
-    "label":"AskConfirm",
-    "type":"keyword",
-    "info":"AskConfirm[\"key\"] is a construct for use inside AskFunction that asks for confirmation of the curren"
-  },
-  {
-    "label":"AskDisplay",
-    "type":"keyword",
-    "info":"AskDisplay[expr] is a construct for use inside AskFunction that displays the result of evaluating ex"
-  },
-  {
-    "label":"AskedQ",
-    "type":"keyword",
-    "info":"AskedQ[\"key\"] is a construct for use inside AskFunction that gives True if a value is currently asso"
-  },
-  {
-    "label":"AskedValue",
-    "type":"keyword",
-    "info":"AskedValue[\"key\"] is a construct for use inside AskFunction that gives the value associated with key"
-  },
-  {
-    "label":"AskFunction",
-    "type":"keyword",
-    "info":"AskFunction[body] evaluates body, interactively asking for values specified by Ask[â¦] and related co"
-  },
-  {
-    "label":"AskState",
-    "type":"keyword",
-    "info":"AskState[] is a construct for use inside AskFunction that returns an association of all values in th"
-  },
-  {
-    "label":"AskTemplateDisplay",
-    "type":"keyword",
-    "info":"AskTemplateDisplay[fun] is a construct for use inside AskFunction that displays the result of applyi"
   },
   {
     "label":"AspectRatio",
@@ -1505,16 +1085,6 @@ export let defaultFunctions = [
     "info":"AtomQ[expr] yields True if expr is an expression which cannot be divided into subexpressions, and yi"
   },
   {
-    "label":"AttachCell",
-    "type":"keyword",
-    "info":"AttachCell[expr] makes expr a cell attached to the current cell being evaluated.AttachCell[obj, expr"
-  },
-  {
-    "label":"AttachedCell",
-    "type":"keyword",
-    "info":"AttachedCell is an option for Cells that indicates whether to find cells that created with AttachCel"
-  },
-  {
     "label":"AttentionLayer",
     "type":"keyword",
     "info":"AttentionLayer[] represents a trainable net layer that learns to pay attention to certain portions o"
@@ -1548,11 +1118,6 @@ export let defaultFunctions = [
     "label":"AudioBlockMap",
     "type":"keyword",
     "info":"AudioBlockMap[f, audio, dur] applies f to non-overlapping partitions of length dur in audio. AudioBl"
-  },
-  {
-    "label":"AudioCapture",
-    "type":"keyword",
-    "info":"AudioCapture[] creates a temporary interactive interface for capturing an audio signal.AudioCapture["
   },
   {
     "label":"AudioChannelAssignment",
@@ -1835,26 +1400,6 @@ export let defaultFunctions = [
     "info":"AugmentedSymmetricPolynomial[{r , r , â¦}] represents a formal augmented symmetric polynomial with ex"
   },
   {
-    "label":"Authenticate",
-    "type":"keyword",
-    "info":"System`Authenticate"
-  },
-  {
-    "label":"Authentication",
-    "type":"keyword",
-    "info":"Authentication is an option for cloud, web and SSH access functions that allows authentication param"
-  },
-  {
-    "label":"AuthenticationDialog",
-    "type":"keyword",
-    "info":"AuthenticationDialog[] initiates a standard dialog for entering username\/password authentication inf"
-  },
-  {
-    "label":"AutoAction",
-    "type":"keyword",
-    "info":"AutoAction is an option for objects such as Slider, Locator, and Button that specifies whether they "
-  },
-  {
     "label":"Autocomplete",
     "type":"keyword",
     "info":"Autocomplete[{string , string , â¦}, \"string\"] gives a list of the string  that can complete string.A"
@@ -1935,16 +1480,6 @@ export let defaultFunctions = [
     "info":"System`AutoNumberFormatting"
   },
   {
-    "label":"AutoOpenNotebooks",
-    "type":"keyword",
-    "info":"AutoOpenNotebooks is a global option that specifies which notebooks should be automatically opened w"
-  },
-  {
-    "label":"AutoOpenPalettes",
-    "type":"keyword",
-    "info":"AutoOpenPalettes is a global option that specifies the palettes that are automatically opened when t"
-  },
-  {
     "label":"AutoOperatorRenderings",
     "type":"keyword",
     "info":"AutoOperatorRenderings is an option for cells and notebooks that specifies automatic renderings to b"
@@ -1963,41 +1498,6 @@ export let defaultFunctions = [
     "label":"AutoRemove",
     "type":"keyword",
     "info":"AutoRemove is an option specifying whether tasks, generators, cloud objects and related constructs s"
-  },
-  {
-    "label":"AutorunSequencing",
-    "type":"keyword",
-    "info":"AutorunSequencing is an option for Manipulate that specifies how autorun should use the controls pro"
-  },
-  {
-    "label":"AutoScaling",
-    "type":"keyword",
-    "info":"System`AutoScaling"
-  },
-  {
-    "label":"AutoScroll",
-    "type":"keyword",
-    "info":"AutoScroll is an option to SelectionMove and related functions that specifies whether a notebook sho"
-  },
-  {
-    "label":"AutoSpacing",
-    "type":"keyword",
-    "info":"AutoSpacing is an option for Style and Cell that specifies whether spaces between successive charact"
-  },
-  {
-    "label":"AutoStyleOptions",
-    "type":"keyword",
-    "info":"System`AutoStyleOptions"
-  },
-  {
-    "label":"AutoStyleWords",
-    "type":"keyword",
-    "info":"System`AutoStyleWords"
-  },
-  {
-    "label":"AutoSubmitting",
-    "type":"keyword",
-    "info":"AutoSubmitting[spec] represents an element of a form that automatically submits the whole form if it"
   },
   {
     "label":"Axes",
@@ -2035,26 +1535,6 @@ export let defaultFunctions = [
     "info":"Axis is a symbol that represents the axis for purposes of alignment and positioning. "
   },
   {
-    "label":"Axis3DBox",
-    "type":"keyword",
-    "info":"System`Axis3DBox"
-  },
-  {
-    "label":"Axis3DBoxOptions",
-    "type":"keyword",
-    "info":"System`Axis3DBoxOptions"
-  },
-  {
-    "label":"AxisBox",
-    "type":"keyword",
-    "info":"System`AxisBox"
-  },
-  {
-    "label":"AxisBoxOptions",
-    "type":"keyword",
-    "info":"System`AxisBoxOptions"
-  },
-  {
     "label":"AxisLabel",
     "type":"keyword",
     "info":"AxisLabel is an option for AxisObject that specifies a label for the axis."
@@ -2080,49 +1560,9 @@ export let defaultFunctions = [
     "info":"Back is a symbol that represents the back of a graphic for purposes of placement and alignment."
   },
   {
-    "label":"BackFaceColor",
-    "type":"keyword",
-    "info":"System`BackFaceColor"
-  },
-  {
-    "label":"BackFaceGlowColor",
-    "type":"keyword",
-    "info":"System`BackFaceGlowColor"
-  },
-  {
-    "label":"BackFaceOpacity",
-    "type":"keyword",
-    "info":"System`BackFaceOpacity"
-  },
-  {
-    "label":"BackFaceSpecularColor",
-    "type":"keyword",
-    "info":"System`BackFaceSpecularColor"
-  },
-  {
-    "label":"BackFaceSpecularExponent",
-    "type":"keyword",
-    "info":"System`BackFaceSpecularExponent"
-  },
-  {
-    "label":"BackFaceSurfaceAppearance",
-    "type":"keyword",
-    "info":"System`BackFaceSurfaceAppearance"
-  },
-  {
-    "label":"BackFaceTexture",
-    "type":"keyword",
-    "info":"System`BackFaceTexture"
-  },
-  {
     "label":"Background",
     "type":"keyword",
     "info":"Background is an option that specifies what background color to use. "
-  },
-  {
-    "label":"BackgroundAppearance",
-    "type":"keyword",
-    "info":"System`BackgroundAppearance"
   },
   {
     "label":"BackgroundTasksSettings",
@@ -2133,11 +1573,6 @@ export let defaultFunctions = [
     "label":"Backslash",
     "type":"keyword",
     "info":"Backslash[x, y, â¦] displays as x â y â â¦."
-  },
-  {
-    "label":"Backsubstitution",
-    "type":"keyword",
-    "info":"System`Backsubstitution"
   },
   {
     "label":"Backward",
@@ -2253,11 +1688,6 @@ export let defaultFunctions = [
     "label":"BaselinePosition",
     "type":"keyword",
     "info":"BaselinePosition is an option that specifies where the baseline of an object is considered to be for"
-  },
-  {
-    "label":"BaseStyle",
-    "type":"keyword",
-    "info":"BaseStyle is an option for formatting and related constructs that specifies the base style to use fo"
   },
   {
     "label":"BasicRecurrentLayer",
@@ -2480,11 +1910,6 @@ export let defaultFunctions = [
     "info":"BetweennessCentrality[g] gives a list of betweenness centralities for the vertices in the graph g.Be"
   },
   {
-    "label":"Beveled",
-    "type":"keyword",
-    "info":"System`Beveled"
-  },
-  {
     "label":"BeveledPolyhedron",
     "type":"keyword",
     "info":"BeveledPolyhedron[poly] gives the beveled polyhedron of poly, by beveling each edge. BeveledPolyhedr"
@@ -2493,26 +1918,6 @@ export let defaultFunctions = [
     "label":"BezierCurve",
     "type":"keyword",
     "info":"BezierCurve[{pt , pt , â¦}] is a graphics primitive that represents a BÃ©zier curve with control point"
-  },
-  {
-    "label":"BezierCurve3DBox",
-    "type":"keyword",
-    "info":"System`BezierCurve3DBox"
-  },
-  {
-    "label":"BezierCurve3DBoxOptions",
-    "type":"keyword",
-    "info":"BezierCurve3DBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Bez"
-  },
-  {
-    "label":"BezierCurveBox",
-    "type":"keyword",
-    "info":"System`BezierCurveBox"
-  },
-  {
-    "label":"BezierCurveBoxOptions",
-    "type":"keyword",
-    "info":"BezierCurveBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Bezie"
   },
   {
     "label":"BezierFunction",
@@ -2810,71 +2215,6 @@ export let defaultFunctions = [
     "info":"Block[{x, y, â¦}, expr] specifies that expr is to be evaluated with local values for the symbols x, y"
   },
   {
-    "label":"BlockchainAddressData",
-    "type":"keyword",
-    "info":"BlockchainAddressData[\"address\"] gives available information connected with the specified address on"
-  },
-  {
-    "label":"BlockchainBase",
-    "type":"keyword",
-    "info":"BlockchainBase is an option for various blockchain functions that specifies which blockchain to use."
-  },
-  {
-    "label":"BlockchainBlockData",
-    "type":"keyword",
-    "info":"BlockchainBlockData[\"hash\"] gives information about the block with the specified hash on the blockch"
-  },
-  {
-    "label":"BlockchainContractValue",
-    "type":"keyword",
-    "info":"BlockchainContractValue[caddr] gets the result obtained from a Wolfram expression contract at blockc"
-  },
-  {
-    "label":"BlockchainData",
-    "type":"keyword",
-    "info":"BlockchainData[] gives information about the blockchain specified by ECBlockchainBase.BlockchainData["
-  },
-  {
-    "label":"BlockchainGet",
-    "type":"keyword",
-    "info":"BlockchainGet[id] retrieves data from the Wolfram blockchain for the transaction with the specified "
-  },
-  {
-    "label":"BlockchainKeyEncode",
-    "type":"keyword",
-    "info":"BlockchainKeyEncode[key, form] encodes a private or public key in the specified blockchain format."
-  },
-  {
-    "label":"BlockchainPut",
-    "type":"keyword",
-    "info":"BlockchainPut[expr] adds expr to the Wolfram blockchain."
-  },
-  {
-    "label":"BlockchainTokenData",
-    "type":"keyword",
-    "info":"BlockchainTokenData[\"name\"] gives information about the use of tokens with the specified name on a b"
-  },
-  {
-    "label":"BlockchainTransaction",
-    "type":"keyword",
-    "info":"BlockchainTransaction[assoc] represents a blockchain transaction built from the components in the as"
-  },
-  {
-    "label":"BlockchainTransactionData",
-    "type":"keyword",
-    "info":"BlockchainTransactionData[txid] gives information about the blockchain transaction with ID txid on t"
-  },
-  {
-    "label":"BlockchainTransactionSign",
-    "type":"keyword",
-    "info":"BlockchainTransactionSign[obj, key] digitally signs a blockchain transaction using the specified pri"
-  },
-  {
-    "label":"BlockchainTransactionSubmit",
-    "type":"keyword",
-    "info":"BlockchainTransactionSubmit[obj] submits the transaction specified in the BlockchainTransaction obje"
-  },
-  {
     "label":"BlockMap",
     "type":"keyword",
     "info":"BlockMap[f, list, n] applies f to non-overlapping sublists of length n in list. BlockMap[f, list, n,"
@@ -3095,89 +2435,14 @@ export let defaultFunctions = [
     "info":"System`Bounds"
   },
   {
-    "label":"Box",
-    "type":"keyword",
-    "info":"System`Box"
-  },
-  {
-    "label":"BoxBaselineShift",
-    "type":"keyword",
-    "info":"BoxBaselineShift is an option for AdjustmentBox that specifies how much the baseline of the box shou"
-  },
-  {
-    "label":"BoxData",
-    "type":"keyword",
-    "info":"BoxData[boxes] is a low-level representation of the contents of a typesetting cell."
-  },
-  {
-    "label":"BoxDimensions",
-    "type":"keyword",
-    "info":"System`BoxDimensions"
-  },
-  {
     "label":"Boxed",
     "type":"keyword",
     "info":"Boxed is an option for Graphics3D that specifies whether to draw the edges of the bounding box in a "
   },
   {
-    "label":"Boxes",
-    "type":"keyword",
-    "info":"Boxes is a symbol that represents typeset boxes in InputField and related functions."
-  },
-  {
-    "label":"BoxForm",
-    "type":"keyword",
-    "info":"System`BoxForm"
-  },
-  {
-    "label":"BoxFormFormatTypes",
-    "type":"keyword",
-    "info":"BoxFormFormatTypes is a global option that specifies the list of typeset format types that are curre"
-  },
-  {
-    "label":"BoxFrame",
-    "type":"keyword",
-    "info":"BoxFrame is an option for FrameBox objects that specifies whether to draw a frame around the content"
-  },
-  {
-    "label":"BoxID",
-    "type":"keyword",
-    "info":"System`BoxID"
-  },
-  {
-    "label":"BoxMargins",
-    "type":"keyword",
-    "info":"BoxMargins is an option for AdjustmentBox objects that specifies the margins to leave around the con"
-  },
-  {
-    "label":"BoxMatrix",
-    "type":"keyword",
-    "info":"BoxMatrix[r] gives a (2 r + 1) Ã (2r + 1) matrix of 1s.BoxMatrix[r, w] gives a (2 r + 1) Ã (2r + 1) "
-  },
-  {
-    "label":"BoxObject",
-    "type":"keyword",
-    "info":"BoxObject[id] is an object that represents a box structure in an open notebook in the front end."
-  },
-  {
     "label":"BoxRatios",
     "type":"keyword",
     "info":"BoxRatios is an option for Graphics3D that gives the ratios of side lengths for the bounding box of "
-  },
-  {
-    "label":"BoxRotation",
-    "type":"keyword",
-    "info":"System`BoxRotation"
-  },
-  {
-    "label":"BoxRotationPoint",
-    "type":"keyword",
-    "info":"System`BoxRotationPoint"
-  },
-  {
-    "label":"BoxStyle",
-    "type":"keyword",
-    "info":"BoxStyle is an option for three-dimensional graphics functions that specifies how the bounding box s"
   },
   {
     "label":"BoxWhiskerChart",
@@ -3260,26 +2525,6 @@ export let defaultFunctions = [
     "info":"BSplineCurve[{pt , pt , â¦}] is a graphics primitive that represents a nonuniform rational B-spline c"
   },
   {
-    "label":"BSplineCurve3DBox",
-    "type":"keyword",
-    "info":"System`BSplineCurve3DBox"
-  },
-  {
-    "label":"BSplineCurve3DBoxOptions",
-    "type":"keyword",
-    "info":"BSplineCurve3DBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for BS"
-  },
-  {
-    "label":"BSplineCurveBox",
-    "type":"keyword",
-    "info":"System`BSplineCurveBox"
-  },
-  {
-    "label":"BSplineCurveBoxOptions",
-    "type":"keyword",
-    "info":"BSplineCurveBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for BSpl"
-  },
-  {
     "label":"BSplineFunction",
     "type":"keyword",
     "info":"BSplineFunction[{pt , pt , â¦}] represents a B-spline function for a curve defined by the control poi"
@@ -3288,16 +2533,6 @@ export let defaultFunctions = [
     "label":"BSplineSurface",
     "type":"keyword",
     "info":"BSplineSurface[array] is a graphics primitive that represents a nonuniform rational B-spline surface"
-  },
-  {
-    "label":"BSplineSurface3DBox",
-    "type":"keyword",
-    "info":"System`BSplineSurface3DBox"
-  },
-  {
-    "label":"BSplineSurface3DBoxOptions",
-    "type":"keyword",
-    "info":"BSplineSurface3DBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for "
   },
   {
     "label":"BubbleChart",
@@ -3345,96 +2580,6 @@ export let defaultFunctions = [
     "info":"ButterworthFilterModel[n] creates a lowpass Butterworth filter of order n and cutoff frequency of 1."
   },
   {
-    "label":"Button",
-    "type":"keyword",
-    "info":"Button[label, action] represents a button that is labeled with label, and evaluates action whenever "
-  },
-  {
-    "label":"ButtonBar",
-    "type":"keyword",
-    "info":"ButtonBar[{lbl  :> act , lbl  :> act , â¦}] represents a bar of buttons with labels lbl  that perform"
-  },
-  {
-    "label":"ButtonBox",
-    "type":"keyword",
-    "info":"ButtonBox[boxes] is a low-level box construct that represents a button in a notebook expression."
-  },
-  {
-    "label":"ButtonBoxOptions",
-    "type":"keyword",
-    "info":"ButtonBoxOptions is an option that specifies settings for ButtonBox."
-  },
-  {
-    "label":"ButtonCell",
-    "type":"keyword",
-    "info":"System`ButtonCell"
-  },
-  {
-    "label":"ButtonContents",
-    "type":"keyword",
-    "info":"System`ButtonContents"
-  },
-  {
-    "label":"ButtonData",
-    "type":"keyword",
-    "info":"ButtonData is an option for the low-level function ButtonBox that specifies the second argument to g"
-  },
-  {
-    "label":"ButtonEvaluator",
-    "type":"keyword",
-    "info":"ButtonEvaluator is an option for the low-level function ButtonBox that specifies where the expressio"
-  },
-  {
-    "label":"ButtonExpandable",
-    "type":"keyword",
-    "info":"ButtonExpandable is an option for the low-level function ButtonBox that specifies whether the button"
-  },
-  {
-    "label":"ButtonFrame",
-    "type":"keyword",
-    "info":"ButtonFrame is an option for the low-level function ButtonBox that specifies the type of frame to di"
-  },
-  {
-    "label":"ButtonFunction",
-    "type":"keyword",
-    "info":"ButtonFunction is an option for the low-level function ButtonBox that specifies the function to exec"
-  },
-  {
-    "label":"ButtonMargins",
-    "type":"keyword",
-    "info":"ButtonMargins is an option for ButtonBox that specifies how much space in printer's points to leave "
-  },
-  {
-    "label":"ButtonMinHeight",
-    "type":"keyword",
-    "info":"ButtonMinHeight is an option for the low-level function ButtonBox that specifies the minimum total h"
-  },
-  {
-    "label":"ButtonNote",
-    "type":"keyword",
-    "info":"ButtonNote is an option for ButtonBox that specifies what should be displayed in the status line of "
-  },
-  {
-    "label":"ButtonNotebook",
-    "type":"keyword",
-    "info":"ButtonNotebook[] gives the notebook, if any, that contains the button which initiated the current ev"
-  },
-  {
-    "label":"ButtonSource",
-    "type":"keyword",
-    "info":"ButtonSource is an option for the low-level function ButtonBox that specifies the first argument to "
-  },
-  {
-    "label":"ButtonStyle",
-    "type":"keyword",
-    "info":"ButtonStyle is an option for ButtonBox that specifies the default properties for the button. "
-  },
-  {
-    "label":"ButtonStyleMenuListing",
-    "type":"keyword",
-    "info":"System`ButtonStyleMenuListing"
-  },
-  {
     "label":"Byte",
     "type":"keyword",
     "info":"Byte represents a single byte of data in Read. "
@@ -3475,26 +2620,6 @@ export let defaultFunctions = [
     "info":"ByteOrdering is an option for BinaryRead, BinaryWrite, and related functions that specifies what ord"
   },
   {
-    "label":"C",
-    "type":"keyword",
-    "info":"                                    th\nC[i] is the default form for the iï ï    parameter or constant "
-  },
-  {
-    "label":"CachedValue",
-    "type":"keyword",
-    "info":"System`CachedValue"
-  },
-  {
-    "label":"CacheGraphics",
-    "type":"keyword",
-    "info":"System`CacheGraphics"
-  },
-  {
-    "label":"CachePersistence",
-    "type":"keyword",
-    "info":"CachePersistence is an option for CloudObject and related cloud functions that specifies the time du"
-  },
-  {
     "label":"CalendarConvert",
     "type":"keyword",
     "info":"CalendarConvert[date, calendar] converts the date object date to the specified calendar type calenda"
@@ -3510,21 +2635,6 @@ export let defaultFunctions = [
     "info":"CalendarType is an option that determines the calendar system in which all dates are to be interpret"
   },
   {
-    "label":"Callout",
-    "type":"keyword",
-    "info":"Callout[data, expr] displays expr in a plot as a callout pointing to data.Callout[data, expr, pos] d"
-  },
-  {
-    "label":"CalloutMarker",
-    "type":"keyword",
-    "info":"CalloutMarker is an option for Callout that specifies what marker to draw at the end of the leader i"
-  },
-  {
-    "label":"CalloutStyle",
-    "type":"keyword",
-    "info":"CalloutStyle is an option for Callout that specifies what style to use for callouts."
-  },
-  {
     "label":"CallPacket",
     "type":"keyword",
     "info":"CallPacket[integer, list] is a WSTP packet encapsulating a request to invoke the external function n"
@@ -3538,11 +2648,6 @@ export let defaultFunctions = [
     "label":"Cancel",
     "type":"keyword",
     "info":"Cancel[expr] cancels out common factors in the numerator and denominator of expr. "
-  },
-  {
-    "label":"CancelButton",
-    "type":"keyword",
-    "info":"CancelButton[] represents a Cancel button in a dialog that closes the dialog window when clicked.Can"
   },
   {
     "label":"CandlestickChart",
@@ -3595,11 +2700,6 @@ export let defaultFunctions = [
     "info":"CantorStaircase[x] gives the Cantor staircase function F (x).\n                                      "
   },
   {
-    "label":"Canvas",
-    "type":"keyword",
-    "info":"Canvas[] represents an empty canvas in the current notebook in which you can do free-form drawing.Ca"
-  },
-  {
     "label":"Cap",
     "type":"keyword",
     "info":"Cap[x, y, â¦] displays as x â¢ y â¢ â¦."
@@ -3623,11 +2723,6 @@ export let defaultFunctions = [
     "label":"CapsuleShape",
     "type":"keyword",
     "info":"CapsuleShape[{{x , y , z }, {x , y , z }}, r] represents the filled capsule between points {x , y , "
-  },
-  {
-    "label":"CaptureRunning",
-    "type":"keyword",
-    "info":"CaptureRunning is an option for signal acquisition functions that specifies whether to immediately s"
   },
   {
     "label":"CardinalBSplineBasis",
@@ -3760,21 +2855,6 @@ export let defaultFunctions = [
     "info":"CayleyGraph[group] returns a Cayley graph representation of group."
   },
   {
-    "label":"CDF",
-    "type":"keyword",
-    "info":"CDF[dist, x] gives the cumulative distribution function for the distribution dist evaluated at x.CDF"
-  },
-  {
-    "label":"CDFDeploy",
-    "type":"keyword",
-    "info":"CDFDeploy[\"file.cdf\", expr] deploys expr in a form that can be played by Wolfram Player.CDFDeploy[\"f"
-  },
-  {
-    "label":"CDFInformation",
-    "type":"keyword",
-    "info":"CDFInformation[expr] gives a list of properties relevant to a CDF deployed with the content expr.CDF"
-  },
-  {
     "label":"CDFWavelet",
     "type":"keyword",
     "info":"CDFWavelet[] represents a CohenâDaubechiesâFeauveau wavelet of type \"9\/7\". CDFWavelet[\"type\"] repres"
@@ -3788,241 +2868,6 @@ export let defaultFunctions = [
     "label":"CelestialSystem",
     "type":"keyword",
     "info":"CelestialSystem is an option for SunPosition, MoonPosition, and related functions that specifies the"
-  },
-  {
-    "label":"Cell",
-    "type":"keyword",
-    "info":"Cell[contents] is the low-level representation of a cell inside a Wolfram System notebook. Cell[cont"
-  },
-  {
-    "label":"CellAutoOverwrite",
-    "type":"keyword",
-    "info":"CellAutoOverwrite is an option for Cell which specifies whether an output cell should be overwritten"
-  },
-  {
-    "label":"CellBaseline",
-    "type":"keyword",
-    "info":"CellBaseline is an option for Cell which specifies where the baseline of the cell should be assumed "
-  },
-  {
-    "label":"CellBoundingBox",
-    "type":"keyword",
-    "info":"System`CellBoundingBox"
-  },
-  {
-    "label":"CellBracketOptions",
-    "type":"keyword",
-    "info":"CellBracketOptions is an option for cells that specifies settings for cell brackets."
-  },
-  {
-    "label":"CellChangeTimes",
-    "type":"keyword",
-    "info":"CellChangeTimes is an option to Cell that specifies when changes were made to the cell."
-  },
-  {
-    "label":"CellContents",
-    "type":"keyword",
-    "info":"System`CellContents"
-  },
-  {
-    "label":"CellContext",
-    "type":"keyword",
-    "info":"CellContext is an option for Cell which specifies the context to use for the evaluation of the conte"
-  },
-  {
-    "label":"CellDingbat",
-    "type":"keyword",
-    "info":"CellDingbat is an option for Cell which specifies what dingbat to use to emphasize a cell. "
-  },
-  {
-    "label":"CellDynamicExpression",
-    "type":"keyword",
-    "info":"CellDynamicExpression is an option for cells that specifies an expression to be dynamically updated "
-  },
-  {
-    "label":"CellEditDuplicate",
-    "type":"keyword",
-    "info":"CellEditDuplicate is an option for Cell which specifies whether the front end should make a copy of "
-  },
-  {
-    "label":"CellElementsBoundingBox",
-    "type":"keyword",
-    "info":"System`CellElementsBoundingBox"
-  },
-  {
-    "label":"CellElementSpacings",
-    "type":"keyword",
-    "info":"System`CellElementSpacings"
-  },
-  {
-    "label":"CellEpilog",
-    "type":"keyword",
-    "info":"CellEpilog is an option for Cell which gives an expression to evaluate after each ordinary evaluatio"
-  },
-  {
-    "label":"CellEvaluationDuplicate",
-    "type":"keyword",
-    "info":"CellEvaluationDuplicate is an option for Cell which specifies whether the front end should make a co"
-  },
-  {
-    "label":"CellEvaluationFunction",
-    "type":"keyword",
-    "info":"CellEvaluationFunction is an option for Cell that gives a function to be applied to every expression"
-  },
-  {
-    "label":"CellEvaluationLanguage",
-    "type":"keyword",
-    "info":"System`CellEvaluationLanguage"
-  },
-  {
-    "label":"CellEventActions",
-    "type":"keyword",
-    "info":"CellEventActions is an option for Cell that gives a list of actions to perform when specified events"
-  },
-  {
-    "label":"CellFrame",
-    "type":"keyword",
-    "info":"CellFrame is an option for Cell that specifies whether a frame should be drawn around a cell. "
-  },
-  {
-    "label":"CellFrameColor",
-    "type":"keyword",
-    "info":"CellFrameColor is an option that specifies the color of the frame around a cell."
-  },
-  {
-    "label":"CellFrameLabelMargins",
-    "type":"keyword",
-    "info":"CellFrameLabelMargins is an option for cells that specifies the absolute margins in printer's points"
-  },
-  {
-    "label":"CellFrameLabels",
-    "type":"keyword",
-    "info":"CellFrameLabels is an option that specifies the labels associated with the frame around a cell."
-  },
-  {
-    "label":"CellFrameMargins",
-    "type":"keyword",
-    "info":"CellFrameMargins is an option for Cell that specifies the absolute margins in printerâs points to le"
-  },
-  {
-    "label":"CellFrameStyle",
-    "type":"keyword",
-    "info":"System`CellFrameStyle"
-  },
-  {
-    "label":"CellGroup",
-    "type":"keyword",
-    "info":"CellGroup[{cell , cell , â¦}] gives an open group of cells that can appear in a Wolfram System notebo"
-  },
-  {
-    "label":"CellGroupData",
-    "type":"keyword",
-    "info":"CellGroupData[{cell , cell , â¦}] is a low-level construct that represents an open group of cells in "
-  },
-  {
-    "label":"CellGrouping",
-    "type":"keyword",
-    "info":"CellGrouping is a notebook option that specifies how cells in the notebook should be assembled into "
-  },
-  {
-    "label":"CellGroupingRules",
-    "type":"keyword",
-    "info":"CellGroupingRules is an option for cells that specifies the rules used for grouping a cell."
-  },
-  {
-    "label":"CellHorizontalScrolling",
-    "type":"keyword",
-    "info":"CellHorizontalScrolling is an option for cells that specifies whether the contents of a cell can be "
-  },
-  {
-    "label":"CellID",
-    "type":"keyword",
-    "info":"CellID is an option for Cell that specifies a unique ID number for a cell."
-  },
-  {
-    "label":"CellInsertionPointCell",
-    "type":"keyword",
-    "info":"System`CellInsertionPointCell"
-  },
-  {
-    "label":"CellLabel",
-    "type":"keyword",
-    "info":"CellLabel is an option for Cell which gives the label to use for a particular cell. "
-  },
-  {
-    "label":"CellLabelAutoDelete",
-    "type":"keyword",
-    "info":"CellLabelAutoDelete is an option for Cell which specifies whether a label for the cell should be aut"
-  },
-  {
-    "label":"CellLabelMargins",
-    "type":"keyword",
-    "info":"CellLabelMargins is an option for cells that specifies the absolute margins in printer's points arou"
-  },
-  {
-    "label":"CellLabelPositioning",
-    "type":"keyword",
-    "info":"CellLabelPositioning is an option for cells that specifies where the label for a cell is positioned."
-  },
-  {
-    "label":"CellLabelStyle",
-    "type":"keyword",
-    "info":"CellLabelStyle is an option for Cell that specifies the style to use in displaying cell labels marki"
-  },
-  {
-    "label":"CellLabelTemplate",
-    "type":"keyword",
-    "info":"System`CellLabelTemplate"
-  },
-  {
-    "label":"CellMargins",
-    "type":"keyword",
-    "info":"CellMargins is an option for Cell that specifies the absolute margins in printer's points to leave a"
-  },
-  {
-    "label":"CellObject",
-    "type":"keyword",
-    "info":"CellObject[id] is an object that represents a cell in an open notebook in the front end."
-  },
-  {
-    "label":"CellOpen",
-    "type":"keyword",
-    "info":"CellOpen is an option for Cell that specifies whether the contents of a cell should be explicitly di"
-  },
-  {
-    "label":"CellPrint",
-    "type":"keyword",
-    "info":"CellPrint[expr] inserts expr as a complete cell in the current notebook just below the cell being ev"
-  },
-  {
-    "label":"CellProlog",
-    "type":"keyword",
-    "info":"CellProlog is an option to Cell that gives an expression to evaluate before each ordinary evaluation"
-  },
-  {
-    "label":"Cells",
-    "type":"keyword",
-    "info":"Cells[] returns a list of CellObject expressions corresponding to cells in the current notebook.Cell"
-  },
-  {
-    "label":"CellSize",
-    "type":"keyword",
-    "info":"CellSize is an option for cells that specifies the width and height of an inline cell."
-  },
-  {
-    "label":"CellStyle",
-    "type":"keyword",
-    "info":"CellStyle is a setting for functions such as NotebookFind and Cells that specifies the name of a cel"
-  },
-  {
-    "label":"CellTags",
-    "type":"keyword",
-    "info":"CellTags is an option for Cell that gives a list of tags to associate with a cell. "
-  },
-  {
-    "label":"CellTrayWidgets",
-    "type":"keyword",
-    "info":"System`CellTrayWidgets"
   },
   {
     "label":"CellularAutomaton",
@@ -4098,11 +2943,6 @@ export let defaultFunctions = [
     "label":"ChampernowneNumber",
     "type":"keyword",
     "info":"ChampernowneNumber[b] gives the base-b Champernowne number C .ChampernowneNumber[] gives the base-10"
-  },
-  {
-    "label":"ChangeOptions",
-    "type":"keyword",
-    "info":"System`ChangeOptions"
   },
   {
     "label":"ChannelBase",
@@ -4315,26 +3155,6 @@ export let defaultFunctions = [
     "info":"CheckArguments[f[args], n] gives True if args consists of exactly n positional arguments followed by"
   },
   {
-    "label":"Checkbox",
-    "type":"keyword",
-    "info":"Checkbox[x] represents a checkbox with setting x, displayed as CheckboxBox[True] when x is True and "
-  },
-  {
-    "label":"CheckboxBar",
-    "type":"keyword",
-    "info":"CheckboxBar[x, {val , val , â¦}] represents a checkbox bar with setting x and with checkboxes for val"
-  },
-  {
-    "label":"CheckboxBox",
-    "type":"keyword",
-    "info":"System`CheckboxBox"
-  },
-  {
-    "label":"CheckboxBoxOptions",
-    "type":"keyword",
-    "info":"CheckboxBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Checkbox"
-  },
-  {
     "label":"ChemicalData",
     "type":"keyword",
     "info":"ChemicalData[\"name\", \"property\"] gives the value of the specified property for the chemical \"name\".C"
@@ -4370,16 +3190,6 @@ export let defaultFunctions = [
     "info":"                                       2\nChiSquareDistribution[Î½] represents a Ï  distribution with "
   },
   {
-    "label":"ChoiceButtons",
-    "type":"keyword",
-    "info":"ChoiceButtons[] represents a pair of OK and Cancel buttons that close a dialog.ChoiceButtons[{act  ,"
-  },
-  {
-    "label":"ChoiceDialog",
-    "type":"keyword",
-    "info":"ChoiceDialog[expr] puts up a standard choice dialog that displays expr together with OK and Cancel b"
-  },
-  {
     "label":"CholeskyDecomposition",
     "type":"keyword",
     "info":"CholeskyDecomposition[m] gives the Cholesky decomposition of a matrix m. "
@@ -4408,11 +3218,6 @@ export let defaultFunctions = [
     "label":"Circle",
     "type":"keyword",
     "info":"Circle[{x, y}, r] represents a circle of radius r centered at {x, y}.Circle[{x, y}] gives a circle o"
-  },
-  {
-    "label":"CircleBox",
-    "type":"keyword",
-    "info":"System`CircleBox"
   },
   {
     "label":"CircleDot",
@@ -4473,7 +3278,7 @@ export let defaultFunctions = [
     "label":"CircularUnitaryMatrixDistribution",
     "type":"keyword",
     "info":"CircularUnitaryMatrixDistribution[n] represents a circular unitary matrix distribution with matrix d"
-  },
+  },//stopped here
   {
     "label":"Circumsphere",
     "type":"keyword",
@@ -5000,21 +3805,6 @@ export let defaultFunctions = [
     "info":"ColorSetter[color] represents a color setter which displays as a swatch of the specified color and w"
   },
   {
-    "label":"ColorSetterBox",
-    "type":"keyword",
-    "info":"System`ColorSetterBox"
-  },
-  {
-    "label":"ColorSetterBoxOptions",
-    "type":"keyword",
-    "info":"ColorSetterBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Color"
-  },
-  {
-    "label":"ColorSlider",
-    "type":"keyword",
-    "info":"ColorSlider[color] represents a color slider currently set to the color corresponding to color.Color"
-  },
-  {
     "label":"ColorsNear",
     "type":"keyword",
     "info":"ColorsNear[color] represents a region around color.ColorsNear[color, d] represents a region with max"
@@ -5035,11 +3825,6 @@ export let defaultFunctions = [
     "info":"Column[{expr , expr , â¦}] is an object that formats with the expr  arranged in a column, with expr  "
   },
   {
-    "label":"ColumnAlignments",
-    "type":"keyword",
-    "info":"ColumnAlignments is an option for the low-level function GridBox that specifies how entries in each "
-  },
-  {
     "label":"ColumnBackgrounds",
     "type":"keyword",
     "info":"System`ColumnBackgrounds"
@@ -5048,26 +3833,6 @@ export let defaultFunctions = [
     "label":"ColumnForm",
     "type":"keyword",
     "info":"ColumnForm[{e , e , â¦}] prints as a column with e  above e , etc. ColumnForm[list, horiz] specifies "
-  },
-  {
-    "label":"ColumnLines",
-    "type":"keyword",
-    "info":"ColumnLines is an option for the low-level function GridBox which specifies whether lines should be "
-  },
-  {
-    "label":"ColumnsEqual",
-    "type":"keyword",
-    "info":"ColumnsEqual is an option for the low-level function GridBox which specifies whether all columns in "
-  },
-  {
-    "label":"ColumnSpacings",
-    "type":"keyword",
-    "info":"ColumnSpacings is an option for the low-level function GridBox which specifies the spaces in ems tha"
-  },
-  {
-    "label":"ColumnWidths",
-    "type":"keyword",
-    "info":"ColumnWidths is an option for the low-level function GridBox which specifies the widths to use for c"
   },
   {
     "label":"CombinatorB",
@@ -5440,11 +4205,6 @@ export let defaultFunctions = [
     "info":"Cone[{{x , y , z }, {x , y , z }}, r] represents a cone with a base of radius r centered at (x , y ,"
   },
   {
-    "label":"ConeBox",
-    "type":"keyword",
-    "info":"System`ConeBox"
-  },
-  {
     "label":"ConfidenceLevel",
     "type":"keyword",
     "info":"ConfidenceLevel is an option for LinearModelFit and other fitting functions that specifies the level"
@@ -5518,16 +4278,6 @@ export let defaultFunctions = [
     "label":"ConicHullRegion",
     "type":"keyword",
     "info":"ConicHullRegion[{p , â¦, p     }] represents the m-dimensional affine hull region passing through poi"
-  },
-  {
-    "label":"ConicHullRegion3DBox",
-    "type":"keyword",
-    "info":"System`ConicHullRegion3DBox"
-  },
-  {
-    "label":"ConicHullRegionBox",
-    "type":"keyword",
-    "info":"System`ConicHullRegionBox"
   },
   {
     "label":"ConicOptimization",
@@ -5745,11 +4495,6 @@ export let defaultFunctions = [
     "info":"ContentPadding is an option for objects that can be displayed with frames that specifies whether the"
   },
   {
-    "label":"ContentsBoundingBox",
-    "type":"keyword",
-    "info":"System`ContentsBoundingBox"
-  },
-  {
     "label":"ContentSelectable",
     "type":"keyword",
     "info":"ContentSelectable is an option to constructs such as Inset, Graphics, and GraphicsGroup that specifi"
@@ -5908,11 +4653,6 @@ export let defaultFunctions = [
     "label":"ControlAlignment",
     "type":"keyword",
     "info":"System`ControlAlignment"
-  },
-  {
-    "label":"ControlGroupContentsBox",
-    "type":"keyword",
-    "info":"System`ControlGroupContentsBox"
   },
   {
     "label":"ControllabilityGramian",
@@ -6090,16 +4830,6 @@ export let defaultFunctions = [
     "info":"System`Cookies"
   },
   {
-    "label":"CoordinateBoundingBox",
-    "type":"keyword",
-    "info":"CoordinateBoundingBox[coords] gives the corners {{x   , y   , â¦}, {x   , y   , â¦}} of the bounding b"
-  },
-  {
-    "label":"CoordinateBoundingBoxArray",
-    "type":"keyword",
-    "info":"CoordinateBoundingBoxArray[{{x   , y   , â¦}, {x   , y   , â¦}}] generates an array of {x, y, â¦} coord"
-  },
-  {
     "label":"CoordinateBounds",
     "type":"keyword",
     "info":"CoordinateBounds[coords] gives a list {{x   , x   }, {y   , y   }, â¦} of the bounds in each dimensio"
@@ -6168,11 +4898,6 @@ export let defaultFunctions = [
     "label":"CopyFile",
     "type":"keyword",
     "info":"CopyFile[file , file ] copies from the local, remote or cloud file file  to the local, remote or clo"
-  },
-  {
-    "label":"CopyFunction",
-    "type":"keyword",
-    "info":"CopyFunction is an option for TemplateBox that specifies how the box is to be copied."
   },
   {
     "label":"CopyTag",
@@ -6298,16 +5023,6 @@ export let defaultFunctions = [
     "label":"CounterAssignments",
     "type":"keyword",
     "info":"CounterAssignments is an option for selections that sets the value of a specified counter."
-  },
-  {
-    "label":"CounterBox",
-    "type":"keyword",
-    "info":"System`CounterBox"
-  },
-  {
-    "label":"CounterBoxOptions",
-    "type":"keyword",
-    "info":"CounterBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for CounterBo"
   },
   {
     "label":"CounterClockwiseContourIntegral",
@@ -6630,11 +5345,6 @@ export let defaultFunctions = [
     "info":"Cuboid[p   ] represents a unit hypercube with its lower corner at p   .Cuboid[p   , p   ] represents"
   },
   {
-    "label":"CuboidBox",
-    "type":"keyword",
-    "info":"System`CuboidBox"
-  },
-  {
     "label":"Cumulant",
     "type":"keyword",
     "info":"                              th                                                                 th "
@@ -6758,11 +5468,6 @@ export let defaultFunctions = [
     "label":"Cylinder",
     "type":"keyword",
     "info":"Cylinder[{{x , y , z }, {x , y , z }}, r] represents a cylinder of radius r around the line from (x "
-  },
-  {
-    "label":"CylinderBox",
-    "type":"keyword",
-    "info":"System`CylinderBox"
   },
   {
     "label":"CylindricalDecomposition",
@@ -7135,11 +5840,6 @@ export let defaultFunctions = [
     "info":"Decapitalize[string] yields a string in which the first character has been made lowercase."
   },
   {
-    "label":"Decimal",
-    "type":"keyword",
-    "info":"Decimal is a setting for the ColumnAlignments option of GridBox which states that numbers should ali"
-  },
-  {
     "label":"DecimalForm",
     "type":"keyword",
     "info":"DecimalForm[expr] prints with approximate real numbers in expr always given in decimal form, without"
@@ -7218,16 +5918,6 @@ export let defaultFunctions = [
     "label":"DefaultBaseStyle",
     "type":"keyword",
     "info":"DefaultBaseStyle is a low-level option for formatting and related constructs that specifies a defaul"
-  },
-  {
-    "label":"DefaultBoxStyle",
-    "type":"keyword",
-    "info":"DefaultBoxStyle is a low-level option for three-dimensional graphics functions that specifies the de"
-  },
-  {
-    "label":"DefaultButton",
-    "type":"keyword",
-    "info":"DefaultButton[] represents an OK button that closes a dialog, and is the default when StyleBox[Dynam"
   },
   {
     "label":"DefaultColor",
@@ -7580,11 +6270,6 @@ export let defaultFunctions = [
     "info":"System`DeleteWithContents"
   },
   {
-    "label":"DeletionWarning",
-    "type":"keyword",
-    "info":"DeletionWarning is an option for InterpretationBox or TagBox objects that specifies whether a warnin"
-  },
-  {
     "label":"DelimitedArray",
     "type":"keyword",
     "info":"System`DelimitedArray"
@@ -7803,11 +6488,6 @@ export let defaultFunctions = [
     "label":"DGaussianWavelet",
     "type":"keyword",
     "info":"DGaussianWavelet[] represents a derivative of Gaussian wavelet of derivative order 2.DGaussianWavele"
-  },
-  {
-    "label":"DiacriticalPositioning",
-    "type":"keyword",
-    "info":"DiacriticalPositioning is an option for UnderscriptBox and related boxes that specifies how close di"
   },
   {
     "label":"Diagonal",
@@ -8313,11 +6993,6 @@ export let defaultFunctions = [
     "label":"Disk",
     "type":"keyword",
     "info":"Disk[{x, y}, r] represents a disk of radius r centered at {x, y}.Disk[{x, y}] gives a disk of radius"
-  },
-  {
-    "label":"DiskBox",
-    "type":"keyword",
-    "info":"System`DiskBox"
   },
   {
     "label":"DiskMatrix",
@@ -8883,106 +7558,6 @@ export let defaultFunctions = [
     "label":"Duration",
     "type":"keyword",
     "info":"Duration[expr] returns the duration of expr."
-  },
-  {
-    "label":"Dynamic",
-    "type":"keyword",
-    "info":"Dynamic[expr] represents an object that displays as the dynamically updated current value of expr. I"
-  },
-  {
-    "label":"DynamicBox",
-    "type":"keyword",
-    "info":"System`DynamicBox"
-  },
-  {
-    "label":"DynamicBoxOptions",
-    "type":"keyword",
-    "info":"DynamicBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for DynamicBo"
-  },
-  {
-    "label":"DynamicEvaluationTimeout",
-    "type":"keyword",
-    "info":"DynamicEvaluationTimeout is an option for displayed objects, cells, and notebooks that specifies the"
-  },
-  {
-    "label":"DynamicGeoGraphics",
-    "type":"keyword",
-    "info":"DynamicGeoGraphics[primitives, options] represents a dynamic, interactive, two-dimensional geographi"
-  },
-  {
-    "label":"DynamicImage",
-    "type":"keyword",
-    "info":"DynamicImage[image] displays a dynamic version of image, supporting panning, zooming, etc.DynamicIma"
-  },
-  {
-    "label":"DynamicLocation",
-    "type":"keyword",
-    "info":"System`DynamicLocation"
-  },
-  {
-    "label":"DynamicModule",
-    "type":"keyword",
-    "info":"DynamicModule[{x, y, â¦}, expr] represents an object which maintains the same local instance of the s"
-  },
-  {
-    "label":"DynamicModuleBox",
-    "type":"keyword",
-    "info":"System`DynamicModuleBox"
-  },
-  {
-    "label":"DynamicModuleBoxOptions",
-    "type":"keyword",
-    "info":"DynamicModuleBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Dyn"
-  },
-  {
-    "label":"DynamicModuleParent",
-    "type":"keyword",
-    "info":"System`DynamicModuleParent"
-  },
-  {
-    "label":"DynamicModuleValues",
-    "type":"keyword",
-    "info":"DynamicModuleValues is an option for DynamicModule that stores downvalues of local symbols."
-  },
-  {
-    "label":"DynamicName",
-    "type":"keyword",
-    "info":"System`DynamicName"
-  },
-  {
-    "label":"DynamicNamespace",
-    "type":"keyword",
-    "info":"System`DynamicNamespace"
-  },
-  {
-    "label":"DynamicReference",
-    "type":"keyword",
-    "info":"System`DynamicReference"
-  },
-  {
-    "label":"DynamicSetting",
-    "type":"keyword",
-    "info":"DynamicSetting[e] represents an object which displays as e, but is interpreted as the dynamically up"
-  },
-  {
-    "label":"DynamicUpdating",
-    "type":"keyword",
-    "info":"DynamicUpdating is an option for displayed objects, cells and notebooks that specifies whether dynam"
-  },
-  {
-    "label":"DynamicWrapper",
-    "type":"keyword",
-    "info":"DynamicWrapper[e, expr] represents an object that displays as e, but dynamically updates the express"
-  },
-  {
-    "label":"DynamicWrapperBox",
-    "type":"keyword",
-    "info":"System`DynamicWrapperBox"
-  },
-  {
-    "label":"DynamicWrapperBoxOptions",
-    "type":"keyword",
-    "info":"DynamicWrapperBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Dy"
   },
   {
     "label":"DEC",
@@ -9655,16 +8230,6 @@ export let defaultFunctions = [
     "info":"lhs == rhs returns True if lhs and rhs are identical. "
   },
   {
-    "label":"EqualColumns",
-    "type":"keyword",
-    "info":"EqualColumns is an option to GridBox which specifies whether the size of the columns are all set to "
-  },
-  {
-    "label":"EqualRows",
-    "type":"keyword",
-    "info":"EqualRows is an option to GridBox which specifies whether the size of the rows are all set to the si"
-  },
-  {
     "label":"EqualTilde",
     "type":"keyword",
     "info":"EqualTilde[x, y, â¦] displays as x â y â â¦."
@@ -9728,16 +8293,6 @@ export let defaultFunctions = [
     "label":"Erosion",
     "type":"keyword",
     "info":"Erosion[image, ker] gives the morphological erosion of image with respect to the structuring element"
-  },
-  {
-    "label":"ErrorBox",
-    "type":"keyword",
-    "info":"ErrorBox[boxes] is a low-level box construct that represents boxes that cannot be interpreted in inp"
-  },
-  {
-    "label":"ErrorBoxOptions",
-    "type":"keyword",
-    "info":"System`ErrorBoxOptions"
   },
   {
     "label":"ErrorNorm",
@@ -9858,11 +8413,6 @@ export let defaultFunctions = [
     "label":"EvaluateScheduledTask",
     "type":"keyword",
     "info":"EvaluateScheduledTask[expr] triggers immediate local execution of the specified task object."
-  },
-  {
-    "label":"EvaluationBox",
-    "type":"keyword",
-    "info":"EvaluationBox[] returns a BoxObject corresponding to the box structure in which this function is bei"
   },
   {
     "label":"EvaluationCell",
@@ -10128,11 +8678,6 @@ export let defaultFunctions = [
     "label":"ExponentialPowerDistribution",
     "type":"keyword",
     "info":"ExponentialPowerDistribution[Îº, Î¼, Ï] represents an exponential power distribution with shape parame"
-  },
-  {
-    "label":"ExponentPosition",
-    "type":"keyword",
-    "info":"ExponentPosition is an option for RadicalBox that specifies the placement of the index outside a rad"
   },
   {
     "label":"ExponentStep",
@@ -10773,16 +9318,6 @@ export let defaultFunctions = [
     "label":"FilledCurve",
     "type":"keyword",
     "info":"FilledCurve[{segment , segment , â¦}] represents a filled curve consisting of segment  followed by se"
-  },
-  {
-    "label":"FilledCurveBox",
-    "type":"keyword",
-    "info":"System`FilledCurveBox"
-  },
-  {
-    "label":"FilledCurveBoxOptions",
-    "type":"keyword",
-    "info":"FilledCurveBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Fille"
   },
   {
     "label":"FilledTorus",
@@ -11495,16 +10030,6 @@ export let defaultFunctions = [
     "info":"System`FontOpacity"
   },
   {
-    "label":"FontPostScriptName",
-    "type":"keyword",
-    "info":"FontPostScriptName is an option to StyleBox which changes the current font. A sample specification i"
-  },
-  {
-    "label":"FontProperties",
-    "type":"keyword",
-    "info":"FontProperties specifies font properties."
-  },
-  {
     "label":"FontReencoding",
     "type":"keyword",
     "info":"System`FontReencoding"
@@ -11578,16 +10103,6 @@ export let defaultFunctions = [
     "label":"FormatValues",
     "type":"keyword",
     "info":"FormatValues[f] gives a list of transformation rules corresponding to all printing formats (values f"
-  },
-  {
-    "label":"FormBox",
-    "type":"keyword",
-    "info":"FormBox[boxes, form] is a low-level box construct which displays as boxes but specifies that rules a"
-  },
-  {
-    "label":"FormBoxOptions",
-    "type":"keyword",
-    "info":"FormBoxOptions is an option for cells that specifies settings for FormBox objects within the cell."
   },
   {
     "label":"FormControl",
@@ -11775,16 +10290,6 @@ export let defaultFunctions = [
     "info":"FractionalPart[x] gives the fractional part of x. "
   },
   {
-    "label":"FractionBox",
-    "type":"keyword",
-    "info":"                                                                      x\nFractionBox[x, y] is a low-l"
-  },
-  {
-    "label":"FractionBoxOptions",
-    "type":"keyword",
-    "info":"FractionBoxOptions is an option that specifies settings for FractionBox objects."
-  },
-  {
     "label":"FractionLine",
     "type":"keyword",
     "info":"FractionLine is an option for fractions that specifies the thickness of the line separating the nume"
@@ -11793,16 +10298,6 @@ export let defaultFunctions = [
     "label":"Frame",
     "type":"keyword",
     "info":"Frame is an option for Graphics, Grid, and other constructs that specifies whether to include a fram"
-  },
-  {
-    "label":"FrameBox",
-    "type":"keyword",
-    "info":"FrameBox[box] is a low-level box construct that represents box with a frame drawn around it. "
-  },
-  {
-    "label":"FrameBoxOptions",
-    "type":"keyword",
-    "info":"FrameBoxOptions is an option that specifies default settings for FrameBox objects."
   },
   {
     "label":"Framed",
@@ -12525,11 +11020,6 @@ export let defaultFunctions = [
     "info":"GeoBoundary[g] returns the boundary line of the geo region g."
   },
   {
-    "label":"GeoBoundingBox",
-    "type":"keyword",
-    "info":"GeoBoundingBox[g] gives the geo positions that define the bounding rectangle enclosing the geo regio"
-  },
-  {
     "label":"GeoBounds",
     "type":"keyword",
     "info":"GeoBounds[g] gives the ranges of latitudes and longitudes in the geo region g.GeoBounds[g, Î\.b4] pads r"
@@ -12815,26 +11305,6 @@ export let defaultFunctions = [
     "info":"GeometricTransformation[g, tfun] represents the result of applying the transformation function tfun "
   },
   {
-    "label":"GeometricTransformation3DBox",
-    "type":"keyword",
-    "info":"System`GeometricTransformation3DBox"
-  },
-  {
-    "label":"GeometricTransformation3DBoxOptions",
-    "type":"keyword",
-    "info":"GeometricTransformation3DBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies sett"
-  },
-  {
-    "label":"GeometricTransformationBox",
-    "type":"keyword",
-    "info":"System`GeometricTransformationBox"
-  },
-  {
-    "label":"GeometricTransformationBoxOptions",
-    "type":"keyword",
-    "info":"GeometricTransformationBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settin"
-  },
-  {
     "label":"GeoModel",
     "type":"keyword",
     "info":"GeoModel is an option for GeoGraphics that specifies the reference body or model for it for the purp"
@@ -12993,11 +11463,6 @@ export let defaultFunctions = [
     "label":"Get",
     "type":"keyword",
     "info":"<< name reads in a file, evaluating each expression in it and returning the last one. Get[stream] re"
-  },
-  {
-    "label":"GetBoundingBoxSizePacket",
-    "type":"keyword",
-    "info":"System`GetBoundingBoxSizePacket"
   },
   {
     "label":"GetContext",
@@ -13235,16 +11700,6 @@ export let defaultFunctions = [
     "info":"Graphics3D[primitives, options] represents a three-dimensional graphical image. "
   },
   {
-    "label":"Graphics3DBox",
-    "type":"keyword",
-    "info":"System`Graphics3DBox"
-  },
-  {
-    "label":"Graphics3DBoxOptions",
-    "type":"keyword",
-    "info":"Graphics3DBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Graphi"
-  },
-  {
     "label":"GraphicsArray",
     "type":"keyword",
     "info":"GraphicsArray[{g , g , â¦}] represents a row of graphics objects.GraphicsArray[{{g  , g  , â¦}, â¦}] re"
@@ -13253,16 +11708,6 @@ export let defaultFunctions = [
     "label":"GraphicsBaseline",
     "type":"keyword",
     "info":"System`GraphicsBaseline"
-  },
-  {
-    "label":"GraphicsBox",
-    "type":"keyword",
-    "info":"System`GraphicsBox"
-  },
-  {
-    "label":"GraphicsBoxOptions",
-    "type":"keyword",
-    "info":"GraphicsBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Graphics"
   },
   {
     "label":"GraphicsColor",
@@ -13280,26 +11725,6 @@ export let defaultFunctions = [
     "info":"GraphicsComplex[{pt , pt , â¦}, data] represents a graphics complex in which coordinates given as int"
   },
   {
-    "label":"GraphicsComplex3DBox",
-    "type":"keyword",
-    "info":"System`GraphicsComplex3DBox"
-  },
-  {
-    "label":"GraphicsComplex3DBoxOptions",
-    "type":"keyword",
-    "info":"GraphicsComplex3DBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for"
-  },
-  {
-    "label":"GraphicsComplexBox",
-    "type":"keyword",
-    "info":"System`GraphicsComplexBox"
-  },
-  {
-    "label":"GraphicsComplexBoxOptions",
-    "type":"keyword",
-    "info":"GraphicsComplexBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for G"
-  },
-  {
     "label":"GraphicsContents",
     "type":"keyword",
     "info":"System`GraphicsContents"
@@ -13315,34 +11740,9 @@ export let defaultFunctions = [
     "info":"GraphicsGrid[{{g  , g  , â¦}, â¦}] generates a graphic in which the g   are laid out in a two-dimensio"
   },
   {
-    "label":"GraphicsGridBox",
-    "type":"keyword",
-    "info":"System`GraphicsGridBox"
-  },
-  {
     "label":"GraphicsGroup",
     "type":"keyword",
     "info":"GraphicsGroup[{g , g , â¦}] represents a collection of graphics objects grouped together for purposes"
-  },
-  {
-    "label":"GraphicsGroup3DBox",
-    "type":"keyword",
-    "info":"System`GraphicsGroup3DBox"
-  },
-  {
-    "label":"GraphicsGroup3DBoxOptions",
-    "type":"keyword",
-    "info":"GraphicsGroup3DBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for G"
-  },
-  {
-    "label":"GraphicsGroupBox",
-    "type":"keyword",
-    "info":"System`GraphicsGroupBox"
-  },
-  {
-    "label":"GraphicsGroupBoxOptions",
-    "type":"keyword",
-    "info":"GraphicsGroupBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Gra"
   },
   {
     "label":"GraphicsGrouping",
@@ -13538,71 +11938,6 @@ export let defaultFunctions = [
     "label":"Grid",
     "type":"keyword",
     "info":"Grid[{{expr  , expr  , â¦}, {expr  , expr  , â¦}, â¦}] is an object that formats with the expr   arrang"
-  },
-  {
-    "label":"GridBaseline",
-    "type":"keyword",
-    "info":"GridBaseline is an option for GridBox that specifies what place in the grid should be considered its"
-  },
-  {
-    "label":"GridBox",
-    "type":"keyword",
-    "info":"GridBox[{{box  , box  , â¦}, {box  , box  , â¦}, â¦}] is a low-level box construct that represents a tw"
-  },
-  {
-    "label":"GridBoxAlignment",
-    "type":"keyword",
-    "info":"System`GridBoxAlignment"
-  },
-  {
-    "label":"GridBoxBackground",
-    "type":"keyword",
-    "info":"System`GridBoxBackground"
-  },
-  {
-    "label":"GridBoxDividers",
-    "type":"keyword",
-    "info":"System`GridBoxDividers"
-  },
-  {
-    "label":"GridBoxFrame",
-    "type":"keyword",
-    "info":"System`GridBoxFrame"
-  },
-  {
-    "label":"GridBoxItemSize",
-    "type":"keyword",
-    "info":"System`GridBoxItemSize"
-  },
-  {
-    "label":"GridBoxItemStyle",
-    "type":"keyword",
-    "info":"System`GridBoxItemStyle"
-  },
-  {
-    "label":"GridBoxOptions",
-    "type":"keyword",
-    "info":"GridBoxOptions -> {opt  -> val , opt  -> val , â¦} is an option which specifies default settings for "
-  },
-  {
-    "label":"GridBoxSpacings",
-    "type":"keyword",
-    "info":"System`GridBoxSpacings"
-  },
-  {
-    "label":"GridCreationSettings",
-    "type":"keyword",
-    "info":"GridCreationSettings is a global option that specifies settings for the Create Table\/Matrix dialog."
-  },
-  {
-    "label":"GridDefaultElement",
-    "type":"keyword",
-    "info":"GridDefaultElement is an option for the low-level function GridBox that specifies what to insert whe"
-  },
-  {
-    "label":"GridElementStyleOptions",
-    "type":"keyword",
-    "info":"System`GridElementStyleOptions"
   },
   {
     "label":"GridFrame",
@@ -14138,16 +12473,6 @@ export let defaultFunctions = [
     "label":"Hexahedron",
     "type":"keyword",
     "info":"Hexahedron[{p , p , â¦, p }] represents a filled hexahedron with corners p , p , â¦, p .Hexahedron[{{p"
-  },
-  {
-    "label":"HexahedronBox",
-    "type":"keyword",
-    "info":"System`HexahedronBox"
-  },
-  {
-    "label":"HexahedronBoxOptions",
-    "type":"keyword",
-    "info":"System`HexahedronBoxOptions"
   },
   {
     "label":"HiddenItems",
@@ -15590,21 +13915,6 @@ export let defaultFunctions = [
     "info":"InputAutoReplacements is an option for cells and notebooks which specifies strings of characters tha"
   },
   {
-    "label":"InputField",
-    "type":"keyword",
-    "info":"InputField[] represents a blank editable input field. InputField[x] represents an editable input fie"
-  },
-  {
-    "label":"InputFieldBox",
-    "type":"keyword",
-    "info":"System`InputFieldBox"
-  },
-  {
-    "label":"InputFieldBoxOptions",
-    "type":"keyword",
-    "info":"InputFieldBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for InputF"
-  },
-  {
     "label":"InputForm",
     "type":"keyword",
     "info":"InputForm[expr] prints as a version of expr suitable for input to the Wolfram Language. "
@@ -15655,11 +13965,6 @@ export let defaultFunctions = [
     "info":"InputStringPacket[] is a WSTP packet that requests input in string form."
   },
   {
-    "label":"InputToBoxFormPacket",
-    "type":"keyword",
-    "info":"InputToBoxFormPacket is an internal symbol used for formatting."
-  },
-  {
     "label":"Insert",
     "type":"keyword",
     "info":"Insert[list, elem, n] inserts elem at position n in list. If n is negative, the position is counted "
@@ -15688,26 +13993,6 @@ export let defaultFunctions = [
     "label":"Inset",
     "type":"keyword",
     "info":"Inset[obj] represents an object obj inset in a graphic. Inset[obj, pos] specifies that the inset sho"
-  },
-  {
-    "label":"Inset3DBox",
-    "type":"keyword",
-    "info":"System`Inset3DBox"
-  },
-  {
-    "label":"Inset3DBoxOptions",
-    "type":"keyword",
-    "info":"Inset3DBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Inset3DBo"
-  },
-  {
-    "label":"InsetBox",
-    "type":"keyword",
-    "info":"System`InsetBox"
-  },
-  {
-    "label":"InsetBoxOptions",
-    "type":"keyword",
-    "info":"InsetBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for InsetBox ob"
   },
   {
     "label":"Insphere",
@@ -15863,21 +14148,6 @@ export let defaultFunctions = [
     "label":"Interpretation",
     "type":"keyword",
     "info":"Interpretation[e, expr] represents an object that displays as e, but is interpreted as the unevaluat"
-  },
-  {
-    "label":"InterpretationBox",
-    "type":"keyword",
-    "info":"InterpretationBox[boxes, expr] is a low-level box construct that displays as boxes but is interprete"
-  },
-  {
-    "label":"InterpretationBoxOptions",
-    "type":"keyword",
-    "info":"InterpretationBoxOptions is an option for selections that specifies settings for InterpretationBox c"
-  },
-  {
-    "label":"InterpretationFunction",
-    "type":"keyword",
-    "info":"InterpretationFunction is an option for TemplateBox that specifies how the box is to be evaluated."
   },
   {
     "label":"Interpreter",
@@ -16270,41 +14540,6 @@ export let defaultFunctions = [
     "info":"Italic represents an italic font slant."
   },
   {
-    "label":"Item",
-    "type":"keyword",
-    "info":"Item[expr, options] represents an item within constructs such as Grid, Overlay, and Manipulate that "
-  },
-  {
-    "label":"ItemAspectRatio",
-    "type":"keyword",
-    "info":"ItemAspectRatio is an option for GraphicsGrid which specifies the ratio of height to width for the r"
-  },
-  {
-    "label":"ItemBox",
-    "type":"keyword",
-    "info":"System`ItemBox"
-  },
-  {
-    "label":"ItemBoxOptions",
-    "type":"keyword",
-    "info":"ItemBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for ItemBox obje"
-  },
-  {
-    "label":"ItemDisplayFunction",
-    "type":"keyword",
-    "info":"ItemDisplayFunction is an option for Dataset that specifies a function to apply to items before disp"
-  },
-  {
-    "label":"ItemSize",
-    "type":"keyword",
-    "info":"ItemSize is an option for Grid, Column, and related constructs that specifies the sizes to allow for"
-  },
-  {
-    "label":"ItemStyle",
-    "type":"keyword",
-    "info":"ItemStyle is an option for Dataset, Grid and related constructs that specifies styles to use for ite"
-  },
-  {
     "label":"ItoProcess",
     "type":"keyword",
     "info":"ItoProcess[{a, b}, x, t] represents an Ito process x(t), where ï x(t) ï a(t, x(t)) ï t + b(t, x(t)) "
@@ -16458,16 +14693,6 @@ export let defaultFunctions = [
     "label":"JoinedCurve",
     "type":"keyword",
     "info":"JoinedCurve[{segment , segment , â¦}] represents a curve consisting of segment  followed by segment  "
-  },
-  {
-    "label":"JoinedCurveBox",
-    "type":"keyword",
-    "info":"System`JoinedCurveBox"
-  },
-  {
-    "label":"JoinedCurveBoxOptions",
-    "type":"keyword",
-    "info":"JoinedCurveBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Joine"
   },
   {
     "label":"JoinForm",
@@ -17560,11 +15785,6 @@ export let defaultFunctions = [
     "info":"              *                                                 *           *                       "
   },
   {
-    "label":"LimitsPositioning",
-    "type":"keyword",
-    "info":"LimitsPositioning is an option for UnderoverscriptBox and related boxes that specifies whether to ch"
-  },
-  {
     "label":"LimitsPositioningTokens",
     "type":"keyword",
     "info":"LimitsPositioningTokens is an option for selections that specifies a set of characters for which the"
@@ -17578,16 +15798,6 @@ export let defaultFunctions = [
     "label":"Line",
     "type":"keyword",
     "info":"Line[{p , p , â¦}] represents the line segments joining a sequence for points p .Line[{{p  , p  , â¦},"
-  },
-  {
-    "label":"Line3DBox",
-    "type":"keyword",
-    "info":"System`Line3DBox"
-  },
-  {
-    "label":"Line3DBoxOptions",
-    "type":"keyword",
-    "info":"Line3DBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Line3DBox "
   },
   {
     "label":"LinearFilter",
@@ -17660,16 +15870,6 @@ export let defaultFunctions = [
     "info":"LinearSolveFunction[dimensions, data] represents a function for providing solutions to a matrix equa"
   },
   {
-    "label":"LineBox",
-    "type":"keyword",
-    "info":"System`LineBox"
-  },
-  {
-    "label":"LineBoxOptions",
-    "type":"keyword",
-    "info":"LineBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for LineBox obje"
-  },
-  {
     "label":"LineBreak",
     "type":"keyword",
     "info":"System`LineBreak"
@@ -17708,11 +15908,6 @@ export let defaultFunctions = [
     "label":"LineIndent",
     "type":"keyword",
     "info":"LineIndent is an option for Style and Cell that specifies how many ems of indentation to add at the "
-  },
-  {
-    "label":"LineIndentMaxFraction",
-    "type":"keyword",
-    "info":"LineIndentMaxFraction is an option for Cell, StyleBox, and Style that specifies the maximum fraction"
   },
   {
     "label":"LineIntegralConvolutionPlot",
@@ -17985,21 +16180,6 @@ export let defaultFunctions = [
     "info":"ListPicker[list, {val , val , â¦}] represents a list pane with setting list that can contain possible"
   },
   {
-    "label":"ListPickerBox",
-    "type":"keyword",
-    "info":"ListPickerBox[list, {val  ï¢ lbl , val  ï¢ lbl , â¦}] is a low-level box structure that represents a li"
-  },
-  {
-    "label":"ListPickerBoxBackground",
-    "type":"keyword",
-    "info":"System`ListPickerBoxBackground"
-  },
-  {
-    "label":"ListPickerBoxOptions",
-    "type":"keyword",
-    "info":"ListPickerBoxOptions is an option that specifies settings for ListPickerBox objects."
-  },
-  {
     "label":"ListPlay",
     "type":"keyword",
     "info":"ListPlay[{a , a , â¦}] creates an object that plays as a sound whose amplitude is given by the sequen"
@@ -18180,44 +16360,9 @@ export let defaultFunctions = [
     "info":"LocationTest[data] tests whether the mean or median of the data is zero. LocationTest[{data , data }"
   },
   {
-    "label":"Locator",
-    "type":"keyword",
-    "info":"Locator[{x, y}] represents a locator object at position {x, y} in a graphic. Locator[Dynamic[pos]] t"
-  },
-  {
     "label":"LocatorAutoCreate",
     "type":"keyword",
     "info":"LocatorAutoCreate is an option for LocatorPane, Manipulate, and related functions that specifies whe"
-  },
-  {
-    "label":"LocatorBox",
-    "type":"keyword",
-    "info":"System`LocatorBox"
-  },
-  {
-    "label":"LocatorBoxOptions",
-    "type":"keyword",
-    "info":"LocatorBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for LocatorBo"
-  },
-  {
-    "label":"LocatorCentering",
-    "type":"keyword",
-    "info":"System`LocatorCentering"
-  },
-  {
-    "label":"LocatorPane",
-    "type":"keyword",
-    "info":"LocatorPane[{x, y}, back] represents a pane with a locator at position {x, y} and background back.Lo"
-  },
-  {
-    "label":"LocatorPaneBox",
-    "type":"keyword",
-    "info":"System`LocatorPaneBox"
-  },
-  {
-    "label":"LocatorPaneBoxOptions",
-    "type":"keyword",
-    "info":"LocatorPaneBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Locat"
   },
   {
     "label":"LocatorRegion",
@@ -19670,11 +17815,6 @@ export let defaultFunctions = [
     "info":"MinRecursion is an option for NIntegrate and other numerical functions that use a recursive algorith"
   },
   {
-    "label":"MinSize",
-    "type":"keyword",
-    "info":"MinSize is an option of certain BoxForm primitives."
-  },
-  {
     "label":"MinStableDistribution",
     "type":"keyword",
     "info":"MinStableDistribution[Î¼, Ï, Î¾] represents a generalized minimum extreme value distribution with loca"
@@ -20130,11 +18270,6 @@ export let defaultFunctions = [
     "info":"System`MultiLetterStyle"
   },
   {
-    "label":"MultilineFunction",
-    "type":"keyword",
-    "info":"MultilineFunction is an option for UnderscriptBox and related box objects that specifies what to do "
-  },
-  {
     "label":"Multinomial",
     "type":"keyword",
     "info":"Multinomial[n , n , â¦] gives the multinomial coefficient (n  + n  + â¦) !\/(n  ! n  ! â¦). \n           "
@@ -20203,16 +18338,6 @@ export let defaultFunctions = [
     "label":"Names",
     "type":"keyword",
     "info":"Names[\"string\"] gives a list of the names of symbols that match the string. Names[patt] gives a list"
-  },
-  {
-    "label":"NamespaceBox",
-    "type":"keyword",
-    "info":"System`NamespaceBox"
-  },
-  {
-    "label":"NamespaceBoxOptions",
-    "type":"keyword",
-    "info":"System`NamespaceBoxOptions"
   },
   {
     "label":"Nand",
@@ -21760,29 +19885,9 @@ export let defaultFunctions = [
     "info":"OpacityFunctionScaling is an option to visualization functions such as DensityPlot3D that specifies "
   },
   {
-    "label":"Open",
-    "type":"keyword",
-    "info":"System`Open"
-  },
-  {
     "label":"OpenAppend",
     "type":"keyword",
     "info":"OpenAppend[\"file\"] opens a file to append output to it, and returns an OutputStream object. "
-  },
-  {
-    "label":"Opener",
-    "type":"keyword",
-    "info":"Opener[x] represents an opener with setting x, displayed as OpenerBox[True] when x is True and Opene"
-  },
-  {
-    "label":"OpenerBox",
-    "type":"keyword",
-    "info":"System`OpenerBox"
-  },
-  {
-    "label":"OpenerBoxOptions",
-    "type":"keyword",
-    "info":"OpenerBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for OpenerBox "
   },
   {
     "label":"OpenerView",
@@ -21878,16 +19983,6 @@ export let defaultFunctions = [
     "label":"OptionValue",
     "type":"keyword",
     "info":"OptionValue[name] gives the value of name in options matched by OptionsPattern. OptionValue[f, name]"
-  },
-  {
-    "label":"OptionValueBox",
-    "type":"keyword",
-    "info":"System`OptionValueBox"
-  },
-  {
-    "label":"OptionValueBoxOptions",
-    "type":"keyword",
-    "info":"OptionValueBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Optio"
   },
   {
     "label":"Or",
@@ -22070,16 +20165,6 @@ export let defaultFunctions = [
     "info":"Overlay[{expr , expr , â¦}] displays as an overlay of all the expr .Overlay[{expr , expr , â¦}, {i, j,"
   },
   {
-    "label":"OverlayBox",
-    "type":"keyword",
-    "info":"System`OverlayBox"
-  },
-  {
-    "label":"OverlayBoxOptions",
-    "type":"keyword",
-    "info":"OverlayBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for OverlayBo"
-  },
-  {
     "label":"OverlayVideo",
     "type":"keyword",
     "info":"OverlayVideo[background, o] gives the result of overlaying o onto a background video or image backgr"
@@ -22088,16 +20173,6 @@ export let defaultFunctions = [
     "label":"Overscript",
     "type":"keyword",
     "info":"                                              y\nOverscript[x, y] is an object that formats as x. "
-  },
-  {
-    "label":"OverscriptBox",
-    "type":"keyword",
-    "info":"                                                            y\nOverscriptBox[x, y] is the lowâlevel b"
-  },
-  {
-    "label":"OverscriptBoxOptions",
-    "type":"keyword",
-    "info":"OverscriptBoxOptions is an option that specifies the style and display of OverscriptBox constructs."
   },
   {
     "label":"OverTilde",
@@ -22405,29 +20480,9 @@ export let defaultFunctions = [
     "info":"Pane[expr] displays as a pane containing expr. Pane[expr, w] makes the pane be w printer's points wi"
   },
   {
-    "label":"PaneBox",
-    "type":"keyword",
-    "info":"System`PaneBox"
-  },
-  {
-    "label":"PaneBoxOptions",
-    "type":"keyword",
-    "info":"PaneBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for PaneBox obje"
-  },
-  {
     "label":"Panel",
     "type":"keyword",
     "info":"Panel[expr] displays as a panel containing expr. Panel[expr, title] gives the panel the specified ti"
-  },
-  {
-    "label":"PanelBox",
-    "type":"keyword",
-    "info":"System`PanelBox"
-  },
-  {
-    "label":"PanelBoxOptions",
-    "type":"keyword",
-    "info":"PanelBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for PanelBox ob"
   },
   {
     "label":"Paneled",
@@ -22440,16 +20495,6 @@ export let defaultFunctions = [
     "info":"PaneSelector[{val  ï¢ expr , val  ï¢ expr , â¦}, x] represents an object that displays as a pane contai"
   },
   {
-    "label":"PaneSelectorBox",
-    "type":"keyword",
-    "info":"System`PaneSelectorBox"
-  },
-  {
-    "label":"PaneSelectorBoxOptions",
-    "type":"keyword",
-    "info":"PaneSelectorBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Pane"
-  },
-  {
     "label":"PaperWidth",
     "type":"keyword",
     "info":"System`PaperWidth"
@@ -22458,16 +20503,6 @@ export let defaultFunctions = [
     "label":"ParabolicCylinderD",
     "type":"keyword",
     "info":"ParabolicCylinderD[Î½, z] gives the parabolic cylinder function D (z). \n                             "
-  },
-  {
-    "label":"ParagraphIndent",
-    "type":"keyword",
-    "info":"ParagraphIndent is an option for Cell which specifies how far in printer's points to indent the firs"
-  },
-  {
-    "label":"ParagraphSpacing",
-    "type":"keyword",
-    "info":"ParagraphSpacing is an option for Cell, StyleBox, and Style that specifies how much extra space to l"
   },
   {
     "label":"ParallelArray",
@@ -22608,11 +20643,6 @@ export let defaultFunctions = [
     "label":"ParametricRegion",
     "type":"keyword",
     "info":"                                                                   n\nParametricRegion[{f , â¦, f }, {"
-  },
-  {
-    "label":"ParentBox",
-    "type":"keyword",
-    "info":"ParentBox[obj] returns the BoxObject that contains obj."
   },
   {
     "label":"ParentCell",
@@ -22763,11 +20793,6 @@ export let defaultFunctions = [
     "label":"PasteAutoQuoteCharacters",
     "type":"keyword",
     "info":"System`PasteAutoQuoteCharacters"
-  },
-  {
-    "label":"PasteBoxFormInlineCells",
-    "type":"keyword",
-    "info":"PasteBoxFormInlineCells is an option for cells that specifies whether a new inline cell is created w"
   },
   {
     "label":"PasteButton",
@@ -23405,26 +21430,6 @@ export let defaultFunctions = [
     "info":"Point[p] is a graphics and geometry primitive that represents a point at p. Point[{p , p , â¦}] repre"
   },
   {
-    "label":"Point3DBox",
-    "type":"keyword",
-    "info":"System`Point3DBox"
-  },
-  {
-    "label":"Point3DBoxOptions",
-    "type":"keyword",
-    "info":"Point3DBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Point3DBo"
-  },
-  {
-    "label":"PointBox",
-    "type":"keyword",
-    "info":"System`PointBox"
-  },
-  {
-    "label":"PointBoxOptions",
-    "type":"keyword",
-    "info":"PointBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for PointBox ob"
-  },
-  {
     "label":"PointCountDistribution",
     "type":"keyword",
     "info":"PointCountDistribution[pproc, reg] represents the distribution of point counts for the point process"
@@ -23565,16 +21570,6 @@ export let defaultFunctions = [
     "info":"Polygon[{p , â¦, p }] represents a filled polygon with points p .Polygon[{p , â¦, p } ï¢ {{q , â¦, q }, "
   },
   {
-    "label":"Polygon3DBox",
-    "type":"keyword",
-    "info":"System`Polygon3DBox"
-  },
-  {
-    "label":"Polygon3DBoxOptions",
-    "type":"keyword",
-    "info":"Polygon3DBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Polygon"
-  },
-  {
     "label":"PolygonalNumber",
     "type":"keyword",
     "info":"                               th                                                        th         "
@@ -23583,16 +21578,6 @@ export let defaultFunctions = [
     "label":"PolygonAngle",
     "type":"keyword",
     "info":"PolygonAngle[poly] gives a list of angles at the vertex points of poly.PolygonAngle[poly, p] gives t"
-  },
-  {
-    "label":"PolygonBox",
-    "type":"keyword",
-    "info":"System`PolygonBox"
-  },
-  {
-    "label":"PolygonBoxOptions",
-    "type":"keyword",
-    "info":"PolygonBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for PolygonBo"
   },
   {
     "label":"PolygonCoordinates",
@@ -23628,11 +21613,6 @@ export let defaultFunctions = [
     "label":"PolyhedronAngle",
     "type":"keyword",
     "info":"PolyhedronAngle[poly, p] gives the solid angle at the point p and spanned by edges with common point"
-  },
-  {
-    "label":"PolyhedronBox",
-    "type":"keyword",
-    "info":"System`PolyhedronBox"
   },
   {
     "label":"PolyhedronCoordinates",
@@ -23733,16 +21713,6 @@ export let defaultFunctions = [
     "label":"PopupMenu",
     "type":"keyword",
     "info":"PopupMenu[x, {val , val , â¦}] represents a popup menu with setting x and possible values val . Popup"
-  },
-  {
-    "label":"PopupMenuBox",
-    "type":"keyword",
-    "info":"System`PopupMenuBox"
-  },
-  {
-    "label":"PopupMenuBoxOptions",
-    "type":"keyword",
-    "info":"PopupMenuBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for PopupMe"
   },
   {
     "label":"PopupView",
@@ -24145,16 +22115,6 @@ export let defaultFunctions = [
     "info":"Prism[{p , â¦, p }] represents a filled prism connecting the triangles {p , p , p } and {p , p , p }."
   },
   {
-    "label":"PrismBox",
-    "type":"keyword",
-    "info":"System`PrismBox"
-  },
-  {
-    "label":"PrismBoxOptions",
-    "type":"keyword",
-    "info":"System`PrismBoxOptions"
-  },
-  {
     "label":"PrivateCellOptions",
     "type":"keyword",
     "info":"PrivateCellOptions is an option for cells that specifies various low-level cell settings."
@@ -24295,16 +22255,6 @@ export let defaultFunctions = [
     "info":"ProgressIndicator[x] represents a progress indicator with setting x in the range 0 to 1. ProgressInd"
   },
   {
-    "label":"ProgressIndicatorBox",
-    "type":"keyword",
-    "info":"System`ProgressIndicatorBox"
-  },
-  {
-    "label":"ProgressIndicatorBoxOptions",
-    "type":"keyword",
-    "info":"ProgressIndicatorBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for"
-  },
-  {
     "label":"ProgressReporting",
     "type":"keyword",
     "info":"ProgressReporting is an option for various algorithmic functions that specifies whether to report th"
@@ -24428,16 +22378,6 @@ export let defaultFunctions = [
     "label":"Pyramid",
     "type":"keyword",
     "info":"Pyramid[{p , â¦, p }] represents a filled pyramid with base {p , â¦, p } and top p .\n          1      "
-  },
-  {
-    "label":"PyramidBox",
-    "type":"keyword",
-    "info":"System`PyramidBox"
-  },
-  {
-    "label":"PyramidBoxOptions",
-    "type":"keyword",
-    "info":"System`PyramidBoxOptions"
   },
   {
     "label":"QBinomial",
@@ -24655,36 +22595,6 @@ export let defaultFunctions = [
     "info":"RadialityCentrality[g] gives a list of radiality centralities for the vertices in the graph g.Radial"
   },
   {
-    "label":"RadicalBox",
-    "type":"keyword",
-    "info":"                                                                                    1\/n\nRadicalBox[x"
-  },
-  {
-    "label":"RadicalBoxOptions",
-    "type":"keyword",
-    "info":"RadicalBoxOptions is an option for selections that specifies settings for RadicalBox objects."
-  },
-  {
-    "label":"RadioButton",
-    "type":"keyword",
-    "info":"RadioButton[x, val] represents a radio button whose setting x is set to val when the button is click"
-  },
-  {
-    "label":"RadioButtonBar",
-    "type":"keyword",
-    "info":"RadioButtonBar[x, {val , val , â¦}] represents a radio button bar with setting x and with labeled rad"
-  },
-  {
-    "label":"RadioButtonBox",
-    "type":"keyword",
-    "info":"System`RadioButtonBox"
-  },
-  {
-    "label":"RadioButtonBoxOptions",
-    "type":"keyword",
-    "info":"RadioButtonBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Radio"
-  },
-  {
     "label":"Radon",
     "type":"keyword",
     "info":"Radon[image] gives an image representing the discrete Radon transform of image.Radon[image, {w, h}] "
@@ -24895,29 +22805,9 @@ export let defaultFunctions = [
     "info":"Raster3D[{{{a  , a  , â¦}, â¦}, â¦}] is a three-dimensional graphics primitive that represents a cubica"
   },
   {
-    "label":"Raster3DBox",
-    "type":"keyword",
-    "info":"System`Raster3DBox"
-  },
-  {
-    "label":"Raster3DBoxOptions",
-    "type":"keyword",
-    "info":"Raster3DBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Raster3D"
-  },
-  {
     "label":"RasterArray",
     "type":"keyword",
     "info":"RasterArray[{{g  , g  , â¦}, â¦}] is a two-dimensional graphics primitive that represents a rectangula"
-  },
-  {
-    "label":"RasterBox",
-    "type":"keyword",
-    "info":"System`RasterBox"
-  },
-  {
-    "label":"RasterBoxOptions",
-    "type":"keyword",
-    "info":"RasterBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for RasterBox "
   },
   {
     "label":"Rasterize",
@@ -24963,11 +22853,6 @@ export let defaultFunctions = [
     "label":"RawArray",
     "type":"keyword",
     "info":"System`RawArray"
-  },
-  {
-    "label":"RawBoxes",
-    "type":"keyword",
-    "info":"RawBoxes[boxes] is a low-level construct which is formatted as boxes without further interpretation."
   },
   {
     "label":"RawData",
@@ -25115,16 +23000,6 @@ export let defaultFunctions = [
     "info":"Rectangle[{x   , y   }, {x   , y   }] represents an axis-aligned filled rectangle from {x   , y   } "
   },
   {
-    "label":"RectangleBox",
-    "type":"keyword",
-    "info":"System`RectangleBox"
-  },
-  {
-    "label":"RectangleBoxOptions",
-    "type":"keyword",
-    "info":"RectangleBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Rectang"
-  },
-  {
     "label":"RectangleChart",
     "type":"keyword",
     "info":"RectangleChart[{{x , y }, {x , y }, â¦}] makes a rectangle chart with bars of width x  and height y ."
@@ -25163,11 +23038,6 @@ export let defaultFunctions = [
     "label":"Reduce",
     "type":"keyword",
     "info":"Reduce[expr, vars] reduces the statement expr by solving equations or inequalities for vars and elim"
-  },
-  {
-    "label":"RefBox",
-    "type":"keyword",
-    "info":"System`RefBox"
   },
   {
     "label":"ReferenceLineStyle",
@@ -26275,16 +24145,6 @@ export let defaultFunctions = [
     "info":"RotationAction is an option for three-dimensional graphics functions that specifies how to render 3D"
   },
   {
-    "label":"RotationBox",
-    "type":"keyword",
-    "info":"System`RotationBox"
-  },
-  {
-    "label":"RotationBoxOptions",
-    "type":"keyword",
-    "info":"RotationBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Rotation"
-  },
-  {
     "label":"RotationMatrix",
     "type":"keyword",
     "info":"RotationMatrix[Î¸] gives the 2D rotation matrix that rotates 2D vectors counterclockwise by Î¸ radians"
@@ -26315,11 +24175,6 @@ export let defaultFunctions = [
     "info":"Row[{expr , expr , â¦}] is an object that formats with the expr  arranged in a row, potentially exten"
   },
   {
-    "label":"RowAlignments",
-    "type":"keyword",
-    "info":"RowAlignments is an option for the low-level function GridBox that specifies how entries in each row"
-  },
-  {
     "label":"RowBackgrounds",
     "type":"keyword",
     "info":"System`RowBackgrounds"
@@ -26330,34 +24185,9 @@ export let defaultFunctions = [
     "info":"RowBox[{box , box , â¦}] is a low-level box construct that represents a row of boxes or strings in a "
   },
   {
-    "label":"RowHeights",
-    "type":"keyword",
-    "info":"System`RowHeights"
-  },
-  {
-    "label":"RowLines",
-    "type":"keyword",
-    "info":"RowLines is an option for the low-level function GridBox that specifies whether lines should be draw"
-  },
-  {
-    "label":"RowMinHeight",
-    "type":"keyword",
-    "info":"RowMinHeight is an option for the low-level function GridBox that specifies the minimum total height"
-  },
-  {
     "label":"RowReduce",
     "type":"keyword",
     "info":"RowReduce[m] gives the rowâreduced form of the matrix m. "
-  },
-  {
-    "label":"RowsEqual",
-    "type":"keyword",
-    "info":"RowsEqual is an option for the low-level function GridBox that specifies whether all rows in the gri"
-  },
-  {
-    "label":"RowSpacings",
-    "type":"keyword",
-    "info":"RowSpacings is an option for the low-level function GridBox that specifies the spaces in x heights t"
   },
   {
     "label":"RSolve",
@@ -27175,11 +25005,6 @@ export let defaultFunctions = [
     "info":"System`Setbacks"
   },
   {
-    "label":"SetBoxFormNamesPacket",
-    "type":"keyword",
-    "info":"System`SetBoxFormNamesPacket"
-  },
-  {
     "label":"SetCloudDirectory",
     "type":"keyword",
     "info":"SetCloudDirectory[dir] sets the current working directory used for cloud objects to dir.SetCloudDire"
@@ -27303,16 +25128,6 @@ export let defaultFunctions = [
     "label":"SetterBar",
     "type":"keyword",
     "info":"SetterBar[x, {val , val , â¦}] represents a setter bar with setting x and with setter buttons for val"
-  },
-  {
-    "label":"SetterBox",
-    "type":"keyword",
-    "info":"System`SetterBox"
-  },
-  {
-    "label":"SetterBoxOptions",
-    "type":"keyword",
-    "info":"SetterBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for SetterBox "
   },
   {
     "label":"Setting",
@@ -27490,11 +25305,6 @@ export let defaultFunctions = [
     "info":"System`ShowCodeAssist"
   },
   {
-    "label":"ShowContents",
-    "type":"keyword",
-    "info":"ShowContents is an option for selections that specifies whether an object represented by a StyleBox "
-  },
-  {
     "label":"ShowControls",
     "type":"keyword",
     "info":"System`ShowControls"
@@ -27535,11 +25345,6 @@ export let defaultFunctions = [
     "info":"ShowSelection is an option to Notebook, Cell, and Style that specifies whether to show the current s"
   },
   {
-    "label":"ShowShortBoxForm",
-    "type":"keyword",
-    "info":"ShowShortBoxForm is an option for cells that specifies whether box expressions, which are used to re"
-  },
-  {
     "label":"ShowSpecialCharacters",
     "type":"keyword",
     "info":"ShowSpecialCharacters is an option for Style and Cell that specifies whether to replace \\\[Name], \\:n"
@@ -27558,11 +25363,6 @@ export let defaultFunctions = [
     "label":"ShrinkingDelay",
     "type":"keyword",
     "info":"ShrinkingDelay is an option for dynamic objects that specifies how long to delay before shrinking th"
-  },
-  {
-    "label":"ShrinkWrapBoundingBox",
-    "type":"keyword",
-    "info":"System`ShrinkWrapBoundingBox"
   },
   {
     "label":"SiderealTime",
@@ -27783,46 +25583,6 @@ export let defaultFunctions = [
     "label":"SliceVectorPlot3D",
     "type":"keyword",
     "info":"SliceVectorPlot3D[{v , v , v }, surf, {x, x   , x   }, {y, y   , y   }, {z, z   , z   }] generates a"
-  },
-  {
-    "label":"Slider",
-    "type":"keyword",
-    "info":"Slider[x] represents a slider with setting x in the range 0 to 1. Slider[Dynamic[x]] takes the setti"
-  },
-  {
-    "label":"Slider2D",
-    "type":"keyword",
-    "info":"Slider2D[{x, y}] represents a 2D slider with settings x and y in the range 0 to 1. Slider2D[Dynamic["
-  },
-  {
-    "label":"Slider2DBox",
-    "type":"keyword",
-    "info":"System`Slider2DBox"
-  },
-  {
-    "label":"Slider2DBoxOptions",
-    "type":"keyword",
-    "info":"Slider2DBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Slider2D"
-  },
-  {
-    "label":"SliderBox",
-    "type":"keyword",
-    "info":"System`SliderBox"
-  },
-  {
-    "label":"SliderBoxOptions",
-    "type":"keyword",
-    "info":"SliderBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for SliderBox "
-  },
-  {
-    "label":"SlideShowVideo",
-    "type":"keyword",
-    "info":"SlideShowVideo[{image , image , â¦}] generates a video iterating through all image .SlideShowVideo[{i"
-  },
-  {
-    "label":"SlideView",
-    "type":"keyword",
-    "info":"                                                                                                    "
   },
   {
     "label":"Slot",
@@ -28385,11 +26145,6 @@ export let defaultFunctions = [
     "info":"Sphere[p] represents a unit sphere centered at the point p.Sphere[p, r] represents a sphere of radiu"
   },
   {
-    "label":"SphereBox",
-    "type":"keyword",
-    "info":"System`SphereBox"
-  },
-  {
     "label":"SpherePoints",
     "type":"keyword",
     "info":"SpherePoints[n] gives the positions of n uniformly distributed points on the surface of a unit spher"
@@ -28543,16 +26298,6 @@ export let defaultFunctions = [
     "label":"Sqrt",
     "type":"keyword",
     "info":"Sqrt[z] or Sqrt[z] gives the square root of z. "
-  },
-  {
-    "label":"SqrtBox",
-    "type":"keyword",
-    "info":"SqrtBox[x] is a low-level box construct that represents the displayed object Sqrt[x] in notebook exp"
-  },
-  {
-    "label":"SqrtBoxOptions",
-    "type":"keyword",
-    "info":"SqrtBoxOptions is an option that specifies settings for SqrtBox objects."
   },
   {
     "label":"Square",
@@ -29180,11 +26925,6 @@ export let defaultFunctions = [
     "info":"StringTrim[\"string\"] trims whitespace from the beginning and end of \"string\".StringTrim[\"string\", pa"
   },
   {
-    "label":"StripBoxes",
-    "type":"keyword",
-    "info":"StripBoxes[expr] will strip out unnecessary boxes, spaces, and styles from a format expression."
-  },
-  {
     "label":"StripOnInput",
     "type":"keyword",
     "info":"StripOnInput is an option for certain boxes that determines whether the box should be stripped on ev"
@@ -29193,11 +26933,6 @@ export let defaultFunctions = [
     "label":"StripStyleOnPaste",
     "type":"keyword",
     "info":"System`StripStyleOnPaste"
-  },
-  {
-    "label":"StripWrapperBoxes",
-    "type":"keyword",
-    "info":"StripWrapperBoxes is an option to TagBox that controls how boxes are stripped upon evaluation."
   },
   {
     "label":"StrokeForm",
@@ -29248,16 +26983,6 @@ export let defaultFunctions = [
     "label":"Style",
     "type":"keyword",
     "info":"Style[expr, options] displays with expr formatted using the specified option settings. Style[expr, \""
-  },
-  {
-    "label":"StyleBox",
-    "type":"keyword",
-    "info":"StyleBox[boxes, options] is a low-level representation of boxes to be shown with the specified optio"
-  },
-  {
-    "label":"StyleBoxAutoDelete",
-    "type":"keyword",
-    "info":"StyleBoxAutoDelete is an option for selections that specifies whether a StyleBox wrapped around them"
   },
   {
     "label":"StyleData",
@@ -29355,16 +27080,6 @@ export let defaultFunctions = [
     "info":"Subscript[x, y] is an object that formats as x . Subscript[x, y , y , â¦] formats as x         .\n    "
   },
   {
-    "label":"SubscriptBox",
-    "type":"keyword",
-    "info":"SubscriptBox[x, y] is the lowâlevel box representation for x  in notebook expressions. \n            "
-  },
-  {
-    "label":"SubscriptBoxOptions",
-    "type":"keyword",
-    "info":"SubscriptBoxOptions is an option for selections that specifies settings for SubscriptBox objects."
-  },
-  {
     "label":"Subscripted",
     "type":"keyword",
     "info":"System`Subscripted"
@@ -29433,16 +27148,6 @@ export let defaultFunctions = [
     "label":"Subsuperscript",
     "type":"keyword",
     "info":"                                                      z\nSubsuperscript[x, y, z] is an object that fo"
-  },
-  {
-    "label":"SubsuperscriptBox",
-    "type":"keyword",
-    "info":"                                                                    z\nSubsuperscriptBox[x, y, z] is "
-  },
-  {
-    "label":"SubsuperscriptBoxOptions",
-    "type":"keyword",
-    "info":"SubsuperscriptBoxOptions is an option for selections that specifies settings for SubsuperscriptBox o"
   },
   {
     "label":"SubtitleEncoding",
@@ -29565,16 +27270,6 @@ export let defaultFunctions = [
     "info":"                                                y\nSuperscript[x, y] is an object that formats as x ."
   },
   {
-    "label":"SuperscriptBox",
-    "type":"keyword",
-    "info":"                                                              y\nSuperscriptBox[x, y] is the lowâleve"
-  },
-  {
-    "label":"SuperscriptBoxOptions",
-    "type":"keyword",
-    "info":"SuperscriptBoxOptions is an option for selections that specifies settings for SuperscriptBox objects"
-  },
-  {
     "label":"Superset",
     "type":"keyword",
     "info":"Superset[x, y, â¦] displays as x â y â â¦."
@@ -29593,11 +27288,6 @@ export let defaultFunctions = [
     "label":"Surd",
     "type":"keyword",
     "info":"                                   th\nSurd[x, n] gives the real-valued nï    root of x."
-  },
-  {
-    "label":"SurdForm",
-    "type":"keyword",
-    "info":"SurdForm is an option to RadicalBox and SqrtBox that indicates whether the radical represents a Surd"
   },
   {
     "label":"SurfaceAppearance",
@@ -30075,41 +27765,6 @@ export let defaultFunctions = [
     "info":"TableView[{{expr  , expr  , â¦}, {expr  , expr  , â¦}, â¦}] displays as a spreadsheet-like table view f"
   },
   {
-    "label":"TableViewBox",
-    "type":"keyword",
-    "info":"System`TableViewBox"
-  },
-  {
-    "label":"TableViewBoxAlignment",
-    "type":"keyword",
-    "info":"System`TableViewBoxAlignment"
-  },
-  {
-    "label":"TableViewBoxBackground",
-    "type":"keyword",
-    "info":"System`TableViewBoxBackground"
-  },
-  {
-    "label":"TableViewBoxHeaders",
-    "type":"keyword",
-    "info":"System`TableViewBoxHeaders"
-  },
-  {
-    "label":"TableViewBoxItemSize",
-    "type":"keyword",
-    "info":"System`TableViewBoxItemSize"
-  },
-  {
-    "label":"TableViewBoxItemStyle",
-    "type":"keyword",
-    "info":"System`TableViewBoxItemStyle"
-  },
-  {
-    "label":"TableViewBoxOptions",
-    "type":"keyword",
-    "info":"System`TableViewBoxOptions"
-  },
-  {
     "label":"TabSpacings",
     "type":"keyword",
     "info":"TabSpacings is an option for character selections that specifies the number of spaces in ems that th"
@@ -30118,31 +27773,6 @@ export let defaultFunctions = [
     "label":"TabView",
     "type":"keyword",
     "info":"                                                                                                    "
-  },
-  {
-    "label":"TabViewBox",
-    "type":"keyword",
-    "info":"System`TabViewBox"
-  },
-  {
-    "label":"TabViewBoxOptions",
-    "type":"keyword",
-    "info":"TabViewBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for TabViewBo"
-  },
-  {
-    "label":"TagBox",
-    "type":"keyword",
-    "info":"TagBox[boxes, tag] is a low-level box construct that displays as boxes but maintains tag to guide th"
-  },
-  {
-    "label":"TagBoxNote",
-    "type":"keyword",
-    "info":"System`TagBoxNote"
-  },
-  {
-    "label":"TagBoxOptions",
-    "type":"keyword",
-    "info":"TagBoxOptions is an option that specifies settings for TagBox objects."
   },
   {
     "label":"TaggingRules",
@@ -30300,21 +27930,6 @@ export let defaultFunctions = [
     "info":"TemplateApply[template] applies a template, evaluating all template elements it contains.TemplateApp"
   },
   {
-    "label":"TemplateArgBox",
-    "type":"keyword",
-    "info":"System`TemplateArgBox"
-  },
-  {
-    "label":"TemplateBox",
-    "type":"keyword",
-    "info":"TemplateBox[{box , box , â¦}, tag] is a low-level box structure that parameterizes the display and ev"
-  },
-  {
-    "label":"TemplateBoxOptions",
-    "type":"keyword",
-    "info":"TemplateBoxOptions is an option that specifies settings for TemplateBox objects."
-  },
-  {
     "label":"TemplateEvaluate",
     "type":"keyword",
     "info":"System`TemplateEvaluate"
@@ -30460,16 +28075,6 @@ export let defaultFunctions = [
     "info":"Tetrahedron[] represents a regular tetrahedron centered at the origin with unit edge length.Tetrahed"
   },
   {
-    "label":"TetrahedronBox",
-    "type":"keyword",
-    "info":"System`TetrahedronBox"
-  },
-  {
-    "label":"TetrahedronBoxOptions",
-    "type":"keyword",
-    "info":"System`TetrahedronBoxOptions"
-  },
-  {
     "label":"TeXForm",
     "type":"keyword",
     "info":"TeXForm[expr] prints as a TeX version of expr. "
@@ -30485,16 +28090,6 @@ export let defaultFunctions = [
     "info":"Text[expr] displays with expr in plain text format. Text[expr, coords] is a graphics primitive that "
   },
   {
-    "label":"Text3DBox",
-    "type":"keyword",
-    "info":"System`Text3DBox"
-  },
-  {
-    "label":"Text3DBoxOptions",
-    "type":"keyword",
-    "info":"Text3DBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for Text3DBox "
-  },
-  {
     "label":"TextAlignment",
     "type":"keyword",
     "info":"TextAlignment is an option for Cell, Style and related constructs which specifies how successive lin"
@@ -30503,16 +28098,6 @@ export let defaultFunctions = [
     "label":"TextBand",
     "type":"keyword",
     "info":"System`TextBand"
-  },
-  {
-    "label":"TextBoundingBox",
-    "type":"keyword",
-    "info":"System`TextBoundingBox"
-  },
-  {
-    "label":"TextBox",
-    "type":"keyword",
-    "info":"System`TextBox"
   },
   {
     "label":"TextCases",
@@ -31070,16 +28655,6 @@ export let defaultFunctions = [
     "info":"TogglerBar[x, {val , val , â¦}] represents a toggler bar with setting x and with toggler buttons for "
   },
   {
-    "label":"TogglerBox",
-    "type":"keyword",
-    "info":"System`TogglerBox"
-  },
-  {
-    "label":"TogglerBoxOptions",
-    "type":"keyword",
-    "info":"TogglerBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for TogglerBo"
-  },
-  {
     "label":"ToHeldExpression",
     "type":"keyword",
     "info":"System`ToHeldExpression"
@@ -31118,31 +28693,6 @@ export let defaultFunctions = [
     "label":"TooBig",
     "type":"keyword",
     "info":"TooBig is an internal symbol."
-  },
-  {
-    "label":"Tooltip",
-    "type":"keyword",
-    "info":"Tooltip[expr, label] displays label as a tooltip while the mouse pointer is in the area where expr i"
-  },
-  {
-    "label":"TooltipBox",
-    "type":"keyword",
-    "info":"System`TooltipBox"
-  },
-  {
-    "label":"TooltipBoxOptions",
-    "type":"keyword",
-    "info":"TooltipBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for TooltipBo"
-  },
-  {
-    "label":"TooltipDelay",
-    "type":"keyword",
-    "info":"TooltipDelay is an option for objects such as Tooltip that specifies how long to delay after the mou"
-  },
-  {
-    "label":"TooltipStyle",
-    "type":"keyword",
-    "info":"TooltipStyle is an option for tooltips that specifies the style to use in displaying their elements."
   },
   {
     "label":"ToonShading",
@@ -31875,36 +29425,6 @@ export let defaultFunctions = [
     "info":"Tube[{{x , y , z }, {x , y , z }, â¦}] represents a 3D tube around the line joining a sequence of poi"
   },
   {
-    "label":"TubeBezierCurveBox",
-    "type":"keyword",
-    "info":"System`TubeBezierCurveBox"
-  },
-  {
-    "label":"TubeBezierCurveBoxOptions",
-    "type":"keyword",
-    "info":"TubeBezierCurveBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for T"
-  },
-  {
-    "label":"TubeBox",
-    "type":"keyword",
-    "info":"System`TubeBox"
-  },
-  {
-    "label":"TubeBoxOptions",
-    "type":"keyword",
-    "info":"TubeBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for TubeBox obje"
-  },
-  {
-    "label":"TubeBSplineCurveBox",
-    "type":"keyword",
-    "info":"System`TubeBSplineCurveBox"
-  },
-  {
-    "label":"TubeBSplineCurveBoxOptions",
-    "type":"keyword",
-    "info":"TubeBSplineCurveBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for "
-  },
-  {
     "label":"Tuesday",
     "type":"keyword",
     "info":"Tuesday is a day of the week."
@@ -32005,29 +29525,9 @@ export let defaultFunctions = [
     "info":"                                                      z\nUnderoverscript[x, y, z] is an object that f"
   },
   {
-    "label":"UnderoverscriptBox",
-    "type":"keyword",
-    "info":"                                                                    z\nUnderoverscriptBox[x, y, z] is"
-  },
-  {
-    "label":"UnderoverscriptBoxOptions",
-    "type":"keyword",
-    "info":"UnderoverscriptBoxOptions is an option for selections that specifies settings for UnderoverscriptBox"
-  },
-  {
     "label":"Underscript",
     "type":"keyword",
     "info":"Underscript[x, y] is an object that formats as x. \n                                               y"
-  },
-  {
-    "label":"UnderscriptBox",
-    "type":"keyword",
-    "info":"UnderscriptBox[x, y] is the lowâlevel box representation for x in notebook expressions. \n           "
-  },
-  {
-    "label":"UnderscriptBoxOptions",
-    "type":"keyword",
-    "info":"UnderscriptBoxOptions is an option for selections that specifies settings for UnderscriptBox objects"
   },
   {
     "label":"UnderseaFeatureData",
@@ -32123,11 +29623,6 @@ export let defaultFunctions = [
     "label":"UnitaryMatrixQ",
     "type":"keyword",
     "info":"UnitaryMatrixQ[m] gives True if m is a unitary matrix, and False otherwise."
-  },
-  {
-    "label":"UnitBox",
-    "type":"keyword",
-    "info":"                                                                    1                               "
   },
   {
     "label":"UnitConvert",
@@ -32508,16 +30003,6 @@ export let defaultFunctions = [
     "label":"Value",
     "type":"keyword",
     "info":"System`Value"
-  },
-  {
-    "label":"ValueBox",
-    "type":"keyword",
-    "info":"System`ValueBox"
-  },
-  {
-    "label":"ValueBoxOptions",
-    "type":"keyword",
-    "info":"ValueBoxOptions ï¢ {opt  ï¢ val , opt  ï¢ val , â¦} is an option that specifies settings for ValueBox ob"
   },
   {
     "label":"ValueDimensions",
