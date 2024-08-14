@@ -25,7 +25,7 @@ ExpressionReplacements = {
     u_Quantity :> QuantityWrapper[u],
     v_Video :> VideoWrapper[v],
     t_Tree :> TreeWrapper[t],
-    TreeForm[expr_] :> ExpressionGraph[Unevaluated[expr], VertexLabels->Automatic]
+    TreeForm[expr_] :> (ExpressionTree[Unevaluated[expr] ] /. t_Tree :> TreeWrapper[t])
 } // Quiet
 
 Unprotect[ToString]
