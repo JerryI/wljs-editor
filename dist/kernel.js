@@ -21691,10 +21691,25 @@ class CompletionTooltip {
                 this.info = null;
             }
             let { completion } = open.options[open.selected];
-            let { info } = completion;
+            let { info, label, c } = completion;
             if (!info)
                 return;
-            let infoResult = typeof info === 'string' ? document.createTextNode(info) : info(completion);
+            let infoResult = typeof info === 'string' ? document.createTextNode(info + ' ') : info(completion);
+            
+            if (!infoResult)
+                return;
+            
+            if (!c) { //if not custom
+                const parent = document.createElement('span');
+                parent.appendChild(infoResult);
+                infoResult = parent;
+                const lnk = document.createElement('a');
+                lnk.innerText = '🔎';
+                lnk.href = '/docFind/'+label;
+                lnk.target = "blank";
+                infoResult.appendChild(lnk);
+            }
+
             if (!infoResult)
                 return;
             if ('then' in infoResult) {
@@ -45334,7 +45349,7 @@ let defaultFunctions = [
   {
     "label":"Map",
     "type":"keyword",
-    "info":"Map[f, expr] or f\/@expr applies f to each element on the first level in expr. Map[f, expr, levelspec"
+    "info":'Map[f, expr] or f\/@expr applies f to each element on the first level in expr. Map[f, expr, levelspec]'
   },
   {
     "label":"MapAll",

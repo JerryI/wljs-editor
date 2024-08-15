@@ -17,7 +17,8 @@ core.UIAutocompleteExtend = async (args, env) => {
           {
               "label": name,
               "type": "keyword",
-              "info": usage 
+              "info": usage,
+              "c": true
           }]);
   
         core.UIAutocompleteExtend.symbols[name] = usage;

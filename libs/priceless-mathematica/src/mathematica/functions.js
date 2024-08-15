@@ -16857,7 +16857,7 @@ export let defaultFunctions = [
   {
     "label":"Map",
     "type":"keyword",
-    "info":"Map[f, expr] or f\/@expr applies f to each element on the first level in expr. Map[f, expr, levelspec"
+    "info":'Map[f, expr] or f\/@expr applies f to each element on the first level in expr. Map[f, expr, levelspec]'
   },
   {
     "label":"MapAll",

@@ -4,7 +4,10 @@ BeginPackage["Notebook`Editor`Autocomplete`", {
     "JerryI`Notebook`", 
     "JerryI`WLX`WebUI`", 
     "JerryI`Notebook`AppExtensions`",
-    "JerryI`Notebook`Kernel`"
+    "JerryI`Notebook`Kernel`",
+    "KirillBelov`HTTPHandler`",
+    "KirillBelov`HTTPHandler`Extensions`",
+    "KirillBelov`Internal`",
 }]
 
 Begin["`Private`"]
@@ -30,6 +33,23 @@ attachListeners[notebook_Notebook] := With[{},
         ]
     }]; 
 ]
+
+docsFinder[request_] := With[{
+    name = If[StringTake[#, -1] == "/", StringDrop[#, -1], #] &@ (StringReplace[request["Path"], ___~~"/docFind/"~~(n:__)~~EndOfString :> n])
+},
+    With[{url = Information[name]["Documentation"]//First},
+        If[StringQ[url],
+            StringTemplate["<iframe style=\"width:100%;height:100%;border: none;border-radius: 7px; background: transparent;\" src=\"``\"></iframe>"][url]
+        ,
+            StringTemplate["<div style=\"padding:1rem; margin-top:2rem;\">Undocumented symbol ``</div>"][url]
+        ]
+        
+    ]
+]
+
+With[{http = AppExtensions`HTTPHandler},
+    http["MessageHandler", "DocsFinder"] = AssocMatchQ[<|"Path" -> ("/docFind/"~~___)|>] -> docsFinder;
+];
 
 
 End[]
