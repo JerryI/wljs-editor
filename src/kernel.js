@@ -839,6 +839,8 @@ class CodeMirrorCell {
     }
   }
 
+  core.EditorView.virtual = true
+
   core.PreviewCell = (element, data) => {
 
   }
