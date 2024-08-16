@@ -7,7 +7,7 @@ BeginPackage["Notebook`Editor`Autocomplete`", {
     "JerryI`Notebook`Kernel`",
     "KirillBelov`HTTPHandler`",
     "KirillBelov`HTTPHandler`Extensions`",
-    "KirillBelov`Internal`",
+    "KirillBelov`Internal`"
 }]
 
 Begin["`Private`"]
