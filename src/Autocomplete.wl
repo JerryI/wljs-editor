@@ -39,9 +39,9 @@ docsFinder[request_] := With[{
 },
     With[{url = Information[name]["Documentation"]//First},
         If[StringQ[url],
-            StringTemplate["<iframe style=\"width:100%;height:100%;border: none;border-radius: 7px; background: transparent;\" src=\"``\"></iframe>"][url]
+            StringTemplate["<body><div style=\"height: 2rem;width: 100%;-webkit-app-region: drag;-webkit-user-select: none;\"></div><iframe style=\"width:100%;height:calc(100% - 2rem);border: none;border-radius: 7px; background: transparent;\" src=\"``\"></iframe></body>"][url]
         ,
-            StringTemplate["<div style=\"padding:1rem; margin-top:2rem;\">Undocumented symbol ``</div>"][url]
+            StringTemplate["<body><div style=\"height: 2rem;width: 100%;-webkit-app-region: drag;-webkit-user-select: none;\"></div><div style=\"padding:1rem; margin-top:2rem;\">Undocumented symbol ``</div></body>"][url]
         ]
         
     ]
