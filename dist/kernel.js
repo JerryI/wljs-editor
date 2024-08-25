@@ -72326,7 +72326,7 @@ const EditorExtensions = [
   (self, initialLang) => EditorView.updateListener.of((v) => {
     if (v.docChanged) {
       //TODO: TOO SLOW FIXME!!!
-      self.origin.save(v.state.doc.toString().replaceAll('\\\\', '\\\\\\\\').replaceAll('\\\"', '\\\\\"').replaceAll('\"', '\\"'));
+      self.origin.save(encodeURIComponent(v.state.doc.toString()));
     }
     if (v.selectionSet) {
       //console.log('selected editor:');
