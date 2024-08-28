@@ -124,6 +124,10 @@ Unprotect[GridBox]
 GridBox[list_List, a___] := RowBox@(Join@@(Join[{{"(*GB[*){"}}, Riffle[#, {{"(*||*),(*||*)"}}] &@ (Join[{"{"}, Riffle[#, "(*|*),(*|*)"], {"}"}] &/@ list), {{"}(*]GB*)"}}]))
 
 
+Unprotect[Annotation]; (* see issue with Rasterize *)
+Annotation[x_, _, "DynamicHighlight"] := x 
+Protect[Annotation]
+
 PiecewiseBox;
 (* I HATE YOU WOLFRAM. WHY DID MAKE IT IMPOSSIBLE TO OVERWRITE MAKEBOXES ON PIECEWISE!!!? *)
 GridBox[{{"\[Piecewise]", whatever_}}, a___] := With[{original = whatever /. {RowBox -> RowBoxFlatten} // ToString // ToExpression},
