@@ -176,6 +176,10 @@ core.UIObjects.GetAllSymbols = async (args, env) => {
   const list = Object.keys(server.kernel.trackedSymbols);
   const message = [];
   for (let i=0; i<list.length; i++) {
+    if (Object.keys(core[list[i]].instances).length == 0) {
+      console.warn('Dead symbol: '+list[i] + ' found!');
+      continue;
+    }
     message.push(['Rule', "'"+list[i]+"'", core[list[i]].data]);
   }
   message.unshift('Association');
