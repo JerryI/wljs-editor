@@ -29,6 +29,7 @@ ConjugateTranspose /: MakeBoxes[t: ConjugateTranspose[expr_], StandardForm]:= Wi
 Unprotect[Sum]
 SumBox;
 
+
 Sum /: MakeBoxes[Sum[expr_, {x_Symbol, min_, max_}], s: StandardForm] := With[{func = MakeBoxes[expr, s]},
     With[{dp = SumBox[1, True], symbol = MakeBoxes[x, s], bmin = MakeBoxes[min, s], bmax = MakeBoxes[max, s]},
       RowBox[{"(*TB[*)Sum[(*|*)", func, "(*|*), {(*|*)", symbol, "(*|*),(*|*)", bmin, "(*|*),(*|*)", bmax, "(*|*)}](*|*)(*", Compress[dp], "*)(*]TB*)"}]
@@ -124,10 +125,6 @@ Unprotect[GridBox]
 GridBox[list_List, a___] := RowBox@(Join@@(Join[{{"(*GB[*){"}}, Riffle[#, {{"(*||*),(*||*)"}}] &@ (Join[{"{"}, Riffle[#, "(*|*),(*|*)"], {"}"}] &/@ list), {{"}(*]GB*)"}}]))
 
 
-Unprotect[Annotation]; (* see issue with Rasterize *)
-Annotation[x_, _, "DynamicHighlight"] := x 
-Protect[Annotation]
-
 PiecewiseBox;
 (* I HATE YOU WOLFRAM. WHY DID MAKE IT IMPOSSIBLE TO OVERWRITE MAKEBOXES ON PIECEWISE!!!? *)
 GridBox[{{"\[Piecewise]", whatever_}}, a___] := With[{original = whatever /. {RowBox -> RowBoxFlatten} // ToString // ToExpression},
@@ -146,6 +143,8 @@ GridBox[{{"\[Piecewise]", whatever_}}, a___] := With[{original = whatever /. {Ro
     ]
   ]
 ]
+
+
 
 Unprotect[TagBox]
 TagBox[x_, opts___] := x
