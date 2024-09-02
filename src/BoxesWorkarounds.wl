@@ -537,3 +537,13 @@ MeshRegion /: MakeBoxes[b_MeshRegion, StandardForm] := With[{r = If[RegionDimens
   ]
 ]
 
+(*
+
+ClearAll[Rasterize]
+Unprotect[Rasterize]
+
+Rasterize[n_Notebook, opts___] := Block[{Internal`RasterizeOptionsProvided = opts},
+  ToExpression[n // First // First // First, StandardForm]
+]
+
+*)
