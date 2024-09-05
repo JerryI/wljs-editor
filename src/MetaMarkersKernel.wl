@@ -16,7 +16,7 @@ Begin["`Private`"]
 notString[s_] := !StringQ[s]
 MetaMarker[s_?notString] := MetaMarker[s // ToString]
 
-End[]
+
 
 FrontSubmit[expr_, m_MetaMarker, OptionsPattern[] ] := With[{cli = OptionValue["Window"]["Socket"]},
     If[OptionValue["Tracking"],     
@@ -57,5 +57,7 @@ FrontFetchAsync[expr_, m_MetaMarker, OptionsPattern[] ] := With[{cli = OptionVal
 
     promise
 ]
+
+End[]
 
 EndPackage[]

@@ -1,4 +1,5 @@
 core.UIAutocompleteConnect = async (args, env) => {
+    console.log('Autocomplete connected to a server');
     server.kernel.emitt('autocomplete', 'True', 'Connect');
 }
 
@@ -6,7 +7,7 @@ const codemirror = window.SupportedCells['codemirror'].context;
 
 core.UIAutocompleteExtend = async (args, env) => {
     const data = await interpretate(args[0], env);
- 
+    console.log('Autocomplete populate');
     
     data.forEach((element)=>{
       const name = element[0];
