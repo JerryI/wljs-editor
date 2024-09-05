@@ -435,7 +435,7 @@ BoxForm`temporal = {};
 Options[BoxForm`ArrangeSummaryBox] = {"Event" -> Null}
 
 BoxForm`ArrangeSummaryBox[head_, interpretation_, icon_, above_, hidden_, ___, OptionsPattern[] ] := With[{
-  headString = ToString[head, InputForm],
+  headString = If[!StringQ[head], ToString[head, InputForm], head],
   event = OptionValue["Event"],
   iconHash = Hash[icon]
 },
