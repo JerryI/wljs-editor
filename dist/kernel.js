@@ -60890,6 +60890,9 @@ class GreekWidget extends WidgetType {
         .replace(/curly(.*)/, (arg, rep) => {
           return rep;
         })
+        .replace(/script(.*)/, (arg, rep) => {
+          return 'el'+rep.toLowerCase();
+        })
         .replace('transpose', '#7488')
         .replace("degree", "deg") +
       ";";
