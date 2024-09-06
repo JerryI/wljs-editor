@@ -8,6 +8,7 @@ const codemirror = window.SupportedCells['codemirror'].context;
 core.UIAutocompleteExtend = async (args, env) => {
     const data = await interpretate(args[0], env);
     console.log('Autocomplete populate');
+    //console.log(data);
     
     data.forEach((element)=>{
       const name = element[0];

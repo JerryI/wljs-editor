@@ -37,7 +37,7 @@ EventHandler["autocomplete", {
 extend[set_] := shareDefinitions[#, set] &/@ clients;
 
 (* a bug with a first defined symbol $InterfaceEnvironment that causes shutdown (BUT THIS IS A STRING!!!). No idea why *)
-skip = 1;
+skip = -1;
 
 blacklist = {"CodeParser`", "Notebook`Autocomplete`", "KirillBelov`LTP`JerryI`Events`","KirillBelov`CSockets`EventsExtension`","JerryI`Misc`WLJS`Transport`","KirillBelov`WebSocketHandler`","KirillBelov`TCPServer`","KirillBelov`LTP`","KirillBelov`Internal`","KirillBelov`CSockets`","HighlightingCompatibility`","System`","Global`"};
 
