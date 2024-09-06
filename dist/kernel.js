@@ -72467,9 +72467,13 @@ class CodeMirrorCell {
     
     let textData = await interpretate(args[0], env);
 
+
+
     textData = unicodeToChar2(textData);
     console.log('UNICODE Disaster');
     const options = await core._getRules(args, env);
+
+
 
     let evalFunction = () => {};
 
@@ -72608,6 +72612,38 @@ function uuidv4() {
         (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
       );
 }    
+
+core.CellView = async (args, env) => {
+  const opts = await core._getRules(args, env);
+
+  if (!opts.Display) opts.Display = 'codemirror';
+
+  const data = await interpretate(args[0], env);
+
+  const container = {
+    element: env.element,
+    uid: uuidv4()
+  };
+
+  if (opts.Style) {
+    env.element.style = opts.Style;
+  }
+  if (opts.Class) {
+    env.element.classList.add(...(opts.Class.split(' ')));
+  }
+
+  if (opts.ImageSize) {
+    if (Array.isArray(opts.ImageSize)) {
+      env.element.style.width = opts.ImageSize[0] + 'px';
+      env.element.style.height = opts.ImageSize[1] + 'px';
+    } else {
+      env.element.style.width = opts.ImageSize + 'px';
+    }
+  }
+  
+
+  new window.SupportedCells[opts.Display].view(container, data);
+};
 
 const editorHashMap = {};
 
