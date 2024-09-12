@@ -10,7 +10,7 @@ SqrtBox[a_] := RowBox[{"(*SqB[*)Sqrt[", a, "](*]SqB*)"}]
 
 Unprotect[RotationBox]
 RotationBox[expr_, OptionsPattern[] ] := With[{o = OptionValue["BoxRotation"]}, BoxBox[expr, RotationBox[o] // Hold] ]
-Options[RotationBox] = {"BoxRotation" -> 90.}
+Options[RotationBox] = {"BoxRotation" -> 90. Degree}
 
 Unprotect[SuperscriptBox]
 SuperscriptBox[a_, b_] := RowBox[{"(*SpB[*)Power[", a, "(*|*),(*|*)",  b, "](*]SpB*)"}]

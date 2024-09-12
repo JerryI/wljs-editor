@@ -11,7 +11,7 @@
 
   boxes.RotationBox = async (args, env) => {
     const degrees = await interpretate(args[0], env);
-    env.element.style.transform = `rotate(${Math.floor(degrees)}deg)`
+    env.element.style.transform = `rotate(${Math.floor(degrees/Math.PI*180.0)}deg)`
   }
 
   boxes.RowBox = async (args, env) => {
