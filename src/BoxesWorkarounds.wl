@@ -8,6 +8,10 @@ FractionBox[a_, b_] := RowBox[{"(*FB[*)((", a, ")(*,*)/(*,*)(", b, "))(*]FB*)"}]
 Unprotect[SqrtBox]
 SqrtBox[a_] := RowBox[{"(*SqB[*)Sqrt[", a, "](*]SqB*)"}]
 
+Unprotect[RotationBox]
+RotationBox[expr_, OptionsPattern[] ] := With[{o = OptionValue["BoxRotation"]}, BoxBox[expr, RotationBox[o] // Hold] ]
+Options[RotationBox] = {"BoxRotation" -> 90.}
+
 Unprotect[SuperscriptBox]
 SuperscriptBox[a_, b_] := RowBox[{"(*SpB[*)Power[", a, "(*|*),(*|*)",  b, "](*]SpB*)"}]
 SuperscriptBox[a_, b_, _] := RowBox[{"(*SpB[*)Power[", a, "(*|*),(*|*)",  b, "](*]SpB*)"}]

@@ -9,6 +9,11 @@
 
   boxes.Background = () => "Background"
 
+  boxes.RotationBox = async (args, env) => {
+    const degrees = await interpretate(args[0], env);
+    env.element.style.transform = `rotate(${Math.floor(degrees)}deg)`
+  }
+
   boxes.RowBox = async (args, env) => {
     console.log(args);
   }
