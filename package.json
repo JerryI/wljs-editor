@@ -1,6 +1,6 @@
 {
   "name": "wljs-editor",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "WLJS Code editor",
   "scripts": {
     "build": "node --max-old-space-size=8192 ./node_modules/.bin/rollup --config rollup.config.mjs",
@@ -23,7 +23,8 @@
       "src/autocomplete.js",
       "src/frontsubmit.js",
       "src/dir.js",
-      "src/metamarkers.js"
+      "src/metamarkers.js",
+      "src/rasterize.js"
     ],
     "frontend": [
       "src/FrontendObject.wl",
@@ -34,6 +35,7 @@
       "src/RemoteCells.wl",
       "src/FrontSubmit.wl",
       "src/Store.wl",
+      "src/Notifications.wl",
       "src/Autocomplete.wl",
       "src/ContextMenu.wl",
       "src/FileUpload.wl"
@@ -53,7 +55,8 @@
       "src/StoreKernel.wl",
       "src/NotificationsKernel.wl",
       "src/MetaMarkersKernel.wl",
-      "src/AutocompleteKernel.wl"
+      "src/AutocompleteKernel.wl",
+      "src/RasterizeKernel.wl"
     ],
     "styles": "src/styles.css",
     "priority": -10,

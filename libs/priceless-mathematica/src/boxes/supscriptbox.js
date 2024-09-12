@@ -73,6 +73,9 @@ import {
         doc: self.args[0].body.slice(6),
         parent: head,
         update: (upd) => this.applyChanges(upd, 0),
+        eval: () => {
+          view.viewState.state.config.eval();
+        },
         extensions: [
           keymap.of([
             { key: "ArrowLeft", run: function (editor, key) {  
@@ -106,6 +109,9 @@ import {
         doc: self.args[2].body.slice(0, -1),
         parent: sub,
         update: (upd) => this.applyChanges(upd, 2),
+        eval: () => {
+          view.viewState.state.config.eval();
+        },
         extensions: [
           keymap.of([
             { key: "ArrowRight", run: function (editor, key) {  

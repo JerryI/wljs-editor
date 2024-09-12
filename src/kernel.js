@@ -579,6 +579,8 @@ const EditorExtensions = [
   () => highlightSelectionMatches(),
   () => cellTypesHighlight,
   () => placeholder('Type WL Expression / .md / .js'),
+
+  () => EditorState.allowMultipleSelections.of(true),
   
   (self, initialLang) => languageConf.of(initialLang),
   () => readWriteCompartment.of(EditorState.readOnly.of(false)),

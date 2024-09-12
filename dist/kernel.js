@@ -7985,7 +7985,7 @@ class MouseSelection {
 }
 function addsSelectionRange(view, event) {
     let facet = view.state.facet(clickAddsSelectionRange);
-    return facet.length ? facet[0](event) : browser.mac ? event.metaKey : event.ctrlKey;
+    return facet.length ? facet[0](event) : browser.mac ? event.altKey : event.altKey;
 }
 function dragMovesSelection(view, event) {
     let facet = view.state.facet(dragMovesSelection$1);
@@ -19727,7 +19727,7 @@ const defaultKeymap = /*@__PURE__*/[
     { key: "Mod-Alt-\\", run: indentSelection },
     { key: "Shift-Mod-k", run: deleteLine },
     { key: "Shift-Mod-\\", run: cursorMatchingBracket },
-    { key: "Mod-/", run: toggleComment },
+    { key: "Mod-/", win: "Alt+/", linux: "Alt+/", run: toggleComment },
     { key: "Alt-A", run: toggleBlockComment }
 ].concat(standardKeymap);
 /**
@@ -30511,6 +30511,9 @@ let EditorWidget$5 = class EditorWidget {
       doc: self.args[0].body.slice(10),
       parent: head,
       update: (upd) => this.applyChanges(upd, 0),
+      eval: () => {
+        view.viewState.state.config.eval();
+      },
       extensions: [
         keymap.of([
           { key: "ArrowLeft", run: function (editor, key) {  
@@ -30544,6 +30547,9 @@ let EditorWidget$5 = class EditorWidget {
       doc: self.args[2].body.slice(0, -1),
       parent: sub,
       update: (upd) => this.applyChanges(upd, 2),
+      eval: () => {
+        view.viewState.state.config.eval();
+      },
       extensions: [
         keymap.of([
           { key: "ArrowRight", run: function (editor, key) {  
@@ -30940,6 +30946,9 @@ var compactCMEditor$3;
         doc: self.args[0].body.slice(6),
         parent: head,
         update: (upd) => this.applyChanges(upd, 0),
+        eval: () => {
+          view.viewState.state.config.eval();
+        },
         extensions: [
           keymap.of([
             { key: "ArrowLeft", run: function (editor, key) {  
@@ -30973,6 +30982,9 @@ var compactCMEditor$3;
         doc: self.args[2].body.slice(0, -1),
         parent: sub,
         update: (upd) => this.applyChanges(upd, 2),
+        eval: () => {
+          view.viewState.state.config.eval();
+        },
         extensions: [
           keymap.of([
             { key: "ArrowRight", run: function (editor, key) {  
@@ -40351,6 +40363,8 @@ const EditorExtensions = [
   () => highlightSelectionMatches(),
   () => cellTypesHighlight,
   () => placeholder$8('Type WL Expression / .md / .js'),
+
+  () => EditorState.allowMultipleSelections.of(true),
   
   (self, initialLang) => languageConf.of(initialLang),
   () => readWriteCompartment.of(EditorState.readOnly.of(false)),

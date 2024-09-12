@@ -397,26 +397,42 @@ Internal`RawText /: MakeBoxes[Internal`RawText[text_], StandardForm] := MakeBoxe
 Unprotect[FrameBox]
 FrameBox[x_] := FrameBox[x, "Background"->White] 
 
-(* TODO: just leave as EditorView, no ToStringMethod *)
-(* Assume that EditorView will automatically apply ToString *)
-
 Unprotect[Show]
 Show[any_, DisplayFunction->Identity] := any 
 Protect[Show]
 
-Legended[expr_, SwatchLegend[l_List, names_List] ] := ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject
 
-Legended[expr_, {Placed[SwatchLegend[l_, names_List, opts__], _, Identity]}] := ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject
+Legended /: MakeBoxes[Legended[expr_, SwatchLegend[l_List, names_List] ], f: StandardForm] := With[{o = {expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor] :> color }) //Transpose// Grid} // Row}, MakeBoxes[o, f] ]
 
-Legended[expr_, {Placed[SwatchLegend[{head_List, l_List}, {{}, names_List}, opts__], _, Identity]}] := ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject
+Legended /: MakeBoxes[Legended[expr_, {Placed[SwatchLegend[l_, names_List, opts__], _, Identity]}], f: StandardForm] := With[{o = {expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor] :> color }) //Transpose// Grid} // Row}, MakeBoxes[o, f] ]
 
-Legended[expr_, Placed[SwatchLegend[l_List, names_List, opts__], _, Identity] ] := ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject
+Legended /: MakeBoxes[Legended[expr_, {Placed[SwatchLegend[{head_List, l_List}, {{}, names_List}, opts__], _, Identity]}], f: StandardForm] := With[{o = {expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor] :> color }) //Transpose// Grid} // Row}, MakeBoxes[o, f] ]
 
-Legended[expr_, Placed[PointLegend[l_List, names_List, opts__], _, Identity] ] := ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject
+Legended /: MakeBoxes[Legended[expr_, Placed[SwatchLegend[l_List, names_List, opts__], _, Identity] ], f: StandardForm] := With[{o = {expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row}, MakeBoxes[o, f] ]
 
-Legended[expr_, {Placed[LineLegend[l_, names_List, opts__], _, Identity]}] := ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject
+Legended /: MakeBoxes[Legended[expr_, Placed[PointLegend[l_List, names_List, opts__], _, Identity] ], f: StandardForm] := With[{o = {expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row}, MakeBoxes[o, f] ]
 
-Legended[expr_, Placed[LineLegend[l_, names_List, opts__], _, Identity] ] := ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject
+Legended /: MakeBoxes[Legended[expr_, {Placed[LineLegend[l_, names_List, opts__], _, Identity]}], f: StandardForm] := With[{o = {expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row}, MakeBoxes[o, f] ]
+
+Legended /: MakeBoxes[Legended[expr_, Placed[LineLegend[l_, names_List, opts__], _, Identity] ], f: StandardForm] := With[{o = {expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row}, MakeBoxes[o, f] ]
+
+System`WLXForm;
+
+(* have to convert to FE, since there is no wljs-editor avalable to interpretate RowBoxes*)
+
+Legended /: MakeBoxes[Legended[expr_, SwatchLegend[l_List, names_List] ], f: WLXForm] := With[{o = ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject}, MakeBoxes[o, f] ]
+
+Legended /: MakeBoxes[Legended[expr_, {Placed[SwatchLegend[l_, names_List, opts__], _, Identity]}], f: WLXForm] := With[{o = ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject}, MakeBoxes[o, f] ]
+
+Legended /: MakeBoxes[Legended[expr_, {Placed[SwatchLegend[{head_List, l_List}, {{}, names_List}, opts__], _, Identity]}], f: WLXForm] := With[{o = ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject}, MakeBoxes[o, f] ]
+
+Legended /: MakeBoxes[Legended[expr_, Placed[SwatchLegend[l_List, names_List, opts__], _, Identity] ], f: WLXForm] := With[{o = ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject}, MakeBoxes[o, f] ]
+
+Legended /: MakeBoxes[Legended[expr_, Placed[PointLegend[l_List, names_List, opts__], _, Identity] ], f: WLXForm] := With[{o = ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject}, MakeBoxes[o, f] ]
+
+Legended /: MakeBoxes[Legended[expr_, {Placed[LineLegend[l_, names_List, opts__], _, Identity]}], f: WLXForm] := With[{o = ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject}, MakeBoxes[o, f] ]
+
+Legended /: MakeBoxes[Legended[expr_, Placed[LineLegend[l_, names_List, opts__], _, Identity] ], f: WLXForm] := With[{o = ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject}, MakeBoxes[o, f] ]
 
 
 
@@ -453,7 +469,7 @@ BoxForm`ArrangeSummaryBox[head_, interpretation_, icon_, above_, hidden_, ___, O
                       
                     ]},
   With[{interpretationString = ToString[interpretation, InputForm]},
-    If[StringLength[interpretationString] > 25000 (* not supported for NOW *),
+    If[StringLength[interpretationString] > 2500,
       Module[{temporalStorage},
         With[{
           tempSymbol = ToString[temporalStorage, InputForm],
@@ -537,13 +553,3 @@ MeshRegion /: MakeBoxes[b_MeshRegion, StandardForm] := With[{r = If[RegionDimens
   ]
 ]
 
-(*
-
-ClearAll[Rasterize]
-Unprotect[Rasterize]
-
-Rasterize[n_Notebook, opts___] := Block[{Internal`RasterizeOptionsProvided = opts},
-  ToExpression[n // First // First // First, StandardForm]
-]
-
-*)
