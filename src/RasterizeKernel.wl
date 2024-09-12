@@ -40,7 +40,13 @@ Rasterize[any_, ___, OptionsPattern[] ] := With[{p = Promise[], channel = Create
 
   FrontSubmit[OverlayView["Create", EditorView[ToString[any, StandardForm] ], channel], "Window" -> window];
 
-  WaitAll[p]
+  With[{r = WaitAll[p]},
+    If[FailureQ[r],
+      Print["Rasterization of arbitary data is available only for Desktop App"];
+    ];
+
+    r
+  ]
 ]
 
 Options[Rasterize] = {"Window" :> CurrentWindow[]}
