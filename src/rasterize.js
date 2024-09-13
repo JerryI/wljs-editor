@@ -64,7 +64,7 @@ core['Notebook`Editor`Rasterize`Internal`OverlayView'].Create = async (args, env
 
     setTimeout(() => {
         server.kernel.emitt(channel, 'True');
-    }, 300);
+    }, 1000);
 }
 
 
