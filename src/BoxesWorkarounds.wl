@@ -420,6 +420,64 @@ Legended /: MakeBoxes[Legended[expr_, {Placed[LineLegend[l_, names_List, opts__]
 
 Legended /: MakeBoxes[Legended[expr_, Placed[LineLegend[l_, names_List, opts__], _, Identity] ], f: StandardForm] := With[{o = {expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row}, MakeBoxes[o, f] ]
 
+Legended /: MakeBoxes[Legended[expr_, {Placed[BarLegend[a__], n__]} ], f: StandardForm] := MakeBoxes[Legended[expr, Placed[BarLegend[a], n] ], f]
+
+Legended /: MakeBoxes[Legended[expr_, Placed[BarLegend[{cf_, range_List}, opts___Rule, ___] , _, Identity] ], f: StandardForm] := With[{
+  ticks = Table[{Round[i, (range[[2]] - range[[1]])/20.0], Null}, {i, range[[1]], range[[2]], (range[[2]] - range[[1]])/10.0}]
+},
+  With[{
+    legend =   With[{options = Association[List[opts] ]}, 
+    
+    Module[{colorConvert, step = (ticks[[2, 1]] - ticks[[1, 1]]) * 0.5, 
+      imageSize = 
+        If[KeyExistsQ[options, ImageSize], options[ImageSize], 370 / 1.6180339  ]},
+      
+      (* Adjust the image size depending on whether it is a list or not *)
+      imageSize = 
+        1.2 If[!ListQ[imageSize], 
+          (* If it's not a list, scale by the golden ratio *)
+          imageSize {0.3, 1.0} ,
+          (* If it's a list, adjust by the second element *)
+          imageSize[[2]] {0.3, 1.0} // N
+        ];
+      
+      (* Color conversion function based on range *)
+      colorConvert[value_] := 
+        cf @ ((value - range[[1]]) / (range[[2]] - range[[1]]));
+      
+      (* Create the graphic with rectangles for each tick *)
+      Graphics[
+        Map[
+          Function[tick, 
+            With[{val = tick[[1]], deco = tick[[2 ;;]]}, 
+              {colorConvert[val], 
+               Rectangle[{-1, val - step}, {1, val + step}]}
+            ]
+          ], 
+          ticks
+        ], 
+        Axes -> True, Frame -> True, 
+        FrameTicks -> {{{}, ticks[[All, 1]]}, {False, False}}, 
+        TickLabels -> {False, False, False, True}, 
+        PlotRange -> {{-1, 1}, range}, 
+        "Controls" -> False, 
+        ImageSize -> imageSize, 
+        ImagePadding -> 25
+      ]
+    ]
+  ]
+  },
+  
+  With[{
+    box = Row[{expr, legend // CreateFrontEndObject}]
+  },
+    MakeBoxes[box, f]
+  ]
+  
+  ]
+]
+
+
 System`WLXForm;
 
 (* have to convert to FE, since there is no wljs-editor avalable to interpretate RowBoxes*)
@@ -437,6 +495,7 @@ Legended /: MakeBoxes[Legended[expr_, Placed[PointLegend[l_List, names_List, opt
 Legended /: MakeBoxes[Legended[expr_, {Placed[LineLegend[l_, names_List, opts__], _, Identity]}], f: WLXForm] := With[{o = ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject}, MakeBoxes[o, f] ]
 
 Legended /: MakeBoxes[Legended[expr_, Placed[LineLegend[l_, names_List, opts__], _, Identity] ], f: WLXForm] := With[{o = ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject}, MakeBoxes[o, f] ]
+
 
 
 
