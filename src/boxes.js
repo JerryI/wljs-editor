@@ -715,7 +715,7 @@
 
       content.style.maxWidth = "200px";
     
-      label.innerText = await interpretate(args[0], env);
+      label.innerText = (await interpretate(args[0], env)).trim();
     
       await interpretate(args[1], {...env, context:boxes, element: content});
     

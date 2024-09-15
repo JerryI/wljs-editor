@@ -22,7 +22,6 @@ import {
 
 import { StreamLanguage } from "@codemirror/language";
 
-import { defaultFunctions } from "./functions";
 
 function newESC() {
   return ({ state, dispatch }) => {
@@ -47,9 +46,10 @@ function newESC() {
 function Completions(context, defaultFunctions) {
   let word = context.matchBefore(/\w*/);
   if (word.from === word.to && !context.explicit) return null;
+  //console.log(defaultFunctions);
   return {
     from: word.from,
-    options: defaultFunctions
+    options: defaultFunctions.data
   };
 }
 
@@ -76,7 +76,7 @@ var reIdInContext = new RegExp(
   "(?:`?)(?:" + Identifier + ")(?:`(?:" + Identifier + "))*(?:`?)"
 );
 
-let builtins = defaultFunctions.map((e) => e.label);
+let builtins = [];
 
 const builtinsSpecial = [
   "True",
@@ -200,7 +200,7 @@ function tokenBase(stream, state) {
   // Literals like variables, keywords, functions
   if (stream.match(reIdInContext, true, false)) {
     if (builtinsSpecial.indexOf(stream.current()) > -1) return "number";
-    if (builtins.indexOf(stream.current()) > -1) return "keyword";
+    if (builtins.indexOf(stream.current()) > -1 || builtins.length == 0) return "keyword";
     if (stream.current() in state.localVars) return "atom";
 
     state.localVars[stream.current()] = true;
@@ -275,18 +275,7 @@ const mathematica = {
   }
 };
 
-export let wolframLanguage;
-
-wolframLanguage = [
-  StreamLanguage.define(mathematica),
-  autocompletion({
-    override: [
-      async (ctx) => Completions(ctx, defaultFunctions)
-      //snippetCompletion('mySnippet(${one}, ${two})', {label: 'mySnippet'})
-    ]
-  }),
-  keymap.of([{ key: "Escape", run: newESC() }])
-];
+export let wolframLanguage = {};
 
 wolframLanguage.of = (vocabulary) => {
 
@@ -303,5 +292,5 @@ wolframLanguage.of = (vocabulary) => {
 }
 
 wolframLanguage.reBuild = (vocabulary) => {
-  builtins = vocabulary.map((e) => e.label)
+  builtins = vocabulary.map((e) => e.label);
 }

@@ -54,7 +54,6 @@ import {StreamLanguage} from "@codemirror/language"
 import {spreadsheet} from "@codemirror/legacy-modes/mode/spreadsheet"
 
 import { wolframLanguage } from "../libs/priceless-mathematica/src/mathematica/mathematica"
-import { defaultFunctions } from "../libs/priceless-mathematica/src/mathematica/functions"
 
 import { DropPasteHandlers } from "../libs/priceless-mathematica/src/mathematica/dropevents";
 
@@ -124,10 +123,15 @@ const defaultHighlightStyle = HighlightStyle.define([
 
 
 
-const EditorAutocomplete = defaultFunctions;
+const EditorAutocomplete = {data: []};
 EditorAutocomplete.extend = (list) => {
-  EditorAutocomplete.push(...list);
-  wolframLanguage.reBuild(EditorAutocomplete);
+  EditorAutocomplete.data.push(...list);
+  wolframLanguage.reBuild(EditorAutocomplete.data);
+}
+
+EditorAutocomplete.replaceAll = (list) => {
+  EditorAutocomplete.data = list;
+  wolframLanguage.reBuild(EditorAutocomplete.data);
 }
 
 const unknownLanguage = StreamLanguage.define(spreadsheet);

@@ -14,10 +14,18 @@ Begin["`Private`"]
 
 rootDir = $InputFileName // DirectoryName // ParentDirectory;
 
+defaults = Get[FileNameJoin[{rootDir, "src", "AutocompleteDefaults.wl"}] ];
+
 EventHandler[AppExtensions`AppEvents// EventClone, {
     "Loader:NewNotebook" ->  (Once[ attachListeners[#] ] &),
     "Loader:LoadNotebook" -> (Once[ attachListeners[#] ] &)
 }];
+
+
+GetDefaults := With[{},
+    <|"hash" -> Hash[defaults], "data" -> defaults|>
+]
+
 
 attachListeners[notebook_Notebook] := With[{},
     Echo["Attach event listeners to notebook from EXTENSION"];
@@ -29,7 +37,7 @@ attachListeners[notebook_Notebook] := With[{},
             ], "Once"->True];
          
 
-            WebUISubmit[ Global`UIAutocompleteConnect[], payload["Client"] ];
+            WebUISubmit[ Global`UIAutocompleteConnect[Hash[defaults] ], payload["Client"] ];
         ]
     }]; 
 ]
