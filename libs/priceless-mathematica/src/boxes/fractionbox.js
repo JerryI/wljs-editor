@@ -222,6 +222,9 @@ class EditorWidget {
       const data = '(('+update+')';
       const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
 
+      //update an imprint
+      this.visibleValue.str = this.visibleValue.str.substring(0, args[0].from).concat(data, this.visibleValue.str.substring(args[0].from + args[0].length));
+
       //shift other positions
       const delta = data.length - args[0].length;
 
@@ -239,6 +242,9 @@ class EditorWidget {
       const data = '('+update+'))';
 
       const changes = {from: relative + args[2].from, to: relative + args[2].from + args[2].length, insert: data};
+      //update an imprint
+      this.visibleValue.str = this.visibleValue.str.substring(0, args[2].from).concat(data, this.visibleValue.str.substring(args[2].from + args[2].length));
+
 
       //shift other positions
       const delta = (data.length - args[2].length);
@@ -257,6 +263,115 @@ class EditorWidget {
 
   update(visibleValue, placeholder) {
     //console.log('Update instance: new ranges & arguments');
+    
+    if (this.visibleValue.str != visibleValue.str) {
+      console.warn('Out of sync');
+      const self = this;
+      const view = this.view;
+      this.visibleValue = visibleValue;
+
+      //rematch all
+      this.args = matchArguments(visibleValue.str, /\(\*,\*\)/gm);
+
+      //console.log(visibleValue);
+  
+      console.log('recreating InstanceWidget');
+
+      let topState, bottomState;
+
+      topState = compactCMEditor.state({
+        doc: self.args[0].body.slice(2,-1),
+        update: (upd) => self.applyChanges(upd, 0),
+        eval: () => {
+          view.viewState.state.config.eval();
+        },
+        extensions: [
+          keymap.of([
+            { key: "ArrowLeft", run: function (editor, key) {  
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                //const range = self.placeholder.placeholder.placeholder;
+                console.log(self.visibleValue.pos);
+                //if (self.visibleValue.pos == 0) return;
+  
+                view.dispatch({selection: {anchor: self.visibleValue.pos}});
+                view.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              } else {
+                editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+              }
+              
+            } }, 
+            { key: "ArrowRight", run: function (editor, key) {  
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                self.bottomEditor.dispatch({selection: {anchor: 0}});
+                self.bottomEditor.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              }
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            } },             
+            { key: "ArrowDown", run: function (editor, key) {  
+              self.bottomEditor.focus();
+              editor.editorLastCursor = undefined; 
+            } }
+          ])
+        ]
+      });
+  
+      bottomState = compactCMEditor.state({
+        doc: self.args[2].body.slice(1,-2),
+
+        update: (upd) => self.applyChanges(upd, 2),
+        eval: () => {
+          self.view.viewState.state.config.eval();
+        },
+        extensions: [
+          keymap.of([
+            { key: "ArrowLeft", run: function (editor, key) {  
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                //const range = self.placeholder.placeholder.placeholder;
+                self.topEditor.dispatch({selection: {anchor: self.topEditor.state.doc.length}});
+                self.topEditor.focus();
+                editor.editorLastCursor = undefined;
+                return;
+              } else {
+                editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+              }
+              
+            } }, 
+            { key: "ArrowRight", run: function (editor, key) {  
+              if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                
+                view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
+                view.focus();
+              
+  
+                editor.editorLastCursor = undefined;
+                return;
+              }
+              editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+            } },             
+            { key: "ArrowUp", run: function (editor, key) {  
+              self.topEditor.focus();
+              editor.editorLastCursor = undefined;
+            } }
+          ])        
+        ]  
+      });  
+
+      this.topEditor.setState(topState);
+      this.bottomEditor.setState(bottomState);
+
+      console.log(self);
+  
+      self.args[0].length = self.args[0].body.length;
+      self.args[2].length = self.args[2].body.length;
+
+      return;
+    }
+
+
     this.visibleValue.pos = visibleValue.pos;
     this.placeholder = placeholder;
     this.visibleValue.argsPos = visibleValue.argsPos;

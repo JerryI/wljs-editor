@@ -3,8 +3,8 @@ core.FSAskKernelSocket = async (args, env) => {
 }
 
 core.FSAsk = async (args, env) => {
-    const result = await interpretate(args[0]);
-    const uid = await interpretate(args[1]);
+    const result = await interpretate(args[0], env);
+    const uid = await interpretate(args[1], env);
     console.warn("A request from kernel server");
     //console.log(result);
     //console.log(JSON.stringify(result));

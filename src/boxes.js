@@ -9,6 +9,11 @@
 
   boxes.Background = () => "Background"
 
+  boxes.RotationBox = async (args, env) => {
+    const degrees = await interpretate(args[0], env);
+    env.element.style.transform = `rotate(${Math.floor(degrees/Math.PI*180.0)}deg)`
+  }
+
   boxes.RowBox = async (args, env) => {
     console.log(args);
   }
@@ -710,7 +715,7 @@
 
       content.style.maxWidth = "200px";
     
-      label.innerText = await interpretate(args[0], env);
+      label.innerText = (await interpretate(args[0], env)).trim();
     
       await interpretate(args[1], {...env, context:boxes, element: content});
     
@@ -856,12 +861,14 @@
       interpretate(args[0], {...env, element: iconElement,  global: env.global, imageSize:[iconWidth, iconWidth]});
       await interpretate(args[1], {...env, context: boxes, element: tbodyElement, static:true, local: false});
 
-      if (env.options.DataOnKernel) {
-        const warn = document.createElement('span');
-        warn.innerText = "Data is on Kernel";
-        warn.classList.add('text-gray-400');
-
-        tbodyElement.appendChild(warn);
+      if (env.options) {
+        if (env.options.DataOnKernel) {
+          const warn = document.createElement('span');
+          warn.innerText = "Data is on Kernel";
+          warn.classList.add('text-gray-400');
+        
+          tbodyElement.appendChild(warn);
+        }
       }
     }
 

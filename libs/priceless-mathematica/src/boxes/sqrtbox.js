@@ -7,6 +7,8 @@ import {
   } from "@codemirror/view";
   import { isCursorInside } from "./utils";
   
+import {EditorState} from "@codemirror/state";
+
   import { BallancedMatchDecorator2 } from "./matcher";
   
   import { keymap } from "@codemirror/view";
@@ -58,6 +60,7 @@ import {
       this.view = view;
       this.visibleValue = visibleValue;
       const self = this;
+      this.sliceRanges = sliceRanges;
 
       this.length = visibleValue.str.length;
 
@@ -123,6 +126,7 @@ import {
       const delta = (data.length + 6) - this.length;
       this.length = this.length + delta;
       this.visibleValue.length = this.visibleValue.length + delta;
+      this.visibleValue.str = "Sqrt["+data+"]"; //save internally
       
       this.view.dispatch({changes: changes});
     }
@@ -130,6 +134,56 @@ import {
 
     update(visibleValue) {
       //console.log('Update instance: new ranges & arguments');
+      if (this.visibleValue.str != visibleValue.str) {
+        console.warn('Out of sync');
+
+        //if changes occured outside the widget
+        //rebuild an entire thing
+
+        this.visibleValue = visibleValue;
+        const sliceRanges = this.sliceRanges;
+        const editor = this.editor;
+        const self = this;
+        const view = this.view;
+
+  
+        this.length = visibleValue.str.length;
+
+        const newState = compactCMEditor.state({
+          doc: visibleValue.str.slice(...sliceRanges),
+          update: (upd) => self.applyChanges(upd),
+          eval: () => {
+            view.viewState.state.config.eval();
+          },
+          extensions: [
+            keymap.of([
+              { key: "ArrowRight", run: function (editor, key) {  
+                if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                  view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
+                  view.focus();
+  
+                  editor.editorLastCursor = undefined;
+                  return;
+                }
+                editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+              } },   
+              { key: "ArrowLeft", run: function (editor, key) {  
+                if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                  view.dispatch({selection: {anchor: self.visibleValue.pos}});
+                  view.focus();
+                  editor.editorLastCursor = undefined;
+                  return;
+                }
+                editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+              } }
+            ])
+          ]             
+        });
+        
+        editor.setState(newState);
+        return;
+      }
+      
       this.visibleValue.pos = visibleValue.pos;
       this.visibleValue.argsPos = visibleValue.argsPos;
       //this.visibleValue.args = visibleValue.args;
@@ -241,6 +295,7 @@ import {
       update(update) {
         //console.log('update Deco');
         //console.log(this.disposable );
+        //console.warn(update);
         this.placeholder = matcher(this.disposable, update).updateDeco(
           update,
           this.placeholder

@@ -47,7 +47,8 @@ evaluationInPlace[text_String, notebook_Notebook, controls_, logs_, cli_, head_:
         t["Data"] = StringJoin[head,"[",t["Data"],"]"];
     ];
 
-    t["EvaluationContext"] = notebook["EvaluationContext"];
+
+    t["EvaluationContext"] = Join[notebook["EvaluationContext"], <|"Notebook" -> notebook["Hash"]|>];
 
     EventHandler[t, {
         (* capture successfull event of the last transaction to end the process *)  
@@ -78,6 +79,24 @@ processSelected[text_, notebook_, controls_, logs_, cli_, head_:""] := With[{},
     ];
 ]
 
+processSelected[text_, notebook_, controls_, logs_, cli_, "Store"] := With[{uid = RandomWord[]<>"-"<>StringTake[CreateUUID[], 3]},
+    Echo["Evaluate in PLACE!!!!"];
+    If[!checkLink[notebook, logs], Return[] ];
+    Then[WebUIFetch[FrontEditorSelected["Get"], cli, "Format"->"JSON"],
+        Function[text,
+            Then[evaluationInPlace[text, notebook, controls, logs, cli, "Function[data, NotebookStore[\""<>uid<>"\"] = data]"], 
+                Function[result,
+                    WebUISubmit[FrontEditorSelected["Set",  "NotebookStore[\""<>uid<>"\"]"], cli];
+                ]
+            ,
+                Function[result,
+                    Echo["Contextmenu >> evaluate in place >> Rejected!"];
+                ]
+            ];
+        ]
+    ];
+]
+
 addListeners[notebook_Notebook, controls_, logs_, cli_] := With[{},
     EventHandler[controls, {
         "evaluate_in_place" -> Function[Null,
@@ -86,6 +105,10 @@ addListeners[notebook_Notebook, controls_, logs_, cli_] := With[{},
 
         "iconize_selected" -> Function[Null,
             processSelected[text, notebook, controls, logs, cli, "Iconize"]
+        ],
+
+        "store_selected" -> Function[Null,
+            processSelected[text, notebook, controls, logs, cli, "Store"]
         ],
 
         "simplify_selected" -> Function[Null,

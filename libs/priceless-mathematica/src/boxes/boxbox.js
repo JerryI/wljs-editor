@@ -37,7 +37,12 @@ export function BoxBoxWidget(viewEditor) {
 class EditorWidget {
 
   constructor(visibleValue, view, span, ref) {
+    return this._construct(visibleValue, view, span, ref);
+  }
+
+  _construct(visibleValue, view, span, ref) {
     this.view = view;
+    this.span = span;
     this.visibleValue = visibleValue;
 
     this.args = matchArguments(visibleValue.str, /\(\*,\*\)/gm);
@@ -106,6 +111,7 @@ class EditorWidget {
           }
         };
         const aa = document.createElement('span');
+        this.aa;
         aa.onkeydown = function(e) {
           // User hits enter key and is not holding shift
           if (e.keyCode === 13) {
@@ -183,16 +189,34 @@ class EditorWidget {
       const data = '('+this.prolog.string+update+this.epilog.string+')';
       const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
 
+      //update imprint
+      this.visibleValue.str = this.visibleValue.str.substring(0, args[0].from).concat(data, this.visibleValue.str.substring(args[0].from + args[0].length));
+
       const delta = data.length - args[0].length
       args[0].length = data.length;
       this.visibleValue.length = this.visibleValue.length + delta;
-
 
       this.view.dispatch({changes: changes});
   }    
 
   update(visibleValue) {
     //console.log('Update instance: new ranges & arguments');
+
+    if (this.visibleValue.str != visibleValue.str) {
+      console.warn('Out of sync');
+      console.log('recreating InstanceWidget');
+
+      this.destroy();
+
+      //HARD RESET
+      this.span.replaceChildren();
+
+      this._construct(visibleValue, this.view, this.span);
+
+
+      return;
+    }
+
     this.visibleValue.pos = visibleValue.pos;
     this.visibleValue.argsPos = visibleValue.argsPos;
   }

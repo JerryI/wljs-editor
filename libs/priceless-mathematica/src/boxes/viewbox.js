@@ -35,10 +35,15 @@ import {
   }
   
   class EditorWidget {
-  
+
     constructor(visibleValue, view, span, ref) {
+      return this._construct(visibleValue, view, span, ref);
+    }
+  
+    _construct(visibleValue, view, span, ref) {
       this.view = view;
       this.visibleValue = visibleValue;
+      this.span = span;
   
       this.args = matchArguments(visibleValue.str, /\(\*,\*\)/gm);
   
@@ -95,6 +100,7 @@ import {
       const data = '('+update+')';
       const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
 
+      this.visibleValue.str = this.visibleValue.str.substring(0, args[0].from).concat(data, this.visibleValue.str.substring(args[0].from + args[0].length));
   
       args[0].length = data.length;
 
@@ -120,6 +126,22 @@ import {
     update(visibleValue) {
       if (this.deactivated) return;
       //console.log('Update instance: new ranges & arguments');
+
+      if (visibleValue.str != this.visibleValue.str) {
+        console.warn('Out of sync');
+
+        console.log('recreate...');
+
+        this.destroy();
+        
+        const span = this.span;
+
+        span.replaceChildren();
+
+        this._construct(visibleValue, this.view, span);
+      
+        return;
+      }
       
       this.visibleValue.pos = visibleValue.pos;
       this.visibleValue.argsPos = visibleValue.argsPos;

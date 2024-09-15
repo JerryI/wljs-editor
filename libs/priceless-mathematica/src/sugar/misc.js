@@ -54,8 +54,15 @@ class GreekWidget extends WidgetType {
         .replace("sqrt", "radic")
         .replace("undirectededge", 'harr')
         .replace('directededge', 'rarr')
-        .replace('curlyepsilon', 'epsilon')
-        .replace('curlytheta', 'theta')
+        .replace(/capital(.*)/, (arg, rep) => {
+          return rep.charAt(0).toUpperCase() + rep.slice(1);
+        })
+        .replace(/curly(.*)/, (arg, rep) => {
+          return rep;
+        })
+        .replace(/script(.*)/, (arg, rep) => {
+          return 'el'+rep.toLowerCase();
+        })
         .replace('transpose', '#7488')
         .replace("degree", "deg") +
       ";";

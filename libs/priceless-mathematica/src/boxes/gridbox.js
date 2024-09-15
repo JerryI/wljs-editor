@@ -189,7 +189,7 @@ import {
       parent[j].length = text.length;
 
 
-      console.log(changes);
+      //console.log(changes);
       //console.log(this.args);
   
       this.view.dispatch({changes: changes});      
@@ -198,6 +198,7 @@ import {
   
     update(visibleValue) {
       //console.log('Update instance: new ranges & arguments');
+      console.log('We cant verify if changes were applied from the widget itself!');
       this.visibleValue.pos = visibleValue.pos;
       this.visibleValue.argsPos = visibleValue.argsPos;
       //this.visibleValue.args = visibleValue.args;

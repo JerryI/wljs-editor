@@ -8,6 +8,10 @@ FractionBox[a_, b_] := RowBox[{"(*FB[*)((", a, ")(*,*)/(*,*)(", b, "))(*]FB*)"}]
 Unprotect[SqrtBox]
 SqrtBox[a_] := RowBox[{"(*SqB[*)Sqrt[", a, "](*]SqB*)"}]
 
+Unprotect[RotationBox]
+RotationBox[expr_, OptionsPattern[] ] := With[{o = OptionValue["BoxRotation"]}, BoxBox[expr, RotationBox[o] // Hold] ]
+Options[RotationBox] = {"BoxRotation" -> 90. Degree}
+
 Unprotect[SuperscriptBox]
 SuperscriptBox[a_, b_] := RowBox[{"(*SpB[*)Power[", a, "(*|*),(*|*)",  b, "](*]SpB*)"}]
 SuperscriptBox[a_, b_, _] := RowBox[{"(*SpB[*)Power[", a, "(*|*),(*|*)",  b, "](*]SpB*)"}]
@@ -28,6 +32,7 @@ ConjugateTranspose /: MakeBoxes[t: ConjugateTranspose[expr_], StandardForm]:= Wi
 
 Unprotect[Sum]
 SumBox;
+
 
 Sum /: MakeBoxes[Sum[expr_, {x_Symbol, min_, max_}], s: StandardForm] := With[{func = MakeBoxes[expr, s]},
     With[{dp = SumBox[1, True], symbol = MakeBoxes[x, s], bmin = MakeBoxes[min, s], bmax = MakeBoxes[max, s]},
@@ -121,8 +126,11 @@ SubscriptBox[a_, b_] := RowBox[{"(*SbB[*)Subscript[", a, "(*|*),(*|*)",  b, "](*
 SubscriptBox[a_, b_, _] := RowBox[{"(*SbB[*)Subscript[", a, "(*|*),(*|*)",  b, "](*]SbB*)"}]
 
 Unprotect[GridBox]
-GridBox[list_List, a___] := RowBox@(Join@@(Join[{{"(*GB[*){"}}, Riffle[#, {{"(*||*),(*||*)"}}] &@ (Join[{"{"}, Riffle[#, "(*|*),(*|*)"], {"}"}] &/@ list), {{"}(*]GB*)"}}]))
-
+GridBox[list_List, a___] := 
+ RowBox@(Join @@ (Join[{{"(*GB[*){"}}, 
+     Riffle[
+      (Join[{"{"}, Riffle[#, "(*|*),(*|*)"], {"}"}] & /@ list), 
+      If[Length[list] > 1, {{"(*||*),(*||*)"}}, {}] ], {{"}(*]GB*)"}}]))
 
 PiecewiseBox;
 (* I HATE YOU WOLFRAM. WHY DID MAKE IT IMPOSSIBLE TO OVERWRITE MAKEBOXES ON PIECEWISE!!!? *)
@@ -142,6 +150,8 @@ GridBox[{{"\[Piecewise]", whatever_}}, a___] := With[{original = whatever /. {Ro
     ]
   ]
 ]
+
+
 
 Unprotect[TagBox]
 TagBox[x_, opts___] := x
@@ -200,6 +210,13 @@ ByteArrayBox[b_ByteArray, form_] := With[{
     ]
   ]
 ] // Quiet
+
+System`TreeWrapper;
+TreeWrapper /: MakeBoxes[TreeWrapper[t_Tree], StandardForm] := With[{c = Insert[GraphPlot[t, VertexLabels->Automatic, ImageSize->180, ImagePadding->None] /. {
+  Text[{HoldComplete[text_], _}, rest__] :>  {Black, Text[ToString[text], rest]},
+  Text[{text_, _}, rest__] :>  {Black, Text[ToString[text], rest]},
+  Text[text_, rest__] :>  {Black, Text[ToString[text], rest]}
+}, JerryI`Notebook`Graphics2D`Controls->False, {2,-1}] /. Notebook`Editor`StandardForm`ExpressionReplacements}, ViewBox[t, c] ]
 
 
 TagBox["ByteArray", "SummaryHead"] = ""
@@ -384,28 +401,114 @@ Internal`RawText /: MakeBoxes[Internal`RawText[text_], StandardForm] := MakeBoxe
 Unprotect[FrameBox]
 FrameBox[x_] := FrameBox[x, "Background"->White] 
 
-(* TODO: just leave as EditorView, no ToStringMethod *)
-(* Assume that EditorView will automatically apply ToString *)
-
 Unprotect[Show]
 Show[any_, DisplayFunction->Identity] := any 
 Protect[Show]
 
-Legended[expr_, SwatchLegend[l_List, names_List] ] := ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject
 
-Legended[expr_, {Placed[SwatchLegend[l_, names_List, opts__], _, Identity]}] := ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject
+Legended /: MakeBoxes[Legended[expr_, SwatchLegend[l_List, names_List] ], f: StandardForm] := With[{o = {expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor] :> color }) //Transpose// Grid} // Row}, MakeBoxes[o, f] ]
 
-Legended[expr_, {Placed[SwatchLegend[{head_List, l_List}, {{}, names_List}, opts__], _, Identity]}] := ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject
+Legended /: MakeBoxes[Legended[expr_, {Placed[SwatchLegend[l_, names_List, opts__], _, Identity]}], f: StandardForm] := With[{o = {expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor] :> color }) //Transpose// Grid} // Row}, MakeBoxes[o, f] ]
 
-Legended[expr_, Placed[SwatchLegend[l_List, names_List, opts__], _, Identity] ] := ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject
+Legended /: MakeBoxes[Legended[expr_, {Placed[SwatchLegend[{head_List, l_List}, {{}, names_List}, opts__], _, Identity]}], f: StandardForm] := With[{o = {expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor] :> color }) //Transpose// Grid} // Row}, MakeBoxes[o, f] ]
 
-Legended[expr_, Placed[PointLegend[l_List, names_List, opts__], _, Identity] ] := ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject
+Legended /: MakeBoxes[Legended[expr_, Placed[SwatchLegend[l_List, names_List, opts__], _, Identity] ], f: StandardForm] := With[{o = {expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row}, MakeBoxes[o, f] ]
 
-Legended[expr_, {Placed[LineLegend[l_, names_List, opts__], _, Identity]}] := ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject
+Legended /: MakeBoxes[Legended[expr_, Placed[PointLegend[l_List, names_List, opts__], _, Identity] ], f: StandardForm] := With[{o = {expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row}, MakeBoxes[o, f] ]
 
-Legended[expr_, Placed[LineLegend[l_, names_List, opts__], _, Identity] ] := ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject
+Legended /: MakeBoxes[Legended[expr_, {Placed[LineLegend[l_, names_List, opts__], _, Identity]}], f: StandardForm] := With[{o = {expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row}, MakeBoxes[o, f] ]
+
+Legended /: MakeBoxes[Legended[expr_, Placed[LineLegend[l_, names_List, opts__], _, Identity] ], f: StandardForm] := With[{o = {expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row}, MakeBoxes[o, f] ]
+
+Legended /: MakeBoxes[Legended[expr_, {Placed[BarLegend[a__], n__]} ], f: StandardForm] := MakeBoxes[Legended[expr, Placed[BarLegend[a], n] ], f]
 
 
+
+
+System`WLXForm;
+
+
+
+
+(* have to convert to FE, since there is no wljs-editor avalable to interpretate RowBoxes*)
+
+Legended /: MakeBoxes[Legended[expr_, SwatchLegend[l_List, names_List] ], f: WLXForm] := With[{o = ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject}, MakeBoxes[o, f] ]
+
+Legended /: MakeBoxes[Legended[expr_, {Placed[SwatchLegend[l_, names_List, opts__], _, Identity]}], f: WLXForm] := With[{o = ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject}, MakeBoxes[o, f] ]
+
+Legended /: MakeBoxes[Legended[expr_, {Placed[SwatchLegend[{head_List, l_List}, {{}, names_List}, opts__], _, Identity]}], f: WLXForm] := With[{o = ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject}, MakeBoxes[o, f] ]
+
+Legended /: MakeBoxes[Legended[expr_, Placed[SwatchLegend[l_List, names_List, opts__], _, Identity] ], f: WLXForm] := With[{o = ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject}, MakeBoxes[o, f] ]
+
+Legended /: MakeBoxes[Legended[expr_, Placed[PointLegend[l_List, names_List, opts__], _, Identity] ], f: WLXForm] := With[{o = ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject}, MakeBoxes[o, f] ]
+
+Legended /: MakeBoxes[Legended[expr_, {Placed[LineLegend[l_, names_List, opts__], _, Identity]}], f: WLXForm] := With[{o = ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject}, MakeBoxes[o, f] ]
+
+Legended /: MakeBoxes[Legended[expr_, Placed[LineLegend[l_, names_List, opts__], _, Identity] ], f: WLXForm] := With[{o = ToString[{expr, ({l, Internal`RawText /@ (names /. HoldForm -> Identity)} /.{Directive[_, color_RGBColor, ___] :> color }) //Transpose// Grid} // Row, StandardForm] // EditorView // CreateFrontEndObject}, MakeBoxes[o, f] ]
+
+
+Legended /: MakeBoxes[Legended[expr_, Placed[BarLegend[{cf_, range_List}, opts___Rule, ___] , _, Identity] ], f: (StandardForm | WLXForm)] := With[{
+  ticks = Table[{Round[i, (range[[2]] - range[[1]])/20.0], Null}, {i, range[[1]], range[[2]], (range[[2]] - range[[1]])/10.0}]
+},
+  With[{
+    legend =   With[{options = Association[List[opts] ]}, 
+    
+    Module[{colorConvert, step = (ticks[[2, 1]] - ticks[[1, 1]]) * 0.5, 
+      imageSize = 
+        If[KeyExistsQ[options, ImageSize], options[ImageSize], 370 / 1.6180339  ]},
+      
+      (* Adjust the image size depending on whether it is a list or not *)
+      imageSize = 
+        1.2 If[!ListQ[imageSize], 
+          (* If it's not a list, scale by the golden ratio *)
+          imageSize {0.3, 1.0} ,
+          (* If it's a list, adjust by the second element *)
+          imageSize[[2]] {0.3, 1.0} // N
+        ];
+      
+      (* Color conversion function based on range *)
+      colorConvert[value_] := 
+        cf @ ((value - range[[1]]) / (range[[2]] - range[[1]]));
+      
+      (* Create the graphic with rectangles for each tick *)
+      Graphics[
+        Map[
+          Function[tick, 
+            With[{val = tick[[1]], deco = tick[[2 ;;]]}, 
+              {colorConvert[val], 
+               Rectangle[{-1, val - step}, {1, val + step}]}
+            ]
+          ], 
+          ticks
+        ], 
+        Axes -> True, Frame -> True, 
+        FrameTicks -> {{{}, ticks[[All, 1]]}, {False, False}}, 
+        TickLabels -> {False, False, False, True}, 
+        PlotRange -> {{-1, 1}, range}, 
+        "Controls" -> False, 
+        ImageSize -> imageSize, 
+        ImagePadding -> 25
+      ]
+    ]
+  ]
+  },
+  
+  With[{
+    box = Row[{expr, legend // CreateFrontEndObject}]
+  },
+    If[f == StandardForm,
+      MakeBoxes[box, f]
+    ,
+      With[{s = ToString[box, StandardForm]},
+        With[{e = EditorView[s] // CreateFrontEndObject},
+          MakeBoxes[e, WLXForm]
+        ]
+      ]
+    ]
+  ]
+  
+  ]
+]
 
 
 Unprotect[BoxForm`ArrangeSummaryBox]
@@ -422,7 +525,7 @@ BoxForm`temporal = {};
 Options[BoxForm`ArrangeSummaryBox] = {"Event" -> Null}
 
 BoxForm`ArrangeSummaryBox[head_, interpretation_, icon_, above_, hidden_, ___, OptionsPattern[] ] := With[{
-  headString = ToString[head, InputForm],
+  headString = If[!StringQ[head], ToString[head, InputForm], head],
   event = OptionValue["Event"],
   iconHash = Hash[icon]
 },
@@ -440,7 +543,7 @@ BoxForm`ArrangeSummaryBox[head_, interpretation_, icon_, above_, hidden_, ___, O
                       
                     ]},
   With[{interpretationString = ToString[interpretation, InputForm]},
-    If[StringLength[interpretationString] > 25000 (* not supported for NOW *),
+    If[StringLength[interpretationString] > 2500,
       Module[{temporalStorage},
         With[{
           tempSymbol = ToString[temporalStorage, InputForm],
@@ -458,9 +561,17 @@ BoxForm`ArrangeSummaryBox[head_, interpretation_, icon_, above_, hidden_, ___, O
     ,
       
         If[event === Null,
-          RowBox[{headString, "[", "(*VB[*) ", StringDrop[StringDrop[interpretationString, -1], StringLength[headString] + 1], " (*,*)(*", ToString[Compress[BoxForm`ArrangedSummaryBox[iconSymbol // FrontEndVirtual, above, hidden] ], InputForm ], "*)(*]VB*)", "]"}]
+          If[Head[interpretation] =!= head,
+            RowBox[{headString, "[", "(*VB[*) ", interpretationString, " (*,*)(*", ToString[Compress[BoxForm`ArrangedSummaryBox[iconSymbol // FrontEndVirtual, above, hidden] ], InputForm ], "*)(*]VB*)", "]"}]          
+          ,
+            RowBox[{headString, "[", "(*VB[*) ", StringDrop[StringDrop[interpretationString, -1], StringLength[headString] + 1], " (*,*)(*", ToString[Compress[BoxForm`ArrangedSummaryBox[iconSymbol // FrontEndVirtual, above, hidden] ], InputForm ], "*)(*]VB*)", "]"}]
+          ]
         ,
-          RowBox[{headString, "[", "(*VB[*) ", StringDrop[StringDrop[interpretationString, -1], StringLength[headString] + 1], " (*,*)(*", ToString[Compress[ProvidedOptions[BoxForm`ArrangedSummaryBox[iconSymbol // FrontEndVirtual, above, hidden], "Event" -> event] ], InputForm ], "*)(*]VB*)", "]"}]
+          If[Head[interpretation] =!= head,
+            RowBox[{headString, "[", "(*VB[*) ", interpretationString, " (*,*)(*", ToString[Compress[ProvidedOptions[BoxForm`ArrangedSummaryBox[iconSymbol // FrontEndVirtual, above, hidden], "Event" -> event] ], InputForm ], "*)(*]VB*)", "]"}]
+          ,
+            RowBox[{headString, "[", "(*VB[*) ", StringDrop[StringDrop[interpretationString, -1], StringLength[headString] + 1], " (*,*)(*", ToString[Compress[ProvidedOptions[BoxForm`ArrangedSummaryBox[iconSymbol // FrontEndVirtual, above, hidden], "Event" -> event] ], InputForm ], "*)(*]VB*)", "]"}]
+          ]
         ]
       
     ]
@@ -475,7 +586,7 @@ Options[BoxForm`ArrangeSummaryBox] = Append[Options[BoxForm`ArrangeSummaryBox], 
 SetAttributes[BoxForm`ArrangeSummaryBox, HoldAll]
 
 Unprotect[Graph]
-Graph /: MakeBoxes[g_Graph, StandardForm] := With[{c = Insert[GraphPlot[g, ImageSize->120, ImagePadding->None], JerryI`Notebook`Graphics2D`Controls->False, {2,-1}] /. Notebook`Editor`StandardForm`ExpressionReplacements}, ViewBox[g, c] ]
+Graph /: MakeBoxes[g_Graph, StandardForm] := With[{c = Insert[GraphPlot[g, ImageSize->120, ImagePadding->None] /. {Text[text_, rest__] :>  {Black, Text[ToString[text], rest]}}, JerryI`Notebook`Graphics2D`Controls->False, {2,-1}] /. Notebook`Editor`StandardForm`ExpressionReplacements}, ViewBox[g, c] ]
 
 
 Unprotect[PaneBox]

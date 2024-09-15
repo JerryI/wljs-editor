@@ -1,7 +1,6 @@
-BeginPackage["Notebook`Utils`Notifications`", {"JerryI`Misc`Events`"}]
+BeginPackage["Notebook`Utils`Notifications`", {"JerryI`Misc`Events`", "JerryI`Misc`Events`Promise`", "Notebook`CellOperations`"}]
 
 Notify::usage = "Notify[message_, args__, opts] prints a message in a notification box"
-NotificationSpinner::usage = "NotificationSpinner[message_, \"Topic\"->] _Promise"
 
 HapticFeedback::usage = "HapticFeedback[] make a haptic feedback on MacOS devices (Desktop App only)"
 
@@ -37,12 +36,30 @@ Notify[template_, OptionsPattern[] ] := With[{
     EventFire[Internal`Kernel`Stdout[ Internal`Kernel`Hash ], Notifications`NotificationMessage[OptionValue["Topic"] ], message]; 
 ]
 
-Options[Notify] = {"Topic" -> "Kernel"}
+Notify`CreateModal[name_String, data_Association, OptionsPattern[] ] := Module[{}, With[{p = Promise[], promise = Promise[], proxy = Unique["modalContainer"]},
+    EventFire[Internal`Kernel`CommunicationChannel, "CreateModal", <|
+            "Notebook"->First[OptionValue["Notebook"]], 
+            "Ref"->Global`$EvaluationContext["Ref"], 
+            "Promise" -> (promise), 
+            "Kernel"->Internal`Kernel`Hash,
+            "Modal" -> name,
+            "Data"->data
+    |>];
 
-NotificationSpinner[message_, OptionsPattern[] ] := With[{},
-    (*EventFire[Internal`Kernel`Stdout[ Internal`Kernel`Hash ], Notifications`NotificationMessage[OptionValue["Topic"] ], message];*)
-    "In development..."
-]
+    Then[promise, Function[result,
+        EventRemove[proxy];
+        ClearAll[proxy];
+
+        EventFire[p, Resolve, result];
+    ] ];
+    
+    p
+] ]
+
+Options[Notify`CreateModal] = {"Notebook" :> RemoteNotebook[ Global`$EvaluationContext["Notebook"] ] }
+
+
+Options[Notify] = {"Topic" -> "Kernel"}
 
 End[]
 EndPackage[]

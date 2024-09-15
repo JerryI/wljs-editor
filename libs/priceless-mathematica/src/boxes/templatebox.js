@@ -37,6 +37,10 @@ export function TemplateBoxWidget(viewEditor) {
 class EditorWidget {
 
   constructor(visibleValue, view, span, ref) {
+    return this._construct(visibleValue, view, span, ref)
+  }
+
+  _construct(visibleValue, view, span, ref) {
     this.view = view;
     this.visibleValue = visibleValue;
 
@@ -55,6 +59,10 @@ class EditorWidget {
     self.indexes = indexes;
 
     const spans = [];
+
+    this.span = span;
+    this.spans = spans;
+
     for (let i=0; i<indexes.length; ++i) {
       spans.push(document.createElement('span'));
     }
@@ -81,8 +89,6 @@ class EditorWidget {
         console.warn('Event listeners are enabled!');
         self.events = env.options.Event;
       }      
-
-
 
       self.editors = indexes.map((index, i) => compactCMEditor({
         doc: self.args[index].body,
@@ -135,9 +141,12 @@ class EditorWidget {
       const args = this.args;
       const relative = this.visibleValue.argsPos;
   
-      console.log(args);
+      //console.log(args);
 
       const changes = {from: relative + args[index].from, to:relative + args[index].from + args[index].length, insert: update};
+
+      //update imprint
+      this.visibleValue.str = this.visibleValue.str.substring(0, args[index].from).concat(update, this.visibleValue.str.substring(args[index].from + args[index].length));
 
       const delta = update.length - args[index].length;
       args[index].length = update.length;
@@ -150,6 +159,22 @@ class EditorWidget {
 
   update(visibleValue) {
     //console.log('Update instance: new ranges & arguments');
+
+    if (this.visibleValue.str != visibleValue.str) {
+      console.warn('Out of sync');
+      const self = this;
+      const view = this.view;
+      this.visibleValue = visibleValue;
+
+      
+
+      this.destroy();
+
+      this.span.replaceChildren();
+
+      this._construct(visibleValue, this.view, this.span);
+    }
+
     this.visibleValue.pos = visibleValue.pos;
     this.visibleValue.argsPos = visibleValue.argsPos;
   }

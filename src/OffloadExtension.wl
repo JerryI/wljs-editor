@@ -5,10 +5,13 @@ BeginPackage["Notebook`Editor`OffloadExtensions`", {
     "JerryI`Misc`WLJS`Transport`"
 }]
 
+Begin["`Private`"]
 
 Offload`FromEventObject[o_EventObject] := With[{view = o[[1]]["View"], sym = Unique["OffloadGenerated"]}, 
   EventHandler[o, Function[x, sym = x]] // EventFire;
   Interpretation[CreateFrontEndObject[view], Offload[sym]]
 ]
+
+End[]
 
 EndPackage[]

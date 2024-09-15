@@ -15,7 +15,9 @@ processRequest[cli_, controls_, data_, __] := With[{channel = data["Channel"]},
         EventHandler[channel, {
             "File" -> Function[payload,
                 With[{name = payload["Name"]},
-                    files[name] = payload["Data"] // BaseDecode;
+                    With[{safeName = FileBaseName[name]<>"-"<>StringTake[CreateUUID[], 3]<>"."<>FileExtension[name]},
+                        files[safeName] = payload["Data"] // BaseDecode;
+                    ]
                 ];
                 count--;
                 If[count === 0, 
@@ -29,7 +31,7 @@ processRequest[cli_, controls_, data_, __] := With[{channel = data["Channel"]},
             If[!DirectoryQ[FileNameJoin[{path, "attachments"}] ], CreateDirectory[FileNameJoin[{path, "attachments"}] ] ];
             Echo["Uploading files..."];
             (
-                With[{filename = FileNameJoin[{path, "attachments", #}]},
+                With[{filename = FileNameJoin[{path, "attachments", # }]},
                     BinaryWrite[filename, files[#] ] // Close;
                 ]
             ) &/@ Keys[files];

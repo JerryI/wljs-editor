@@ -73,6 +73,9 @@ import {
         doc: self.args[0].body.slice(6),
         parent: head,
         update: (upd) => this.applyChanges(upd, 0),
+        eval: () => {
+          view.viewState.state.config.eval();
+        },
         extensions: [
           keymap.of([
             { key: "ArrowLeft", run: function (editor, key) {  
@@ -106,6 +109,9 @@ import {
         doc: self.args[2].body.slice(0, -1),
         parent: sub,
         update: (upd) => this.applyChanges(upd, 2),
+        eval: () => {
+          view.viewState.state.config.eval();
+        },
         extensions: [
           keymap.of([
             { key: "ArrowRight", run: function (editor, key) {  
@@ -160,6 +166,9 @@ import {
         //uppder one
         const data = 'Power['+update;
         const changes = {from: relative + args[0].from, to: relative + args[0].from + args[0].length, insert: data};
+
+        //update imprint string
+        this.visibleValue.str = this.visibleValue.str.substring(0, args[0].from).concat(data, this.visibleValue.str.substring(args[0].from + args[0].length));
   
         //shift other positions
         args[0].to = args[0].to + (data.length - args[0].length);
@@ -177,6 +186,10 @@ import {
   
         const changes = {from: relative + args[2].from, to: relative + args[2].from + args[2].length, insert: data};
   
+        //update imprint string to compare later changes
+        this.visibleValue.str = this.visibleValue.str.substring(0, args[2].from).concat(data, this.visibleValue.str.substring(args[2].from + args[2].length));
+
+
         //shift other positions
         args[2].to = args[2].to + (data.length - args[2].length);
         const delta = data.length - args[2].length;
@@ -194,6 +207,97 @@ import {
   
     update(visibleValue) {
       //console.log('Update instance: new ranges & arguments');
+      if (this.visibleValue.str != visibleValue.str) {
+        console.warn('Out of sync');
+        const self = this;
+        const view = this.view;
+        this.visibleValue = visibleValue;
+  
+        //rematch all
+        this.args = matchArguments(visibleValue.str, /\(\*\|\*\)/gm);
+
+        console.log('recreating InstanceWidget');
+
+        let topState, bottomState;
+  
+        //console.log(self.visibleValue);
+    
+        topState = compactCMEditor.state({
+          doc: self.args[0].body.slice(6),
+          update: (upd) => self.applyChanges(upd, 0),
+          extensions: [
+            keymap.of([
+              { key: "ArrowLeft", run: function (editor, key) {  
+                if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                  
+                  view.dispatch({selection: {anchor: self.visibleValue.pos}});
+                  view.focus();
+                  editor.editorLastCursor = undefined;
+                  return;
+                }
+                editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+              } },   
+              { key: "ArrowRight", run: function (editor, key) {  
+                if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                  self.bottomEditor.dispatch({selection: {anchor: 0}});
+                  self.bottomEditor.focus();
+                  editor.editorLastCursor = undefined;
+                  return;
+                }
+                editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+              } },
+  
+              { key: "ArrowUp", run: function (editor, key) {  
+                self.bottomEditor.focus();
+              } }
+            ])
+          ]
+        });
+    
+        bottomState = compactCMEditor.state({
+          doc: self.args[2].body.slice(0, -1),
+          update: (upd) => self.applyChanges(upd, 2),
+          extensions: [
+            keymap.of([
+              { key: "ArrowRight", run: function (editor, key) {  
+                if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                  view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
+                  view.focus();
+                  editor.editorLastCursor = undefined;
+                  return;
+                }
+                editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+              } },   
+              { key: "ArrowLeft", run: function (editor, key) {  
+                if (editor?.editorLastCursor === editor.state.selection.ranges[0].to) {
+                  self.topEditor.dispatch({selection: {anchor: self.topEditor.state.doc.length}});
+                  self.topEditor.focus();
+                  editor.editorLastCursor = undefined;
+                  return;
+                }
+                editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+              } },
+  
+              { key: "ArrowDown", run: function (editor, key) {  
+                self.topEditor.focus();
+              } }
+            ])
+          ]            
+        });
+    
+        //if (focusNext) bottomEditor.focus();
+        //focusNext = false;    
+        
+        this.topEditor.setState(topState);
+        this.bottomEditor.setState(bottomState);
+  
+        self.args[0].length = self.args[0].body.length;
+        self.args[2].length = self.args[2].body.length;
+
+        return;
+      }
+
+
       this.visibleValue.pos = visibleValue.pos;
       this.visibleValue.argsPos = visibleValue.argsPos;
     }

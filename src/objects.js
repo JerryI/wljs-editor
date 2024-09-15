@@ -118,7 +118,7 @@ core.FrontEndVirtual = async (args, env) => {
 
 //element will be provided in 
 core.FrontEndExecutable = async (args, env) => {
-    console.log('forntend executable');
+    console.log('executable object');
     const uid = await interpretate(args[0], env);
 
     let obj;
@@ -132,7 +132,7 @@ core.FrontEndExecutable = async (args, env) => {
 
     const copy = {...env};
     const store = await obj.get();
-    const instance = new ExecutableObject('stored-'+uuidv4(), copy, store);
+    const instance = new ExecutableObject('static-'+uuidv4(), copy, store, true); // STATIC
     instance.assignScope(copy);
     obj.assign(instance);
 
@@ -176,6 +176,10 @@ core.UIObjects.GetAllSymbols = async (args, env) => {
   const list = Object.keys(server.kernel.trackedSymbols);
   const message = [];
   for (let i=0; i<list.length; i++) {
+    if (Object.keys(core[list[i]].instances).length == 0) {
+      console.warn('Dead symbol: '+list[i] + ' found!');
+      continue;
+    }
     message.push(['Rule', "'"+list[i]+"'", core[list[i]].data]);
   }
   message.unshift('Association');
