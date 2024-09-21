@@ -153,6 +153,29 @@
 
   }
 
+  boxes.ConditionalBox = async (args, env) => {
+    const childred = env.children;
+    console.log(childred)
+
+    env.element.classList.add('p-1');
+    
+    const outer = document.createElement('span');
+
+    outer.style.alignItems = "baseline";
+    outer.classList.add(...(('flex flex-row gap-x-2 text-sm rounded-md 0 py-1 pl-3 bg-gray-100 pr-2 text-gray-500 ring-1 ring-inset ring-gray-400').split(' ')));
+
+    const textNode = document.createElement('span');
+    textNode.innerText = "if";
+    textNode.classList.add('text-gray-500', 'font-medium', 'sm-controls');
+
+
+    
+    outer.appendChild(childred[0]);
+    outer.appendChild(textNode);
+    outer.appendChild(childred[1]);
+    env.element.appendChild(outer);
+  }
+
   boxes.SumBox = async (args, env) => {
     let vars = await interpretate(args[0], env);
     let bonds = await interpretate(args[1], env);

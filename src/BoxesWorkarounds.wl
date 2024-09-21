@@ -306,6 +306,12 @@ TemplateBox[{number_}, "C"] := RowBox[{ SubscriptBox[C, number]}]
 TemplateBox[expr_, "Bra"] := With[{dp = ProvidedOptions[BraDecorator, "Head"->"Bra"]}, RowBox[{"(*BB[*)(Bra[", RowBox[Riffle[expr, ","]], "])(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]]
 TemplateBox[expr_, "Ket"] := With[{dp = ProvidedOptions[KetDecorator, "Head"->"Ket"]}, RowBox[{"(*BB[*)(Ket[", RowBox[Riffle[expr, ","]], "])(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]]
 
+TemplateBox[{expr_, cond_}, "ConditionalExpression"] := With[{dp = ConditionalBox},
+  RowBox[{"(*TB[*)ConditionalExpression[(*|*)", expr, "(*|*), (*|*)", cond, "(*|*)](*|*)(*", Compress[dp], "*)(*]TB*)"}]
+]
+
+TemplateBox[expr_, "IconizedObject"] := "\"Box is not implemented\""
+
 Unprotect[Ket]
 Unprotect[Bra]
 
