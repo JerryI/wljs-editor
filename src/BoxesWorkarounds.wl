@@ -125,12 +125,23 @@ Unprotect[SubscriptBox]
 SubscriptBox[a_, b_] := RowBox[{"(*SbB[*)Subscript[", a, "(*|*),(*|*)",  b, "](*]SbB*)"}]
 SubscriptBox[a_, b_, _] := RowBox[{"(*SbB[*)Subscript[", a, "(*|*),(*|*)",  b, "](*]SbB*)"}]
 
+(* we do support only one option*)
 Unprotect[GridBox]
-GridBox[list_List, a___] := 
+GridBox[list_List, opts___] := With[{sorted = Association[ List[opts] ]},
+If[!KeyExistsQ[sorted, GridBoxDividers],
  RowBox@(Join @@ (Join[{{"(*GB[*){"}}, 
      Riffle[
       (Join[{"{"}, Riffle[#, "(*|*),(*|*)"], {"}"}] & /@ list), 
       If[Length[list] > 1, {{"(*||*),(*||*)"}}, {}] ], {{"}(*]GB*)"}}]))
+,
+With[{val = sorted[GridBoxDividers]},
+ RowBox@(Join @@ (Join[{{"(*GB[*){"}}, 
+     Riffle[
+      (Join[{"{"}, Riffle[#, "(*|*),(*|*)"], {"}"}] & /@ list), 
+      If[Length[list] > 1, {{"(*||*),(*||*)"}}, {}] ], {{StringJoin["}(*||*)(*", Compress[GridBox[GridBoxDividers -> val ] // Hold ], "*)(*]GB*)"]}}]))
+]
+] ]
+
 
 PiecewiseBox;
 (* I HATE YOU WOLFRAM. WHY DID MAKE IT IMPOSSIBLE TO OVERWRITE MAKEBOXES ON PIECEWISE!!!? *)
@@ -243,7 +254,7 @@ Unprotect[StyleBox]
 (* FIXME!!! *)
 (* FIXME!!! *)
 (* FIXME!!! *)
-StyleBox[x_, opts__]  := With[{list = Association[List[opts] ]},
+StyleBox[x_, opts__]  := With[{list = Association[Cases[List[opts], _Rule] ]},
   If[KeyExistsQ[list, ShowStringCharacters], 
     If[!list[ShowStringCharacters],
       RowBox[{"(*BB[*)(", ReplaceAll[x, s_String :> Kernel`Internal`trimStringCharacters[s] ], ")(*,*)(*", ToString[Compress[Hold[StyleBox[opts]]], InputForm], "*)(*]BB*)"}]  
@@ -278,7 +289,20 @@ iHighlight[expr_] := Style[expr, Background->Yellow]
 
 Unprotect[TemplateBox]
 
-TemplateBox[list_List, "RowDefault"] := GridBox[{list}]
+TemplateBox[list_List, "RowDefault", ___] := GridBox[{list}]
+TemplateBox[list_List, "Row", ___] := GridBox[{list}]
+
+TemplateBox[{pts_Integer}, "Spacer"] := ViewBox[Spacer[pts], SpacerBox[pts] ]
+TemplateBox[{pts_Integer}, "Spacer1"] := ViewBox[Spacer[pts], SpacerBox[pts] ]
+TemplateBox[{pts__Integer}, "Spacer2"] := ViewBox[Spacer[pts], SpacerBox[List[pts] ] ]
+
+TemplateBox[list:{expr_, label_}, "Labeled", opts__Rule ] := With[{func = Association[ List[opts] ][DisplayFunction]},
+  func @@ list
+]
+
+Unprotect[ItemBox]
+
+ItemBox[expr_, o: OptionsPattern[] ] := RowBox[{expr, "(*VB[*)(**)(*,*)(*", ToString[Compress[ItemBox[o] // Hold ], InputForm], "*)(*]VB*)"}] ;/ Head[expr] =!= Slot
 
 (* I HATE YOU WOLFRAM !!! *)
 (*TemplateBox[a:{n_, short_String, long_String, units_String}, "Quantity", o___] := Module[{test}, With[{
@@ -324,6 +348,14 @@ Unprotect[DynamicModuleBox]
 DynamicModuleBox[vars_, body_] := body
 
 TemplateBox[assoc_Association, "RGBColorSwatchTemplate"] := With[{color = assoc["color"]//N},
+   RowBox[{"(*VB[*)(", ToString[assoc["color"], InputForm], ")(*,*)(*", ToString[Compress[Hold[RGBColorSwatchTemplate[color]]], InputForm], "*)(*]VB*)"}]
+]
+
+TemplateBox[assoc_Association, "GrayLevelColorSwatchTemplate"] := With[{color = assoc["color"]//N // RGBColor},
+   RowBox[{"(*VB[*)(", ToString[assoc["color"], InputForm], ")(*,*)(*", ToString[Compress[Hold[RGBColorSwatchTemplate[color]]], InputForm], "*)(*]VB*)"}]
+]
+
+TemplateBox[assoc_Association, "HueColorSwatchTemplate"] := With[{color = assoc["color"]//N // RGBColor},
    RowBox[{"(*VB[*)(", ToString[assoc["color"], InputForm], ")(*,*)(*", ToString[Compress[Hold[RGBColorSwatchTemplate[color]]], InputForm], "*)(*]VB*)"}]
 ]
 
@@ -548,6 +580,7 @@ BoxForm`ArrangeSummaryBox[head_, interpretation_, icon_, above_, hidden_, ___, O
                       ]
                       
                     ]},
+  If[ByteCount[interpretation] < 2 8 2500,               
   With[{interpretationString = ToString[interpretation, InputForm]},
     If[StringLength[interpretationString] > 2500,
       Module[{temporalStorage},
@@ -581,6 +614,21 @@ BoxForm`ArrangeSummaryBox[head_, interpretation_, icon_, above_, hidden_, ___, O
         ]
       
     ]
+  ],
+      Module[{temporalStorage},
+        With[{
+          tempSymbol = ToString[temporalStorage, InputForm],
+          viewBox = StringRiffle[{headString, "[(*VB[*) ", "(*,*)(*", ToString[Compress[ProvidedOptions[BoxForm`ArrangedSummaryBox[iconSymbol // FrontEndVirtual, above, hidden], "DataOnKernel"->True ] ], InputForm ], "*)(*]VB*)]"}, ""]
+        },
+          AppendTo[BoxForm`temporal, Hold[temporalStorage] ];
+
+          temporalStorage = interpretation;
+
+          With[{fakeEditor = EditorView[viewBox, "ReadOnly"->True]},
+            RowBox[{"(*VB[*)", tempSymbol, "(*,*)(*", ToString[Compress[fakeEditor], InputForm ], "*)(*]VB*)"}]
+          ]
+        ]
+      ]
   ]
   ]
 ] // Quiet
@@ -596,7 +644,7 @@ Graph /: MakeBoxes[g_Graph, StandardForm] := With[{c = Insert[GraphPlot[g, Image
 
 
 Unprotect[PaneBox]
-PaneBox[expr_, a__] := BoxBox[expr, Offload[PaneBox[a] ] ]
+PaneBox[expr_, a___] := BoxBox[expr, Offload[PaneBox[a] ] ]
 
 Unprotect[Pane]
 Pane /: EventHandler[p_Pane, list_List] := With[{
@@ -641,3 +689,55 @@ MeshRegion /: MakeBoxes[b_MeshRegion, StandardForm] := With[{r = If[RegionDimens
   ]
 ]
 
+
+EventObjectHasView[assoc_Association] := KeyExistsQ[assoc, "View"]
+EventObject /: MakeBoxes[EventObject[a_?EventObjectHasView], StandardForm] := If[StringQ[a["View"] ],
+  (* reuse an existing FE Object to save up resources, if someone copied it *)
+  With[{uid = a["View"]}, 
+    RowBox[{"(*VB[*)(", ToString[EventObject[Join[a, <|"View"->uid|>] ], InputForm], ")(*,*)(*", ToString[Compress[Hold[FrontEndExecutable[uid]]], InputForm], "*)(*]VB*)"}]
+  ]
+,
+  With[{uid = CreateFrontEndObject[a["View"] ] // First}, 
+    RowBox[{"(*VB[*)(", ToString[EventObject[Join[a, <|"View"->uid|>] ], InputForm], ")(*,*)(*", ToString[Compress[Hold[FrontEndExecutable[uid]]], InputForm], "*)(*]VB*)"}]
+  ] 
+]
+
+System`WLXEmbed /: MakeBoxes[w_System`WLXEmbed, StandardForm] := With[{o = CreateFrontEndObject[w]}, MakeBoxes[o, StandardForm] ]
+
+
+
+Unprotect[Row]
+
+Row /: MakeBoxes[Row[expr__, OptionsPattern[] ], WLXForm] := With[{list = List[expr]},
+  With[{Res = Map[MakeBoxes[#, WLXForm]&, list]},
+    StringJoin["<div class=\"flex flex-row\">", StringRiffle[Res, "\n"], "</div>"]
+  ]
+]
+
+Row /: MakeBoxes[Row[expr_List, OptionsPattern[] ], WLXForm] := With[{list = expr},
+  With[{Res = Map[MakeBoxes[#, WLXForm]&, list]},
+    StringJoin["<div class=\"flex flex-row\">", StringRiffle[Res, "\n"], "</div>"]
+  ]
+]
+
+Unprotect[Column]
+
+Column /: MakeBoxes[Column[expr__, OptionsPattern[] ], WLXForm] := With[{list = List[expr]},
+  With[{Res = Map[MakeBoxes[#, WLXForm]&, list]},
+    StringJoin["<div class=\"flex flex-col\">", StringRiffle[Res, "\n"], "</div>"]
+  ]
+]
+
+Column /: MakeBoxes[Column[expr_List, OptionsPattern[] ], WLXForm] := With[{list = expr},
+  With[{Res = Map[MakeBoxes[#, WLXForm]&, list]},
+    StringJoin["<div class=\"flex flex-row\">", StringRiffle[Res, "\n"], "</div>"]
+  ]
+]
+
+Unprotect[Squiggled]
+
+Unprotect[Style]
+
+Style[Style[expr_, a__], b__] := Style[expr, b, a]
+
+Squiggled[expr_, color_:Lighter[Red] ] := Style[expr, Underlined -> color]

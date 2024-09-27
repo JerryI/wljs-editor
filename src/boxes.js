@@ -7,11 +7,59 @@
   boxes.NumberMarks = () => "NumberMarks"
   boxes.ShowStringCharacters = () => "ShowStringCharacters"
 
+  boxes.Magnification = () => "Magnification"
+
+  boxes.Baseline = () => "Baseline"
   boxes.Background = () => "Background"
+  boxes.DefaultBaseStyle = () => "DefaultBaseStyle"
+  boxes.Alignment = () => "Alignment"
+  boxes.BasePosition  = () => "BasePosition"
+
+  boxes.Center = () => "center"
+  boxes.Left = () => "left"
+  boxes.Right = () => "right"
+  
+  boxes.ShowContents = () => "ShowContents"
 
   boxes.RotationBox = async (args, env) => {
     const degrees = await interpretate(args[0], env);
     env.element.style.transform = `rotate(${Math.floor(degrees/Math.PI*180.0)}deg)`
+  }
+
+  boxes.ItemBox = async (args, env) => {
+    env.element.style.display = 'none';
+    console.log(args);
+
+    let el = env.global.EditorWidget.view.dom;
+
+    const parent = env.global.EditorWidget.view.dom.parentNode;
+    if (parent) {
+      el = parent;
+    }
+
+    const opts = await core._getRules(args, {...env, context: boxes});
+
+    if (opts.DefaultBaseStyle) {
+      if (opts.DefaultBaseStyle == 'LabeledLabel') {
+        el.classList.add('text-sm')
+        el.style.fontSize = '0.875rem';
+        el.style.lineHeight = '1.25rem';
+        el.style.textAlign = 'center';
+      }
+    }
+
+    if (opts.Alignment) {
+      const align = opts.Alignment;
+      if (Array.isArray(align)) {
+        el.style.textAlign = align[0];
+      } else {
+        el.style.textAlign = align;
+      }
+    }
+    //console.log(env.global.EditorWidget.view.dom.parentNode);
+    //mutate the outer editor
+
+    boxes.StyleBox(args, {...env, element: el});
   }
 
   boxes.RowBox = async (args, env) => {
@@ -19,9 +67,9 @@
   }
 
   boxes.PaneBox = async (args, env) => {
-    env.element.classList.add(...('sm-controls cursor-default rounded-md 0 py-1 px-2 bg-gray-100 text-left text-gray-500 ring-1 ring-inset ring-gray-400 text-xs flex flex-row'.split(' '))); 
+    env.element.classList.add(...('sm-controls cursor-default 0 py-1 text-left text-gray-500 flex flex-row'.split(' '))); 
   
-    const opts = await core._getRules(args, {...env, hold:true});
+    const opts = await core._getRules(args, {...env, context: boxes});
     if (opts.ImageSize) {
       const size = await interpretate(opts.ImageSize, env);
       if (size instanceof Object === true) {
@@ -31,6 +79,18 @@
         env.element.style.maxWidth = size + 'px';
       }
     }
+
+    if (opts.Alignment) {
+      const align = opts.Alignment;
+      if (Array.isArray(align)) {
+        env.element.style.textAlign = align[0];
+      } else {
+        env.element.style.textAlign = align;
+      }
+    }
+
+    if (opts.Background) env.element.style.backgroundColor = opts.Background;
+    //if (opts.Background) env.element.style.backgroundColor = opts.Background;
 
     if (opts.Event) {
       const ev = await interpretate(opts.Event, env);
@@ -361,8 +421,10 @@
     env.global.EditorWidget.applyOuterChanges(changes);
   }  
 
+  boxes.FrameStyle = () => "FrameStyle"
+
   boxes.FrameBox = async (args, env) => {
-      env.element.classList.add('frame-box');
+      
       env.context = boxes;
 
       const options = await core._getRules(args, env) || {};
@@ -370,6 +432,24 @@
       if ('Background' in options) {
           env.element.style.backgroundColor = options.Background;
       }
+
+      if ('DefaultBaseStyle' in options) {
+        if (options['DefaultBaseStyle'] == "HighlightedInput") {
+          env.element.style.backgroundColor = "yellow"
+        }
+      }
+
+      if ('FrameStyle' in options) {
+        if (!options.FrameStyle) {
+
+        } else {
+          env.element.classList.add('frame-box');
+        }
+      } else {
+        env.element.classList.add('frame-box');
+      }
+
+      
   }
 
   boxes.IconizeFileBox = async (args, env) => {
@@ -415,11 +495,25 @@
 
   }
 
+  boxes.Inherited = () => 1.0
+
   boxes.Italic = () => "Italic"
   boxes.Bold = () => "Bold"
   boxes.Underlined = () => "Underlined"
   boxes.FontSize = () => "FontSize"
   boxes.FontFamily = () => "FontFamily"
+
+  boxes.SpacerBox = async (args, env) => {
+    const size = await interpretate(args[0], env);
+    if (Array.isArray(size)) {
+      env.element.style.width = (size[0]/10.0)+"rem";
+      env.element.style.height = (size[1]/10.0)+"rem";
+    } else {
+      env.element.style.width = (size/10.0)+"rem";
+    }
+
+    env.element.innerText=' ';
+  }
 
   boxes.StringBox = async (args, env) => {
     env.context = boxes;
@@ -450,6 +544,12 @@
     if ('FontFamily' in options) {
       env.element.style.fontFamily = options.FontFamily.toLowerCase();
     }
+    if ('Underlined' in options) {
+      env.element.style.textDecorationLine = 'underline';
+      if (typeof options.Underlined == 'string') {
+        env.element.style.textDecorationColor = options.Underlined;
+      }
+    }    
     
     const data = [];
     for (let i=0; i<(args.length - Object.keys(options).length); ++i) {
@@ -518,6 +618,34 @@
 
       if ('FontFamily' in options) {
         env.element.style.fontFamily = options.FontFamily.toLowerCase();
+      }
+
+      if ('Magnification' in options) {
+        
+        if (typeof options.Magnification == 'number' && !Number.isNaN(options.Magnification )) {
+          env.element.style.transform = 'scale('+options.Magnification+')';
+          env.element.style.padding = options.Magnification + 'rem';
+        } else {
+          env.element.style.transform = 'scale(3)';
+          console.log({e: env.element.style.transform, options});
+          env.element.style.padding = options.Magnification + 'rem';
+        }
+        
+      }
+
+      if ('Underlined' in options) {
+        env.element.style.textDecorationLine = 'underline';
+        if (typeof options.Underlined == 'string') {
+          env.element.style.textDecorationColor = options.Underlined;
+        }
+      }
+
+      if ('Frame' in options) {
+        if (options.Frame) env.element.classList.add('frame-box');
+      }
+
+      if ('ShowContents' in options) {
+        if (!options.ShowContents) env.element.style.opacity = 0;
       }
 
       const data = [];
@@ -633,10 +761,48 @@
       const data = await interpretate(args[0], env);
       return data;
     }
+
+    boxes.GridBoxDividers = () => "GridBoxDividers"
     
     boxes.GridBox = async (args, env) => {
-      return await interpretate(args[0], env);
+      const opts = await core._getRules(args, {...env, context:boxes});
+      console.warn(env);
+      console.warn(opts);
+      if (opts.GridBoxDividers) {
+        if (!Array.isArray(opts.GridBoxDividers)) return;
+        const rows = env.element.children;
+        opts.GridBoxDividers.forEach((item) => {
+          switch(item.lhs) {
+            case 'Columns':
+              if (!Array.isArray(item.rhs)) break;
+              console.error(item.rhs);
+              for (let i=0; i<item.rhs.length; ++i) {
+                if (item.rhs[i] == true) {
+                  for(let j=0; j<rows.length; ++j) {
+                    if (i>0) {
+                      rows[j].children[i-1].classList.add('pr-2');
+                    }
+                    rows[j].children[i].style.borderLeft = 'solid 1px darkgray';
+                    rows[j].children[i].classList.add('pl-2');
+                  } 
+                }
+              }
+            break;
+
+            case 'Rows':
+              if (!Array.isArray(item.rhs)) break;
+              for (let i=0; i<item.rhs.length; ++i) {
+                if (item.rhs[i] == true) {
+                  rows[i].style.borderTop = 'solid 1px darkgray';
+                }
+              }
+            break;
+          }
+        })
+      }
     }
+
+    
     
     boxes.TagBox = async (args, env) => {
       const name = await interpretate(args[1], env);
@@ -697,20 +863,45 @@
 
     boxes.PanelBox = async (args, env) => {   
       const options = await core._getRules(args, {...env, context: boxes});
+
+      let title = undefined;
+
+      if (Object.keys(options).length < args.length) {
+        title = await interpretate(args[0], env);
+      }
+
       let margin = 0.7; 
       
       if (options.FrameMargins) margin = Math.round(10.0 * options.FrameMargins / 10.0)/10.0;
 
+      if (options.ImageSize) {
+        const size = await interpretate(options.ImageSize, env);
+        if (size instanceof Object === true) {
+          env.element.style.width = size[0] + 'px';
+          env.element.style.height = size[1] + 'px';
+        } else {
+          env.element.style.maxWidth = size + 'px';
+        }
+      }
+  
+
       const editor = document.createElement('span');
       env.global.element = editor;
+
+      env.element.classList.add(...('sm-controls cursor-default rounded-md 0 py-1 px-2 bg-gray-100 text-left text-gray-500 ring-1 ring-inset ring-gray-400 flex-row'.split(' '))); 
     
       env.element.style.display = "inline-flex";
       env.element.style.alignItems = "baseline";
       env.element.style.padding = margin + "em";
 
-      env.element.style.borderRadius = "4px";
-      env.element.style.border = "solid 1px";
-      env.element.style.background = "#f0f0f0";
+      if (options.Background) env.element.style.backgroundColor = opts.Background;
+
+
+      if (title) {
+        const t = document.createElement('span');
+        t.innerText = title;
+        env.element.appendChild(t);
+      }
 
       env.element.appendChild(editor); 
       if (options.Event) {
