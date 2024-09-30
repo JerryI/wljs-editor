@@ -38486,7 +38486,8 @@ var compactCMEditor$2;
     ];
   }
   
-  
+  const itemBox = /"(.+)"\(\*VB\[\*\)\(\*\*\)\(\*\,\*\)\(\*\"([\w:\d=]*)/;
+
   
   let EditorWidget$3 = class EditorWidget {
   
@@ -38605,7 +38606,21 @@ var compactCMEditor$2;
               dispatch: () => {}
             };
 
-            td.innerHTML = text.slice(1,-1);
+            const itemDesc = text.match(itemBox);
+
+            if (itemDesc) {
+              td.innerHTML = itemDesc[1];
+
+              const decoded = Mma.DecompressDecode(itemDesc[2]);
+              const json = Mma.toArray(decoded.parts[0]);
+              const cuid = uuidv4();
+              let global = {call: cuid};
+              let env = {global: global, element: td}; //Created in CM6
+              interpretate(json, env);    
+
+            } else {
+              td.innerHTML = text.slice(1,-1);
+            }
           }
 
 

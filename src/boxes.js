@@ -27,14 +27,18 @@
   }
 
   boxes.ItemBox = async (args, env) => {
-    env.element.style.display = 'none';
-    console.log(args);
+    let el = env.global.EditorWidget;
+    
+    if (!el) {
+      el = env.element;
+    } else {
+      el = el.view.dom;
+      const parent = env.global.EditorWidget.view.dom.parentNode;
+      if (parent) {
+        el = parent;
+      }
 
-    let el = env.global.EditorWidget.view.dom;
-
-    const parent = env.global.EditorWidget.view.dom.parentNode;
-    if (parent) {
-      el = parent;
+      env.element.style.display = 'none';
     }
 
     const opts = await core._getRules(args, {...env, context: boxes});
