@@ -314,13 +314,14 @@ ItemBox[expr_, o: OptionsPattern[] ] := RowBox[{expr, "(*VB[*)(**)(*,*)(*", ToSt
   ]
 ] ]*)
 
-System`QuantityWrapper;
-QuantityWrapper /: MakeBoxes[QuantityWrapper[q_Quantity], StandardForm] := With[{
-  n = QuantityMagnitude[q],
-  units = QuantityUnit[q]
+Unprotect[QuantityUnits`QuantityBox]
+ClearAll[QuantityUnits`QuantityBox]
+QuantityUnits`QuantityBox[QuantityUnits`Private`x_, QuantityUnits`Private`frmt_] := With[{
+  n = QuantityMagnitude[QuantityUnits`Private`x],
+  units = QuantityUnit[QuantityUnits`Private`x]
 },
   ViewBox[q, QuantityBox[n, units] ]
-] 
+]
 
 RootBox;
 TemplateBox[{"Root", m_, raw_, approx_}, opts___] := RowBox[{"(*VB[*)(", approx /. {RowBox->RowBoxFlatten} // ToString, ")(*,*)(*", ToString[Compress[RootBox[approx] ] , InputForm], "*)(*]VB*)"}]

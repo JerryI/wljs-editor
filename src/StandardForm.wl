@@ -8,7 +8,6 @@ System`DatasetWrapper;
 System`AudioWrapper;
 System`VideoWrapper;
 System`ByteArrayWrapper;
-System`QuantityWrapper;
 System`TreeWrapper;
 
 (* Overrride FormatValues*)
@@ -18,7 +17,6 @@ ExpressionReplacements = {
     a_Audio :> AudioWrapper[a],
     b_ByteArray :> ByteArrayWrapper[b],
     d_Dataset :> DatasetWrapper[d],
-    u_Quantity :> QuantityWrapper[u],
     v_Video :> VideoWrapper[v],
     t_Tree :> TreeWrapper[t],
     TreeForm[expr_] :> (ExpressionTree[Unevaluated[expr] ] /. t_Tree :> TreeWrapper[t])
