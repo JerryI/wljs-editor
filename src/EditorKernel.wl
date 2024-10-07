@@ -1,5 +1,9 @@
 BeginPackage["Notebook`EditorUtils`", {"JerryI`Misc`Events`", "Notebook`Editor`FrontendObject`"}]
 
+System`EditorView; (*make it available everywhere*)
+System`CellView;
+
+
 FrontEditorSelected::usage = "A frontend function FrontEditorSelected[\"Get\"] gets the selected content. FrontEditorSelected[\"Set\", value] inserts or replaces content"
 EditorView::usage = "A view component for an editor instance EditorView[_String, opts___], where \"Event\" id can be provided for tracking changes. It supports dynamic updates as well."
 

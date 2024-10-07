@@ -19,7 +19,7 @@ SuperscriptBox[a_, b_, _] := RowBox[{"(*SpB[*)Power[", a, "(*|*),(*|*)",  b, "](
 SuperscriptBox[a_, "\[Prime]", _] := RowBox[{a, "'"}]
 SuperscriptBox[a_, ",", _] := RowBox[{a, "'"}]
 
-TransposeBox;
+System`TransposeBox;
 Unprotect[Transpose]
 Transpose /: MakeBoxes[t: Transpose[expr_], StandardForm]:= With[{boxes = MakeBoxes[expr, StandardForm]},
   BoxBox[expr, TransposeBox["T"], Head->Transpose]
@@ -31,7 +31,7 @@ ConjugateTranspose /: MakeBoxes[t: ConjugateTranspose[expr_], StandardForm]:= Wi
 ]
 
 Unprotect[Sum]
-SumBox;
+System`SumBox;
 
 
 Sum /: MakeBoxes[Sum[expr_, {x_Symbol, min_, max_}], s: StandardForm] := With[{func = MakeBoxes[expr, s]},
@@ -67,7 +67,7 @@ Derivative /: MakeBoxes[Derivative[single_][f_], s: StandardForm] := With[{},
   RowBox[{MakeBoxes[f, s], StringJoin @@ Table["'", {i, single}]}]
 ]
 
-DerivativeBox;
+System`DerivativeBox;
 
 Derivative /: MakeBoxes[Derivative[multi__][f_], s: StandardForm] := With[{list = List[multi]},
   With[{func = MakeBoxes[f, s], head = "Derivative["<>StringRiffle[ToString/@list, ","]<>"]"},
@@ -78,7 +78,7 @@ Derivative /: MakeBoxes[Derivative[multi__][f_], s: StandardForm] := With[{list 
 ]
 
 Unprotect[Integrate]
-IntegrateBox;
+System`IntegrateBox;
 
 Integrate /: MakeBoxes[Integrate[f_, x_Symbol], s: StandardForm ] := With[{},
     With[{dp = IntegrateBox[1, False], func = MakeBoxes[f, s], symbol = MakeBoxes[x, s]},
@@ -143,8 +143,7 @@ With[{val = sorted[GridBoxDividers]},
 ] ]
 
 
-PiecewiseBox;
-(* I HATE YOU WOLFRAM. WHY DID MAKE IT IMPOSSIBLE TO OVERWRITE MAKEBOXES ON PIECEWISE!!!? *)
+System`PiecewiseBox;
 GridBox[{{"\[Piecewise]", whatever_}}, a___] := With[{original = whatever /. {RowBox -> RowBoxFlatten} // ToString // ToExpression},
   With[{
     dp = PiecewiseBox[ Length[original] ]
@@ -316,6 +315,8 @@ ItemBox[expr_, o: OptionsPattern[] ] := RowBox[{expr, "(*VB[*)(**)(*,*)(*", ToSt
 
 Unprotect[QuantityUnits`QuantityBox]
 ClearAll[QuantityUnits`QuantityBox]
+System`QuantityBox;
+
 QuantityUnits`QuantityBox[QuantityUnits`Private`x_, QuantityUnits`Private`frmt_] := With[{
   n = QuantityMagnitude[QuantityUnits`Private`x],
   units = QuantityUnit[QuantityUnits`Private`x]
@@ -323,13 +324,15 @@ QuantityUnits`QuantityBox[QuantityUnits`Private`x_, QuantityUnits`Private`frmt_]
   ViewBox[q, QuantityBox[n, units] ]
 ]
 
-RootBox;
+System`RootBox;
 TemplateBox[{"Root", m_, raw_, approx_}, opts___] := RowBox[{"(*VB[*)(", approx /. {RowBox->RowBoxFlatten} // ToString, ")(*,*)(*", ToString[Compress[RootBox[approx] ] , InputForm], "*)(*]VB*)"}]
 
 TemplateBox[{number_}, "C"] := RowBox[{ SubscriptBox[C, number]}]
 
 TemplateBox[expr_, "Bra"] := With[{dp = ProvidedOptions[BraDecorator, "Head"->"Bra"]}, RowBox[{"(*BB[*)(Bra[", RowBox[Riffle[expr, ","]], "])(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]]
 TemplateBox[expr_, "Ket"] := With[{dp = ProvidedOptions[KetDecorator, "Head"->"Ket"]}, RowBox[{"(*BB[*)(Ket[", RowBox[Riffle[expr, ","]], "])(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]]
+
+System`ConditionalBox;
 
 TemplateBox[{expr_, cond_}, "ConditionalExpression"] := With[{dp = ConditionalBox},
   RowBox[{"(*TB[*)ConditionalExpression[(*|*)", expr, "(*|*), (*|*)", cond, "(*|*)](*|*)(*", Compress[dp], "*)(*]TB*)"}]
@@ -339,6 +342,9 @@ TemplateBox[expr_, "IconizedObject"] := "\"Box is not implemented\""
 
 Unprotect[Ket]
 Unprotect[Bra]
+
+System`KetDecorator;
+System`BraDecorator;
 
 Ket /: MakeBoxes[Ket[list__], StandardForm] := With[{dp = ProvidedOptions[KetDecorator, "Head"->"Ket"]}, RowBox[{"(*BB[*)(Ket[", RowBox[Riffle[List[list], ","]], "])(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]]
 
@@ -371,6 +377,9 @@ TemplateBox[expr_List, "SummaryPanel"] := RowBox[expr]
 
 Unprotect[Iconize]
 ClearAll[Iconize]
+
+System`IconizedFile;
+System`Iconized;
 
 Iconize[expr_, opts: OptionsPattern[] ] := With[{UID = OptionValue["UID"]},
   If[ByteCount[expr] > 30000,
@@ -416,6 +425,8 @@ InterpretationBox[placeholder_, expr_, opts___] := With[{data = expr, v = Editor
 ]
 
 Unprotect[Interpretation]
+
+System`InterpretationOptimized;
 
 Interpretation[view_FrontEndExecutable, expr_] := With[{},
   (*Echo["Optimized expression!"];*)
