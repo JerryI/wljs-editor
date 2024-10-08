@@ -266,6 +266,7 @@ StyleBox[x_, opts__]  := With[{list = Association[Cases[List[opts], _Rule] ]},
 ]
 
 System`ProvidedOptions;
+System`StringBox;
 
 (*if a string, then remove quotes*)
 Unprotect[Style]
