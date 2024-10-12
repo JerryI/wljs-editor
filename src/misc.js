@@ -67,5 +67,28 @@ core['Notebook`Editor`Rasterize`Internal`OverlayView'].Create = async (args, env
     }, 1000);
 }
 
+core.SystemOpen = async (args, env) => {
+    const type = await interpretate(args[1], env);
+    await core.SystemOpen[type](args[0], env);
+}
+
+core.SystemOpen.File = async (path, env) => {
+    const p = await interpretate(path, env);
+    window.electronAPI.openPath(p);
+}
+
+core.SystemOpen.Folder = async (path, env) => {
+    const p = await interpretate(path, env);
+    window.electronAPI.openFolder(p);
+}
+
+core.SystemOpen.URL = async (path, env) => {
+    const p = await interpretate(path, env);
+    window.electronAPI.openExternal(p);
+}
+
+
+
+
 
 

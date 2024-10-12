@@ -473,6 +473,26 @@
 
   }
 
+  boxes.EntityBox = async (args, env) => {
+    const type = await interpretate(args[0], env);
+    const value = await interpretate(args[1], env);
+
+    env.element.classList.add(...('sm-controls gap-x-1 cursor-default rounded-md 0 py-1 px-2 text-left text-gray-500 ring-1 ring-inset ring-gray-400 text-xs'.split(' ')));
+    env.element.style.backgroundColor = "#fff291";
+    env.element.style.verticalAlign = "baseline";
+
+    const t = document.createElement('span');
+    const v = document.createElement('span');
+
+    t.innerText = type;
+    v.innerText = value;
+    v.classList.add('font-semibold');
+
+    
+    env.element.appendChild(v);
+    env.element.appendChild(t);
+  }
+
   boxes.IconizeBox = async (args, env) => {
     env.context = boxes;
     env.element.classList.add(...('sm-controls cursor-default rounded-md 0 py-1 px-2 bg-gray-100 text-left text-gray-500 ring-1 ring-inset ring-gray-400 text-xs'.split(' ')));
@@ -687,7 +707,7 @@
   boxes.DateObjectTemplate = async (args, env) => {
       const element = document.createElement('span');
       element.classList.add(...('sm-controls cursor-default rounded-md 0 py-1 pl-3 bg-gray-100 pr-2 text-left text-gray-500 ring-1 ring-inset ring-gray-400 text-xs'.split(' ')));
-
+      element.style.verticalAlign = "baseline";
       //env.element.classList.add('frame-box');
       env.context = boxes;
 
@@ -700,6 +720,7 @@
       const element = document.createElement('span');
 
       element.classList.add(...('sm-controls cursor-default rounded-md 0 h-4 w-4 shadow-sm'.split(' ')));
+      element.style.verticalAlign = "baseline";
 
       //env.element.classList.add('frame-box');
       env.context = boxes;

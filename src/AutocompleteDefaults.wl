@@ -1,4 +1,4 @@
-{<|"label" -> "Annotation", "type" -> "keyword", 
+{<|"label"->"SystemOpen", "type"->"keyword", "info"->"SystemOpen[path_String | _File | _URL] opens a path using system call"|>, <|"label" -> "Annotation", "type" -> "keyword", 
   "info" -> "Annotation[expr, data] annotates arbitary expression with data (invisible on output). Annotation[edge_, key_->value_] annotates edge of a graph"|>, <|"label" -> "Integrate", "type" -> "keyword", "info" -> "Integrate[f[x], x] gives the indefinite integral. Integrate[f[x], {x, min, max}] gives the definite integral..."|>, <|"label" -> "TableForm", "type" -> "keyword", "info" -> "TableForm[expr_List] formats list of lists as table"|>, <|"label" -> "Item", "type" -> "keyword", "info" -> "Use it inside Grid, TableForm to color or stylize font of expression. Accepts the same options as Style[]"|>, <|"label" -> "ToExpression", "type" -> "keyword", 
   "info" -> "gives the expression obtained by interpreting strings as Wolfram \
 Language input"|>, <|"label" -> "MakeBoxes", "type" -> "keyword", 

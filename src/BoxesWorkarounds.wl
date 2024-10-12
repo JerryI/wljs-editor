@@ -333,6 +333,8 @@ TemplateBox[{number_}, "C"] := RowBox[{ SubscriptBox[C, number]}]
 TemplateBox[expr_, "Bra"] := With[{dp = ProvidedOptions[BraDecorator, "Head"->"Bra"]}, RowBox[{"(*BB[*)(Bra[", RowBox[Riffle[expr, ","]], "])(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]]
 TemplateBox[expr_, "Ket"] := With[{dp = ProvidedOptions[KetDecorator, "Head"->"Ket"]}, RowBox[{"(*BB[*)(Ket[", RowBox[Riffle[expr, ","]], "])(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]]
 
+TemplateBox[{file_String}, "FileArgument"] := file
+
 System`ConditionalBox;
 
 TemplateBox[{expr_, cond_}, "ConditionalExpression"] := With[{dp = ConditionalBox},
@@ -478,8 +480,12 @@ Legended /: MakeBoxes[Legended[expr_, {Placed[BarLegend[a__], n__]} ], f: Standa
 
 System`WLXForm;
 
+Unprotect[System`DateObjectDump`makeDateObjectBox]
+Unprotect[DateObject]
 
+DateObject /: System`DateObjectDump`makeDateObjectBox[System`DateObjectDump`dObj:DateObject[System`DateObjectDump`date_,___], WLXForm] := With[{res = TextString[System`DateObjectDump`dObj]}, res/;System`DateObjectDump`fname=!=$Failed]
 
+System`DateObjectDump`makeDateObjectBox[System`DateObjectDump`dObj:DateObject[System`DateObjectDump`date_,___], WLXForm] := With[{res = TextString[System`DateObjectDump`dObj]}, res/;System`DateObjectDump`fname=!=$Failed]
 
 (* have to convert to FE, since there is no wljs-editor avalable to interpretate RowBoxes*)
 
@@ -754,3 +760,27 @@ Unprotect[Style]
 Style[Style[expr_, a__], b__] := Style[expr, b, a]
 
 Squiggled[expr_, color_:Lighter[Red] ] := Style[expr, Underlined -> color]
+
+Unprotect[GeoGraphics]
+
+GeoGraphics /: MakeBoxes[System`GeoGraphicsDump`g:GeoGraphics[Graphics[System`GeoGraphicsDump`toshow_, System`GeoGraphicsDump`gropts___], System`GeoGraphicsDump`rest___], System`GeoGraphicsDump`fmt_] := With[{Message["Not implemented, we are sorry"]},
+  $Failed
+]
+System`EntityBox;
+Unprotect[Entity];
+
+Entity /: MakeBoxes[EntityFramework`Formatting`Private`x_Entity,
+     EntityFramework`Formatting`Private`fmt_
+    ] :=
+    (Entity;With[{EntityFramework`Formatting`Private`boxes = ViewBox[EntityFramework`Formatting`Private`x, EntityBox[EntityTypeName[EntityFramework`Formatting`Private`x], EntityFramework`Formatting`Private`x//EntityValue //TextString ] ]},
+        
+        EntityFramework`Formatting`Private`boxes/;EntityFramework`Formatting`Private`boxes=!=$Failed
+])
+
+Unprotect[EntityFramework`MakeEntityFrameworkBoxes]
+ClearAll[EntityFramework`MakeEntityFrameworkBoxes]
+EntityFramework`MakeEntityFrameworkBoxes[EntityFramework`Formatting`Private`x_Entity,
+     EntityFramework`Formatting`Private`fmt_] := With[{EntityFramework`Formatting`Private`boxes = ViewBox[EntityFramework`Formatting`Private`x, EntityBox[EntityTypeName[EntityFramework`Formatting`Private`x], EntityFramework`Formatting`Private`x//EntityValue //TextString ]]},
+        
+        EntityFramework`Formatting`Private`boxes
+]
