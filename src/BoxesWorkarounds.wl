@@ -771,7 +771,7 @@ GeoGraphics /: MakeBoxes[System`GeoGraphicsDump`g:GeoGraphics[Graphics[System`Ge
 General::wljsunsupported = "Symbol `` is not supported in WLJS. We are sorry";
 
 (* unsupported! *)
-With[{ unsupported = {GraphicsRow, WordCloud, GraphicsColumn, GeoGraphics, InputField, GraphicsGrid, GalleryView, FormObject, FormFunction, FormPage, Toggler, Opener, Setter, RadioButton, Control, CheckboxBar, RadioButtonBar, Setter, Checkbox, Button, Toggler, SetterBar, RadioButton, Checkbox, PopupMenu, FileNameSetter, ColorSetter, Trigger, HorizontalGauge, Setter, BulletGauge, AngularGauge, ThermometerGauge, Slider, VerticalSlider, ProgressIndicator, Slider2D, IntervalSlider, Manipulator, ProgressIndicator, HorizontalGauge, Locator, Slider2D, ColorSlider, LocatorPane, SlideView, MenuView, FlipView, PopupView, OpenerView, PaneSelector}},
+With[{ unsupported = {GraphicsRow, WordCloud, GraphicsColumn, GeoGraphics, InputField, GraphicsGrid, GalleryView, FormObject, FormFunction, FormPage, Toggler, Opener, Setter, RadioButton, Control, CheckboxBar, RadioButtonBar, Setter, Checkbox, Button, Toggler, SetterBar, RadioButton, Checkbox, PopupMenu, FileNameSetter, ColorSetter, Trigger, HorizontalGauge, Setter, BulletGauge, AngularGauge, ThermometerGauge, Slider, VerticalSlider, Slider2D, IntervalSlider, Manipulator, HorizontalGauge, Locator, Slider2D, ColorSlider, LocatorPane, SlideView, MenuView, FlipView, PopupView, OpenerView, PaneSelector}},
   Do[With[{item = i},
     Unprotect[item];
     ClearAll[item];
