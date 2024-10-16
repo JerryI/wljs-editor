@@ -763,9 +763,22 @@ Squiggled[expr_, color_:Lighter[Red] ] := Style[expr, Underlined -> color]
 
 Unprotect[GeoGraphics]
 
-GeoGraphics /: MakeBoxes[System`GeoGraphicsDump`g:GeoGraphics[Graphics[System`GeoGraphicsDump`toshow_, System`GeoGraphicsDump`gropts___], System`GeoGraphicsDump`rest___], System`GeoGraphicsDump`fmt_] := With[{Message["Not implemented, we are sorry"]},
+GeoGraphics /: MakeBoxes[System`GeoGraphicsDump`g:GeoGraphics[Graphics[System`GeoGraphicsDump`toshow_, System`GeoGraphicsDump`gropts___], System`GeoGraphicsDump`rest___], System`GeoGraphicsDump`fmt_] := With[{},
+  Message["Not implemented in WLJS, we are sorry"];
   $Failed
 ]
+
+General::wljsunsupported = "Symbol `` is not supported in WLJS. We are sorry";
+
+(* unsupported! *)
+With[{ unsupported = {GraphicsRow, WordCloud, GraphicsColumn, GeoGraphics, InputField, GraphicsGrid, GalleryView, FormObject, FormFunction, FormPage, Toggler, Opener, Setter, RadioButton, Control, CheckboxBar, RadioButtonBar, Setter, Checkbox, Button, Toggler, SetterBar, RadioButton, Checkbox, PopupMenu, FileNameSetter, ColorSetter, Trigger, HorizontalGauge, Setter, BulletGauge, AngularGauge, ThermometerGauge, Slider, VerticalSlider, ProgressIndicator, Slider2D, IntervalSlider, Manipulator, ProgressIndicator, HorizontalGauge, Locator, Slider2D, ColorSlider, LocatorPane, SlideView, MenuView, FlipView, PopupView, OpenerView, PaneSelector}},
+  Do[With[{item = i},
+    Unprotect[item];
+    ClearAll[item];
+  ], {i, unsupported}]
+];
+
+
 System`EntityBox;
 Unprotect[Entity];
 
