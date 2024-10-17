@@ -11851,7 +11851,7 @@ that would be obtained if symbols in it were replaced by "|>,
 of points in a mirror normal to the "|>, <|"label" -> "ReflectionTransform", 
   "type" -> "keyword", "info" -> "ReflectionTransform[v] gives a \
 TransformationFunction that represents a reflection in a mirror throu"|>, 
- <|"label" -> "Refresh", "type" -> "keyword", "info" -> "Refresh[expr_, UpdateInterval->interval] creates a dynamic widget, which reevalues expr every UpdateInterval (in seconds or Quantity[]). Refresh[expr_, ev_EventObject] is updated by external event object ev"|>, <|"label" -> "RefreshRate", "type" -> "keyword", 
+ <|"label" -> "Refresh", "type" -> "keyword", "info" -> "Refresh[expr_, interval] creates a dynamic widget, which reevalues expr every interval (in seconds or Quantity[]). Refresh[expr_, ev_EventObject] is updated by external event object ev"|>, <|"label" -> "RefreshRate", "type" -> "keyword", 
   "info" -> "RefreshRate is an option to Animate and related functions which \
 specifies the refresh rate for frame"|>, <|"label" -> "Region", 
   "type" -> "keyword", "info" -> "Region[reg] represents a geometric \
