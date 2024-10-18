@@ -3,8 +3,11 @@ BeginPackage["Notebook`Editor`FrontEndRuntime`", {
     "JerryI`Misc`Events`",
     "JerryI`Misc`Events`Promise`",
     "JerryI`Misc`WLJS`Transport`",
+    "JerryI`Notebook`Kernel`",
     "JerryI`Notebook`",
-    "JerryI`Notebook`AppExtensions`"
+    "JerryI`Notebook`AppExtensions`",
+    "Notebook`Editor`",
+    "JerryI`WLX`WebUI`"  
 }]
 
 
@@ -17,7 +20,7 @@ frontEndRuntime = <|
 |>
 
 rebuild := (
-    stringTemplate = {
+    compiledString = {
         StringRiffle[StringJoin["<script type=\"module\">", #, "</script>"] &/@ frontEndRuntime[{"Modules", "js"}] ],
         StringRiffle[StringJoin["<style>", #, "</style>"] &/@ frontEndRuntime[{"Modules", "css"}] ]
     } // StringRiffle;
@@ -25,24 +28,26 @@ rebuild := (
 
 rebuild;
 
-AppExtensions`TemplateInjection["AppHead"] = Function[Null, ""];
+component[__] := compiledString
 
-injectInRuntime[{"Modules", "js"}, data_List] := With[{notebooks},
+AppExtensions`TemplateInjection["AppHead"] = component
 
+injectInRuntime[{"Modules", "js"}, data_List] := With[{notebooks = Values[Notebook`HashMap]},
+    WebUISubmit[ Global`UIHeadInject["js", data ], #["Socket"] ] &/@ notebooks;
 ]
 
 EventHandler[NotebookEditorChannel // EventClone,
     {
         "RequestRuntimeExtensions" -> Function[assoc,
-            With[{result = frontEndRuntime, kernel = assoc["Kernel"], promise = assoc["Promise"]},
+            With[{result = frontEndRuntime, kernel = Kernel`HashMap[assoc["Kernel"] ], promise = assoc["Promise"]},
                  Kernel`Async[kernel, EventFire[promise, Resolve, result] ];
             ]
         ],
 
         "UpdateRuntimeExtensions" -> Function[assoc,
-            With[{promise = assoc["Promise"], data = assoc["Data"], kernel = assoc["Kernel"], key = assoc["Key"]},
+            With[{promise = assoc["Promise"], data = assoc["Data"], kernel = Kernel`HashMap[assoc["Kernel"] ], key = assoc["Key"]},
 
-                    With[{new = Complement[data, frontEndRuntime[key] ] // DeleteDuplicates},
+                    With[{new = Complement[data, frontEndRuntime[key] // DeleteDuplicates ] // DeleteDuplicates},
                         frontEndRuntime[key] = data // DeleteDuplicates;
                         injectInRuntime[key, new];
                     ];
