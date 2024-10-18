@@ -1,4 +1,5 @@
-{<|"label" -> "ToExpression", "type" -> "keyword", 
+{<|"label"->"Drop", "type"->"keyword", "info"->"Drop[list, n] gives list with its first n elements dropped."|>, <|"label"->"NotebookDirectory", "type"->"keyword", "info"->"NotebookDirectory[] returns a path to a directory of the current notebook"|>, <|"label"->"EvaluationCell", "type"->"keyword", "info"->"EvaluationCell[] returns a reference to the current input cell"|>, <|"label"->"SystemOpen", "type"->"keyword", "info"->"SystemOpen[path_String | _File | _URL] opens a path using system call"|>, <|"label" -> "Annotation", "type" -> "keyword", 
+  "info" -> "Annotation[expr, data] annotates arbitary expression with data (invisible on output). Annotation[edge_, key_->value_] annotates edge of a graph"|>, <|"label" -> "Integrate", "type" -> "keyword", "info" -> "Integrate[f[x], x] gives the indefinite integral. Integrate[f[x], {x, min, max}] gives the definite integral..."|>, <|"label" -> "TableForm", "type" -> "keyword", "info" -> "TableForm[expr_List] formats list of lists as table"|>, <|"label" -> "Item", "type" -> "keyword", "info" -> "Use it inside Grid, TableForm to color or stylize font of expression. Accepts the same options as Style[]"|>, <|"label" -> "ToExpression", "type" -> "keyword", 
   "info" -> "gives the expression obtained by interpreting strings as Wolfram \
 Language input"|>, <|"label" -> "MakeBoxes", "type" -> "keyword", 
   "info" -> "MakeBoxes[expr,form] is the low-level function used to convert \
@@ -11850,9 +11851,7 @@ that would be obtained if symbols in it were replaced by "|>,
 of points in a mirror normal to the "|>, <|"label" -> "ReflectionTransform", 
   "type" -> "keyword", "info" -> "ReflectionTransform[v] gives a \
 TransformationFunction that represents a reflection in a mirror throu"|>, 
- <|"label" -> "Refresh", "type" -> "keyword", "info" -> "Refresh[expr, opts] \
-represents an object whose value in a Dynamic should be refreshed at times \
-speci"|>, <|"label" -> "RefreshRate", "type" -> "keyword", 
+ <|"label" -> "Refresh", "type" -> "keyword", "info" -> "Refresh[expr_, interval] creates a dynamic widget, which reevalues expr every interval (in seconds or Quantity[]). Refresh[expr_, ev_EventObject] is updated by external event object ev"|>, <|"label" -> "RefreshRate", "type" -> "keyword", 
   "info" -> "RefreshRate is an option to Animate and related functions which \
 specifies the refresh rate for frame"|>, <|"label" -> "Region", 
   "type" -> "keyword", "info" -> "Region[reg] represents a geometric \

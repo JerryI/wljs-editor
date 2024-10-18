@@ -1,4 +1,6 @@
-BeginPackage["Notebook`DirectorySetter`", {"JerryI`Misc`Events`"}]
+BeginPackage["Notebook`DirectorySetter`", {
+    "JerryI`Misc`Events`"
+}]
 
 Begin["`Private`"]
 

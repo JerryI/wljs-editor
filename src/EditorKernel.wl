@@ -1,12 +1,15 @@
 BeginPackage["Notebook`EditorUtils`", {"JerryI`Misc`Events`", "Notebook`Editor`FrontendObject`"}]
 
+System`EditorView; (*make it available everywhere*)
+System`CellView;
+
+
 FrontEditorSelected::usage = "A frontend function FrontEditorSelected[\"Get\"] gets the selected content. FrontEditorSelected[\"Set\", value] inserts or replaces content"
 EditorView::usage = "A view component for an editor instance EditorView[_String, opts___], where \"Event\" id can be provided for tracking changes. It supports dynamic updates as well."
 
 CellView::usage = "A view component for an input or output cell CellView[_String, opts___], where \"Display\" is provided to choose a rendering view component"
 
 InputEditor::usage = "InputEditor[string_] _EventObject"
-
 
 Begin["`Private`"]
 
@@ -20,6 +23,11 @@ InputEditor[] := InputEditor[""]
 InputEditor[str_] := With[{id = CreateUUID[]},
     EventObject[<|"Id"->id, "Initial"->First[str], "View"->EditorView[str, "Event"->id]|>]
 ]
+
+System`WLXForm;
+
+EditorView /: MakeBoxes[e_EditorView, WLXForm] := With[{o = CreateFrontEndObject[e]}, MakeBoxes[o, WLXForm] ]
+CellView /: MakeBoxes[e_CellView, WLXForm] := With[{o = CreateFrontEndObject[e]}, MakeBoxes[o, WLXForm] ]
 
 EditorView /: MakeBoxes[e_EditorView, StandardForm] := With[{o = CreateFrontEndObject[e]}, MakeBoxes[o, StandardForm] ]
 CellView /: MakeBoxes[e_CellView, StandardForm] := With[{o = CreateFrontEndObject[e]}, MakeBoxes[o, StandardForm] ]

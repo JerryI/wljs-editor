@@ -67,5 +67,54 @@ core['Notebook`Editor`Rasterize`Internal`OverlayView'].Create = async (args, env
     }, 1000);
 }
 
+core.UIHeadInject = async (args, env) => {
+    const type = await interpretate(args[0], env);
+    await core.UIHeadInject[type](args.slice(1), env);
+}
+
+core.UIHeadInject.js = async (args, env) => {
+    const data = await interpretate(args[0], env);
+
+    data.forEach((el) => {
+        const script = document.createElement('script');
+        script.type = "module";
+        script.textContent = el;
+        document.head.appendChild(script);
+    })
+}
+
+core.UIHeadInject.css = async (args, env) => {
+    const data = await interpretate(args[0], env);
+
+    data.forEach((el) => {
+        const style = document.createElement('style');
+        style.textContent = el;
+        document.head.appendChild(style);
+    })
+}
+
+core.SystemOpen = async (args, env) => {
+    const type = await interpretate(args[1], env);
+    await core.SystemOpen[type](args[0], env);
+}
+
+core.SystemOpen.File = async (path, env) => {
+    const p = await interpretate(path, env);
+    window.electronAPI.openPath(p);
+}
+
+core.SystemOpen.Folder = async (path, env) => {
+    const p = await interpretate(path, env);
+    window.electronAPI.openFolder(p);
+}
+
+core.SystemOpen.URL = async (path, env) => {
+    const p = await interpretate(path, env);
+    window.electronAPI.openExternal(p);
+}
+
+
+
+
 
 

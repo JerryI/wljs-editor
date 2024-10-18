@@ -10,6 +10,8 @@ import {
   import { BallancedMatchDecorator2, matchArguments  } from "./matcher";
   
   import { keymap } from "@codemirror/view";
+
+  import { Mma } from "mma-uncompress/src/mma";
    
   import { EditorSelection } from "@codemirror/state";
   
@@ -26,7 +28,8 @@ import {
     ];
   }
   
-  
+  const itemBox = /"(.+)"\(\*VB\[\*\)\(\*\*\)\(\*\,\*\)\(\*\"([\w:\d=]*)/;
+
   
   class EditorWidget {
   
@@ -43,8 +46,13 @@ import {
         if (index % 2 != 0) return arg;
         return {...arg, body: matchArguments(arg.body, /\(\*\|\*\)/gm)}
       });
+
+      if (!Array.isArray(this.args[this.args.length-1].body)) {
+        this.decorator = this.args.pop();
+      }
   
-      //console.log(this.args);
+      //console.warn(this.args);
+      //return;
       //return;
       const args = this.args;
  
@@ -65,77 +73,101 @@ import {
           if (j == cols.length-1 && i == this.args.length-1) text = text.slice(0,-2);
           if (j == cols.length-1 && i != this.args.length-1) text = text.slice(0,-1);
 
-          cols[j].editor = compactCMEditor({
-            doc: text,
-            parent: td,
-            eval: () => {
-              view.viewState.state.config.eval();
-            },
-            update: (upd) => this.applyChanges(upd, i,j),
-            extensions: [
-              keymap.of([
-                { key: "ArrowLeft", run: function (editor, key) {  
-                  if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                    if (j - 2 >= 0) {
-                      cols[j-2].editor.dispatch({selection:{anchor:cols[j-2].editor.state.doc.length}});
-                      cols[j-2].editor.focus();
-                      editor.editorLastCursor = undefined;
-                      return;
-                    } else {
-                      view.dispatch({selection: {anchor: self.visibleValue.pos}});
-                      view.focus();
+          if (text.charAt(0) != '"') {
+            cols[j].editor = compactCMEditor({
+              doc: text,
+              parent: td,
+              eval: () => {
+                view.viewState.state.config.eval();
+              },
+              update: (upd) => this.applyChanges(upd, i,j),
+              extensions: [
+                keymap.of([
+                  { key: "ArrowLeft", run: function (editor, key) {  
+                    if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+                      if (j - 2 >= 0) {
+                        cols[j-2].editor.dispatch({selection:{anchor:cols[j-2].editor.state.doc.length}});
+                        cols[j-2].editor.focus();
+                        editor.editorLastCursor = undefined;
+                        return;
+                      } else {
+                        view.dispatch({selection: {anchor: self.visibleValue.pos}});
+                        view.focus();
 
-                      editor.editorLastCursor = undefined;
-                      return;
-                    }
-  
-                  editor.editorLastCursor = editor.state.selection.ranges[0].to;  
-                } }, 
-                { key: "ArrowRight", run: function (editor, key) {  
-                  if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                    if (j + 2 < cols.length) {
-                      cols[j+2].editor.dispatch({selection:{anchor:0}});
-                      cols[j+2].editor.focus();
-                      editor.editorLastCursor = undefined;
-                      return;
-                    } else {
-                      //view.focus();
-                      view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
-                      view.focus();
+                        editor.editorLastCursor = undefined;
+                        return;
+                      }
+                    
+                    editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+                  } }, 
+                  { key: "ArrowRight", run: function (editor, key) {  
+                    if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+                      if (j + 2 < cols.length) {
+                        cols[j+2].editor.dispatch({selection:{anchor:0}});
+                        cols[j+2].editor.focus();
+                        editor.editorLastCursor = undefined;
+                        return;
+                      } else {
+                        //view.focus();
+                        view.dispatch({selection: {anchor: self.visibleValue.pos + self.visibleValue.length}});
+                        view.focus();
 
-                      editor.editorLastCursor = undefined;
-                      return;
-                    }
-  
-                  editor.editorLastCursor = editor.state.selection.ranges[0].to;  
-                } },             
-                { key: "ArrowUp", run: function (editor, key) {  
-                  //if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                    if (i - 2 >= 0) {
-                      args[i-2].body[j].editor.focus();
-                      editor.editorLastCursor = undefined;
-                      return;
-                    } else {
-                      //view.focus();
-                    }
-  
-                  //editor.editorLastCursor = editor.state.selection.ranges[0].to;  
-                } },             
-                { key: "ArrowDown", run: function (editor, key) {  
-                  //if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
-                    if (i + 2 < args.length) {
-                      args[i+2].body[j].editor.focus();
-                      editor.editorLastCursor = undefined;
-                      return;
-                    } else {
-                      //view.focus();
-                    }
-  
-                  //editor.editorLastCursor = editor.state.selection.ranges[0].to;  
-                } }
-              ])
-            ] 
-          });
+                        editor.editorLastCursor = undefined;
+                        return;
+                      }
+                    
+                    editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+                  } },             
+                  { key: "ArrowUp", run: function (editor, key) {  
+                    //if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+                      if (i - 2 >= 0) {
+                        args[i-2].body[j].editor.focus();
+                        editor.editorLastCursor = undefined;
+                        return;
+                      } else {
+                        //view.focus();
+                      }
+                    
+                    //editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+                  } },             
+                  { key: "ArrowDown", run: function (editor, key) {  
+                    //if (editor?.editorLastCursor === editor.state.selection.ranges[0].to)
+                      if (i + 2 < args.length) {
+                        args[i+2].body[j].editor.focus();
+                        editor.editorLastCursor = undefined;
+                        return;
+                      } else {
+                        //view.focus();
+                      }
+                    
+                    //editor.editorLastCursor = editor.state.selection.ranges[0].to;  
+                  } }
+                ])
+              ] 
+            });
+          } else {
+            cols[j].editor = {
+              destroy: () => {},
+              focus: () => {},
+              dispatch: () => {}
+            };
+
+            const itemDesc = text.match(itemBox);
+
+            if (itemDesc) {
+              td.innerHTML = itemDesc[1];
+
+              const decoded = Mma.DecompressDecode(itemDesc[2]);
+              const json = Mma.toArray(decoded.parts[0]);
+              const cuid = uuidv4();
+              let global = {call: cuid};
+              let env = {global: global, element: td}; //Created in CM6
+              interpretate(json, env);    
+
+            } else {
+              td.innerHTML = text.slice(1,-1);
+            }
+          }
 
 
           //remove unnecesary
@@ -146,7 +178,17 @@ import {
         tbody.appendChild(tr);
       }   
       
-      console.log(this.args);
+      //console.log(this.args);
+
+      if (this.decorator) {
+        //console.log(this.decorator);
+        const decoded = Mma.DecompressDecode(this.decorator.body.slice(2,-2));
+        const json = Mma.toArray(decoded.parts[0]);
+        const cuid = uuidv4();
+        let global = {call: cuid, EditorWidget: self};
+        let env = {global: global, element: tbody}; //Created in CM6
+        this.interpretated = interpretate(json, env);
+      }
   
       
     }

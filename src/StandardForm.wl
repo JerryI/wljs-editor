@@ -5,25 +5,15 @@ RowBoxFlatten[x_List, y___] := StringJoin @@ (ToString[#] & /@ x)
 Begin["Notebook`Editor`StandardForm`"]
 
 System`DatasetWrapper;
-System`AudioWrapper;
 System`VideoWrapper;
 System`ByteArrayWrapper;
-System`QuantityWrapper;
 System`TreeWrapper;
 
-(* Being unable to change Boxes of Graphics, Graphics3D and Image, we have to use this *)
-(* I HATE YOU WOLFRAM!!!!!!!!!!!! *)
+(* Overrride FormatValues*)
 (* FIXME *)
 ExpressionReplacements = {
-    g2d_Graphics :> CreateFrontEndObject[g2d ], 
-    g3d_Graphics3D :> CreateFrontEndObject[g3d ], 
-    i_Image :> CreateFrontEndObject[i ],
-    s_Sound :> CreateFrontEndObject[s ],
-    a_Audio :> AudioWrapper[a],
     b_ByteArray :> ByteArrayWrapper[b],
     d_Dataset :> DatasetWrapper[d],
-    u_Quantity :> QuantityWrapper[u],
-    v_Video :> VideoWrapper[v],
     t_Tree :> TreeWrapper[t],
     TreeForm[expr_] :> (ExpressionTree[Unevaluated[expr] ] /. t_Tree :> TreeWrapper[t])
 } // Quiet

@@ -19,7 +19,7 @@ SuperscriptBox[a_, b_, _] := RowBox[{"(*SpB[*)Power[", a, "(*|*),(*|*)",  b, "](
 SuperscriptBox[a_, "\[Prime]", _] := RowBox[{a, "'"}]
 SuperscriptBox[a_, ",", _] := RowBox[{a, "'"}]
 
-TransposeBox;
+System`TransposeBox;
 Unprotect[Transpose]
 Transpose /: MakeBoxes[t: Transpose[expr_], StandardForm]:= With[{boxes = MakeBoxes[expr, StandardForm]},
   BoxBox[expr, TransposeBox["T"], Head->Transpose]
@@ -31,7 +31,7 @@ ConjugateTranspose /: MakeBoxes[t: ConjugateTranspose[expr_], StandardForm]:= Wi
 ]
 
 Unprotect[Sum]
-SumBox;
+System`SumBox;
 
 
 Sum /: MakeBoxes[Sum[expr_, {x_Symbol, min_, max_}], s: StandardForm] := With[{func = MakeBoxes[expr, s]},
@@ -67,7 +67,7 @@ Derivative /: MakeBoxes[Derivative[single_][f_], s: StandardForm] := With[{},
   RowBox[{MakeBoxes[f, s], StringJoin @@ Table["'", {i, single}]}]
 ]
 
-DerivativeBox;
+System`DerivativeBox;
 
 Derivative /: MakeBoxes[Derivative[multi__][f_], s: StandardForm] := With[{list = List[multi]},
   With[{func = MakeBoxes[f, s], head = "Derivative["<>StringRiffle[ToString/@list, ","]<>"]"},
@@ -78,7 +78,7 @@ Derivative /: MakeBoxes[Derivative[multi__][f_], s: StandardForm] := With[{list 
 ]
 
 Unprotect[Integrate]
-IntegrateBox;
+System`IntegrateBox;
 
 Integrate /: MakeBoxes[Integrate[f_, x_Symbol], s: StandardForm ] := With[{},
     With[{dp = IntegrateBox[1, False], func = MakeBoxes[f, s], symbol = MakeBoxes[x, s]},
@@ -125,15 +125,25 @@ Unprotect[SubscriptBox]
 SubscriptBox[a_, b_] := RowBox[{"(*SbB[*)Subscript[", a, "(*|*),(*|*)",  b, "](*]SbB*)"}]
 SubscriptBox[a_, b_, _] := RowBox[{"(*SbB[*)Subscript[", a, "(*|*),(*|*)",  b, "](*]SbB*)"}]
 
+(* we do support only one option*)
 Unprotect[GridBox]
-GridBox[list_List, a___] := 
+GridBox[list_List, opts___] := With[{sorted = Association[ List[opts] ]},
+If[!KeyExistsQ[sorted, GridBoxDividers],
  RowBox@(Join @@ (Join[{{"(*GB[*){"}}, 
      Riffle[
       (Join[{"{"}, Riffle[#, "(*|*),(*|*)"], {"}"}] & /@ list), 
       If[Length[list] > 1, {{"(*||*),(*||*)"}}, {}] ], {{"}(*]GB*)"}}]))
+,
+With[{val = sorted[GridBoxDividers]},
+ RowBox@(Join @@ (Join[{{"(*GB[*){"}}, 
+     Riffle[
+      (Join[{"{"}, Riffle[#, "(*|*),(*|*)"], {"}"}] & /@ list), 
+      If[Length[list] > 1, {{"(*||*),(*||*)"}}, {}] ], {{StringJoin["}(*||*)(*", Compress[GridBox[GridBoxDividers -> val ] // Hold ], "*)(*]GB*)"]}}]))
+]
+] ]
 
-PiecewiseBox;
-(* I HATE YOU WOLFRAM. WHY DID MAKE IT IMPOSSIBLE TO OVERWRITE MAKEBOXES ON PIECEWISE!!!? *)
+
+System`PiecewiseBox;
 GridBox[{{"\[Piecewise]", whatever_}}, a___] := With[{original = whatever /. {RowBox -> RowBoxFlatten} // ToString // ToExpression},
   With[{
     dp = PiecewiseBox[ Length[original] ]
@@ -243,7 +253,7 @@ Unprotect[StyleBox]
 (* FIXME!!! *)
 (* FIXME!!! *)
 (* FIXME!!! *)
-StyleBox[x_, opts__]  := With[{list = Association[List[opts] ]},
+StyleBox[x_, opts__]  := With[{list = Association[Cases[List[opts], _Rule] ]},
   If[KeyExistsQ[list, ShowStringCharacters], 
     If[!list[ShowStringCharacters],
       RowBox[{"(*BB[*)(", ReplaceAll[x, s_String :> Kernel`Internal`trimStringCharacters[s] ], ")(*,*)(*", ToString[Compress[Hold[StyleBox[opts]]], InputForm], "*)(*]BB*)"}]  
@@ -256,6 +266,7 @@ StyleBox[x_, opts__]  := With[{list = Association[List[opts] ]},
 ]
 
 System`ProvidedOptions;
+System`StringBox;
 
 (*if a string, then remove quotes*)
 Unprotect[Style]
@@ -278,7 +289,20 @@ iHighlight[expr_] := Style[expr, Background->Yellow]
 
 Unprotect[TemplateBox]
 
-TemplateBox[list_List, "RowDefault"] := GridBox[{list}]
+TemplateBox[list_List, "RowDefault", ___] := GridBox[{list}]
+TemplateBox[list_List, "Row", ___] := GridBox[{list}]
+
+TemplateBox[{pts_Integer}, "Spacer"] := ViewBox[Spacer[pts], SpacerBox[pts] ]
+TemplateBox[{pts_Integer}, "Spacer1"] := ViewBox[Spacer[pts], SpacerBox[pts] ]
+TemplateBox[{pts__Integer}, "Spacer2"] := ViewBox[Spacer[pts], SpacerBox[List[pts] ] ]
+
+TemplateBox[list:{expr_, label_}, "Labeled", opts__Rule ] := With[{func = Association[ List[opts] ][DisplayFunction]},
+  func @@ list
+]
+
+Unprotect[ItemBox]
+
+ItemBox[expr_, o: OptionsPattern[] ] := RowBox[{expr, "(*VB[*)(**)(*,*)(*", ToString[Compress[ItemBox[o] // Hold ], InputForm], "*)(*]VB*)"}] ;/ Head[expr] =!= Slot
 
 (* I HATE YOU WOLFRAM !!! *)
 (*TemplateBox[a:{n_, short_String, long_String, units_String}, "Quantity", o___] := Module[{test}, With[{
@@ -290,15 +314,18 @@ TemplateBox[list_List, "RowDefault"] := GridBox[{list}]
   ]
 ] ]*)
 
-System`QuantityWrapper;
-QuantityWrapper /: MakeBoxes[QuantityWrapper[q_Quantity], StandardForm] := With[{
-  n = QuantityMagnitude[q],
-  units = QuantityUnit[q]
+Unprotect[QuantityUnits`QuantityBox]
+ClearAll[QuantityUnits`QuantityBox]
+System`QuantityBox;
+
+QuantityUnits`QuantityBox[QuantityUnits`Private`x_, QuantityUnits`Private`frmt_] := With[{
+  n = QuantityMagnitude[QuantityUnits`Private`x],
+  units = QuantityUnit[QuantityUnits`Private`x]
 },
   ViewBox[q, QuantityBox[n, units] ]
-] 
+]
 
-RootBox;
+System`RootBox;
 TemplateBox[{"Root", m_, raw_, approx_}, opts___] := RowBox[{"(*VB[*)(", approx /. {RowBox->RowBoxFlatten} // ToString, ")(*,*)(*", ToString[Compress[RootBox[approx] ] , InputForm], "*)(*]VB*)"}]
 
 TemplateBox[{number_}, "C"] := RowBox[{ SubscriptBox[C, number]}]
@@ -306,8 +333,21 @@ TemplateBox[{number_}, "C"] := RowBox[{ SubscriptBox[C, number]}]
 TemplateBox[expr_, "Bra"] := With[{dp = ProvidedOptions[BraDecorator, "Head"->"Bra"]}, RowBox[{"(*BB[*)(Bra[", RowBox[Riffle[expr, ","]], "])(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]]
 TemplateBox[expr_, "Ket"] := With[{dp = ProvidedOptions[KetDecorator, "Head"->"Ket"]}, RowBox[{"(*BB[*)(Ket[", RowBox[Riffle[expr, ","]], "])(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]]
 
+TemplateBox[{file_String}, "FileArgument"] := file
+
+System`ConditionalBox;
+
+TemplateBox[{expr_, cond_}, "ConditionalExpression"] := With[{dp = ConditionalBox},
+  RowBox[{"(*TB[*)ConditionalExpression[(*|*)", expr, "(*|*), (*|*)", cond, "(*|*)](*|*)(*", Compress[dp], "*)(*]TB*)"}]
+]
+
+TemplateBox[expr_, "IconizedObject"] := "\"Box is not implemented\""
+
 Unprotect[Ket]
 Unprotect[Bra]
+
+System`KetDecorator;
+System`BraDecorator;
 
 Ket /: MakeBoxes[Ket[list__], StandardForm] := With[{dp = ProvidedOptions[KetDecorator, "Head"->"Ket"]}, RowBox[{"(*BB[*)(Ket[", RowBox[Riffle[List[list], ","]], "])(*,*)(*", ToString[Compress[dp], InputForm], "*)(*]BB*)"}]]
 
@@ -318,6 +358,14 @@ Unprotect[DynamicModuleBox]
 DynamicModuleBox[vars_, body_] := body
 
 TemplateBox[assoc_Association, "RGBColorSwatchTemplate"] := With[{color = assoc["color"]//N},
+   RowBox[{"(*VB[*)(", ToString[assoc["color"], InputForm], ")(*,*)(*", ToString[Compress[Hold[RGBColorSwatchTemplate[color]]], InputForm], "*)(*]VB*)"}]
+]
+
+TemplateBox[assoc_Association, "GrayLevelColorSwatchTemplate"] := With[{color = assoc["color"]//N // RGBColor},
+   RowBox[{"(*VB[*)(", ToString[assoc["color"], InputForm], ")(*,*)(*", ToString[Compress[Hold[RGBColorSwatchTemplate[color]]], InputForm], "*)(*]VB*)"}]
+]
+
+TemplateBox[assoc_Association, "HueColorSwatchTemplate"] := With[{color = assoc["color"]//N // RGBColor},
    RowBox[{"(*VB[*)(", ToString[assoc["color"], InputForm], ")(*,*)(*", ToString[Compress[Hold[RGBColorSwatchTemplate[color]]], InputForm], "*)(*]VB*)"}]
 ]
 
@@ -332,6 +380,9 @@ TemplateBox[expr_List, "SummaryPanel"] := RowBox[expr]
 
 Unprotect[Iconize]
 ClearAll[Iconize]
+
+System`IconizedFile;
+System`Iconized;
 
 Iconize[expr_, opts: OptionsPattern[] ] := With[{UID = OptionValue["UID"]},
   If[ByteCount[expr] > 30000,
@@ -377,6 +428,8 @@ InterpretationBox[placeholder_, expr_, opts___] := With[{data = expr, v = Editor
 ]
 
 Unprotect[Interpretation]
+
+System`InterpretationOptimized;
 
 Interpretation[view_FrontEndExecutable, expr_] := With[{},
   (*Echo["Optimized expression!"];*)
@@ -427,8 +480,12 @@ Legended /: MakeBoxes[Legended[expr_, {Placed[BarLegend[a__], n__]} ], f: Standa
 
 System`WLXForm;
 
+Unprotect[System`DateObjectDump`makeDateObjectBox]
+Unprotect[DateObject]
 
+DateObject /: System`DateObjectDump`makeDateObjectBox[System`DateObjectDump`dObj:DateObject[System`DateObjectDump`date_,___], WLXForm] := With[{res = TextString[System`DateObjectDump`dObj]}, res/;System`DateObjectDump`fname=!=$Failed]
 
+System`DateObjectDump`makeDateObjectBox[System`DateObjectDump`dObj:DateObject[System`DateObjectDump`date_,___], WLXForm] := With[{res = TextString[System`DateObjectDump`dObj]}, res/;System`DateObjectDump`fname=!=$Failed]
 
 (* have to convert to FE, since there is no wljs-editor avalable to interpretate RowBoxes*)
 
@@ -542,6 +599,7 @@ BoxForm`ArrangeSummaryBox[head_, interpretation_, icon_, above_, hidden_, ___, O
                       ]
                       
                     ]},
+  If[ByteCount[interpretation] < 2 8 2500,               
   With[{interpretationString = ToString[interpretation, InputForm]},
     If[StringLength[interpretationString] > 2500,
       Module[{temporalStorage},
@@ -575,6 +633,21 @@ BoxForm`ArrangeSummaryBox[head_, interpretation_, icon_, above_, hidden_, ___, O
         ]
       
     ]
+  ],
+      Module[{temporalStorage},
+        With[{
+          tempSymbol = ToString[temporalStorage, InputForm],
+          viewBox = StringRiffle[{headString, "[(*VB[*) ", "(*,*)(*", ToString[Compress[ProvidedOptions[BoxForm`ArrangedSummaryBox[iconSymbol // FrontEndVirtual, above, hidden], "DataOnKernel"->True ] ], InputForm ], "*)(*]VB*)]"}, ""]
+        },
+          AppendTo[BoxForm`temporal, Hold[temporalStorage] ];
+
+          temporalStorage = interpretation;
+
+          With[{fakeEditor = EditorView[viewBox, "ReadOnly"->True]},
+            RowBox[{"(*VB[*)", tempSymbol, "(*,*)(*", ToString[Compress[fakeEditor], InputForm ], "*)(*]VB*)"}]
+          ]
+        ]
+      ]
   ]
   ]
 ] // Quiet
@@ -590,7 +663,7 @@ Graph /: MakeBoxes[g_Graph, StandardForm] := With[{c = Insert[GraphPlot[g, Image
 
 
 Unprotect[PaneBox]
-PaneBox[expr_, a__] := BoxBox[expr, Offload[PaneBox[a] ] ]
+PaneBox[expr_, a___] := BoxBox[expr, Offload[PaneBox[a] ] ]
 
 Unprotect[Pane]
 Pane /: EventHandler[p_Pane, list_List] := With[{
@@ -635,3 +708,92 @@ MeshRegion /: MakeBoxes[b_MeshRegion, StandardForm] := With[{r = If[RegionDimens
   ]
 ]
 
+
+EventObjectHasView[assoc_Association] := KeyExistsQ[assoc, "View"]
+EventObject /: MakeBoxes[EventObject[a_?EventObjectHasView], StandardForm] := If[StringQ[a["View"] ],
+  (* reuse an existing FE Object to save up resources, if someone copied it *)
+  With[{uid = a["View"]}, 
+    RowBox[{"(*VB[*)(", ToString[EventObject[Join[a, <|"View"->uid|>] ], InputForm], ")(*,*)(*", ToString[Compress[Hold[FrontEndExecutable[uid]]], InputForm], "*)(*]VB*)"}]
+  ]
+,
+  With[{uid = CreateFrontEndObject[a["View"] ] // First}, 
+    RowBox[{"(*VB[*)(", ToString[EventObject[Join[a, <|"View"->uid|>] ], InputForm], ")(*,*)(*", ToString[Compress[Hold[FrontEndExecutable[uid]]], InputForm], "*)(*]VB*)"}]
+  ] 
+]
+
+System`WLXEmbed /: MakeBoxes[w_System`WLXEmbed, StandardForm] := With[{o = CreateFrontEndObject[w]}, MakeBoxes[o, StandardForm] ]
+
+
+
+Unprotect[Row]
+
+Row /: MakeBoxes[Row[expr__, OptionsPattern[] ], WLXForm] := With[{list = List[expr]},
+  With[{Res = Map[MakeBoxes[#, WLXForm]&, list]},
+    StringJoin["<div class=\"flex flex-row\">", StringRiffle[Res, "\n"], "</div>"]
+  ]
+]
+
+Row /: MakeBoxes[Row[expr_List, OptionsPattern[] ], WLXForm] := With[{list = expr},
+  With[{Res = Map[MakeBoxes[#, WLXForm]&, list]},
+    StringJoin["<div class=\"flex flex-row\">", StringRiffle[Res, "\n"], "</div>"]
+  ]
+]
+
+Unprotect[Column]
+
+Column /: MakeBoxes[Column[expr__, OptionsPattern[] ], WLXForm] := With[{list = List[expr]},
+  With[{Res = Map[MakeBoxes[#, WLXForm]&, list]},
+    StringJoin["<div class=\"flex flex-col\">", StringRiffle[Res, "\n"], "</div>"]
+  ]
+]
+
+Column /: MakeBoxes[Column[expr_List, OptionsPattern[] ], WLXForm] := With[{list = expr},
+  With[{Res = Map[MakeBoxes[#, WLXForm]&, list]},
+    StringJoin["<div class=\"flex flex-row\">", StringRiffle[Res, "\n"], "</div>"]
+  ]
+]
+
+Unprotect[Squiggled]
+
+Unprotect[Style]
+
+Style[Style[expr_, a__], b__] := Style[expr, b, a]
+
+Squiggled[expr_, color_:Lighter[Red] ] := Style[expr, Underlined -> color]
+
+Unprotect[GeoGraphics]
+
+GeoGraphics /: MakeBoxes[System`GeoGraphicsDump`g:GeoGraphics[Graphics[System`GeoGraphicsDump`toshow_, System`GeoGraphicsDump`gropts___], System`GeoGraphicsDump`rest___], System`GeoGraphicsDump`fmt_] := With[{},
+  Message["Not implemented in WLJS, we are sorry"];
+  $Failed
+]
+
+General::wljsunsupported = "Symbol `` is not supported in WLJS. We are sorry";
+
+(* unsupported! *)
+With[{ unsupported = {GraphicsRow, WordCloud, GraphicsColumn, GeoGraphics, InputField, GraphicsGrid, GalleryView, FormObject, FormFunction, FormPage, Toggler, Opener, Setter, RadioButton, Control, CheckboxBar, RadioButtonBar, Setter, Checkbox, Button, Toggler, SetterBar, RadioButton, Checkbox, PopupMenu, FileNameSetter, ColorSetter, Trigger, HorizontalGauge, Setter, BulletGauge, AngularGauge, ThermometerGauge, Slider, VerticalSlider, Slider2D, IntervalSlider, Manipulator, HorizontalGauge, Locator, Slider2D, ColorSlider, LocatorPane, SlideView, MenuView, FlipView, PopupView, OpenerView, PaneSelector}},
+  Do[With[{item = i},
+    Unprotect[item];
+    ClearAll[item];
+  ], {i, unsupported}]
+];
+
+
+System`EntityBox;
+Unprotect[Entity];
+
+Entity /: MakeBoxes[EntityFramework`Formatting`Private`x_Entity,
+     EntityFramework`Formatting`Private`fmt_
+    ] :=
+    (Entity;With[{EntityFramework`Formatting`Private`boxes = ViewBox[EntityFramework`Formatting`Private`x, EntityBox[EntityTypeName[EntityFramework`Formatting`Private`x], EntityFramework`Formatting`Private`x//EntityValue //TextString ] ]},
+        
+        EntityFramework`Formatting`Private`boxes/;EntityFramework`Formatting`Private`boxes=!=$Failed
+])
+
+Unprotect[EntityFramework`MakeEntityFrameworkBoxes]
+ClearAll[EntityFramework`MakeEntityFrameworkBoxes]
+EntityFramework`MakeEntityFrameworkBoxes[EntityFramework`Formatting`Private`x_Entity,
+     EntityFramework`Formatting`Private`fmt_] := With[{EntityFramework`Formatting`Private`boxes = ViewBox[EntityFramework`Formatting`Private`x, EntityBox[EntityTypeName[EntityFramework`Formatting`Private`x], EntityFramework`Formatting`Private`x//EntityValue //TextString ]]},
+        
+        EntityFramework`Formatting`Private`boxes
+]
