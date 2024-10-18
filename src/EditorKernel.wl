@@ -11,7 +11,6 @@ CellView::usage = "A view component for an input or output cell CellView[_String
 
 InputEditor::usage = "InputEditor[string_] _EventObject"
 
-
 Begin["`Private`"]
 
 

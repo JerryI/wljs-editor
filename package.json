@@ -38,7 +38,8 @@
       "src/Notifications.wl",
       "src/Autocomplete.wl",
       "src/ContextMenu.wl",
-      "src/FileUpload.wl"
+      "src/FileUpload.wl",
+      "src/FrontendRuntime.wl"
     ],
     "kernel": [
       "src/FrontendObject.wl",
@@ -56,7 +57,8 @@
       "src/MetaMarkersKernel.wl",
       "src/AutocompleteKernel.wl",
       "src/RasterizeKernel.wl",
-      "src/System.wl"
+      "src/System.wl",
+      "src/FrontendRuntimeKernel.wl"
     ],
     "styles": "src/styles.css",
     "priority": -10,
