@@ -89,6 +89,7 @@ core.UIHeadInject.css = async (args, env) => {
     data.forEach((el) => {
         const style = document.createElement('style');
         style.textContent = el;
+        console.log(el);
         document.head.appendChild(style);
     })
 }

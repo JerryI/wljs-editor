@@ -36,6 +36,10 @@ injectInRuntime[{"Modules", "js"}, data_List] := With[{notebooks = Values[Notebo
     WebUISubmit[ Global`UIHeadInject["js", data ], #["Socket"] ] &/@ notebooks;
 ]
 
+injectInRuntime[{"Modules", "css"}, data_List] := With[{notebooks = Values[Notebook`HashMap]},
+    WebUISubmit[ Global`UIHeadInject["css", data ], #["Socket"] ] &/@ notebooks;
+]
+
 EventHandler[NotebookEditorChannel // EventClone,
     {
         "RequestRuntimeExtensions" -> Function[assoc,
