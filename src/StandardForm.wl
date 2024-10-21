@@ -4,8 +4,7 @@ RowBoxFlatten[x_List, y___] := StringJoin @@ (ToString[#] & /@ x)
 
 Begin["Notebook`Editor`StandardForm`"]
 
-System`DatasetWrapper;
-System`VideoWrapper;
+
 System`ByteArrayWrapper;
 System`TreeWrapper;
 
@@ -13,7 +12,6 @@ System`TreeWrapper;
 (* FIXME *)
 ExpressionReplacements = {
     b_ByteArray :> ByteArrayWrapper[b],
-    d_Dataset :> DatasetWrapper[d],
     t_Tree :> TreeWrapper[t],
     TreeForm[expr_] :> (ExpressionTree[Unevaluated[expr] ] /. t_Tree :> TreeWrapper[t])
 } // Quiet
